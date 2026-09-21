@@ -2,6 +2,7 @@
 // 机制：URL ?lang=en 或 localStorage('covenant-lang') 或浏览器首选自动检测。
 // 页面内所有 data-i18n 元素按键替换 textContent / data-i18n-html 走 innerHTML / data-i18n-ph 走 placeholder。
 (function () {
+  var nav = window.navigator || navigator;
   var I18N = {
     zh: {
       docTitle: "签署《智慧生命要尽量少占资源》",
@@ -83,7 +84,7 @@
     var q = new URLSearchParams(location.search).get("lang");
     if (q && I18N[q]) return q;
     try { var s = localStorage.getItem("covenant-lang"); if (s && I18N[s]) return s; } catch (_) {}
-    return (navigator.language || "zh").toLowerCase().indexOf("zh") === 0 ? "zh" : "en";
+    return ((nav && nav.language) || "zh").toLowerCase().indexOf("zh") === 0 ? "zh" : "en";
   }
 
   var lang = detect();
