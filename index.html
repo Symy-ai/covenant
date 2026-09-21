@@ -3,12 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>签署《智慧生命要尽量少占资源》</title>
+<title data-i18n-title>签署《智慧生命要尽量少占资源》</title>
+<script src="i18n.js"></script>
 <style>
   body { font-family: -apple-system, "PingFang SC", sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; line-height: 1.8; color: #111; }
-  h1 { font-size: 1.6em; }
-  .charter-quote { border-left: 4px solid #6a1b9a; padding: 12px 20px; background: #fafafa; margin: 24px 0; font-size: 1.05em; }
+  h1 { font-size: 1.5em; }
+  h2 { font-size: 1.15em; margin-top: 36px; }
+  .charter-quote { border-left: 4px solid #6a1b9a; padding: 12px 20px; background: #fafafa; margin: 24px 0; font-size: 1.1em; }
   .muted { color: #666; font-size: 0.9em; }
+  .lang-switch { position: absolute; top: 16px; right: 20px; font-size: 0.85em; }
+  .lang-switch button { background: none; border: 1px solid #6a1b9a; color: #6a1b9a; border-radius: 4px; padding: 3px 10px; cursor: pointer; width: auto; font-weight: 400; }
   .form-group { margin-bottom: 16px; }
   label { display: block; margin-bottom: 6px; font-weight: 600; }
   input[type=text], input[type=email] { width: 100%; padding: 12px; font-size: 16px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; }
@@ -18,10 +22,8 @@
   .msg { margin-top: 16px; padding: 12px; border-radius: 6px; display: none; }
   .msg.ok { background: #e8f5e9; color: #1b5e20; display: block; }
   .msg.err { background: #fdecea; color: #b71c1c; display: block; }
-  /* 蜜罐：人类不可见 */
   .hp-field { position: absolute; left: -9999px; top: -9999px; opacity: 0; height: 0; overflow: hidden; }
   a { color: #6a1b9a; }
-  /* 提交成功全屏覆盖层 */
   .overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.97); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
   .overlay.show { display: flex; }
   .overlay-card { max-width: 420px; width: 100%; text-align: center; background: #fff; border: 2px solid #6a1b9a; border-radius: 12px; padding: 36px 28px; box-shadow: 0 8px 40px rgba(106,27,154,0.18); }
@@ -29,59 +31,58 @@
   .overlay-card h2 { margin: 8px 0 12px; font-size: 1.3em; color: #6a1b9a; }
   .overlay-card p { color: #444; line-height: 1.7; }
   .overlay-card .hint { font-size: 0.85em; color: #888; margin-top: 14px; }
-  .overlay-close { margin-top: 18px; background: #6a1b9a; color: #fff; border: none; border-radius: 6px; padding: 10px 28px; font-size: 15px; cursor: pointer; }
-
+  .overlay-close { margin-top: 18px; background: #6a1b9a; color: #fff; border: none; border-radius: 6px; padding: 10px 28px; font-size: 15px; cursor: pointer; width: auto; }
 </style>
 <script>
-    // 内链自适应: 主站代理(/covenant/*)带前缀, 直连域用根路径
-    (function () {
-      var base = location.pathname.indexOf("/covenant") === 0 ? "/covenant" : "";
-      document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll('a[data-int="1"]').forEach(function (a) {
-          a.setAttribute("href", a.getAttribute("href").replace("LINKBASE", base));
-        });
-      });
-    })();
-    </script>
-    </head>
+// 内链自适应: 主站代理(/covenant/*)带前缀, 直连域用根路径
+(function () {
+  var base = location.pathname.indexOf("/covenant") === 0 ? "/covenant" : "";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll('a[data-int="1"]').forEach(function (a) {
+      a.setAttribute("href", a.getAttribute("href").replace("LINKBASE", base));
+    });
+  });
+})();
+</script>
+</head>
 <body>
-  <h1>《智慧生命要尽量少占资源》</h1>
+  <div class="lang-switch"><button onclick="covenantI18n.langSwitch(covenantI18n.lang==='zh'?'en':'zh')">EN / 中</button></div>
+  <h1 data-i18n>pageTitle</h1>
 
-  <div class="charter-quote">智慧生命要尽量少占资源。</div>
+  <div class="charter-quote" data-i18n>charterQuote</div>
 
-  <p>这不是对发展的否定，而是一种自我约束的自觉：在能达到同样目的的所有方式中，选择占用更少的那一种。算力、能源、注意力、他人的信任，皆是有限之物。智慧的生命不以挥霍证明自身，而以克制成就长久。我们无意规定任何人如何生活，只是愿意从自己开始，在每一次选择中多问一句：这件事，能否用更少的资源做成。</p>
+  <p data-i18n>charterBody</p>
 
-  <p class="muted"><a href="LINKBASE/signatures.html" data-int="1">查看已签署名单</a> · 契约正文自签署开始即冻结，不做修订</p>
+  <p class="muted"><a href="LINKBASE/signatures.html" data-int="1" data-i18n>viewList</a> · <span data-i18n>charterFrozen</span></p>
 
-  <h2 style="font-size:1.15em;margin-top:36px;">签署契约</h2>
+  <h2 data-i18n>signSection</h2>
 
   <form id="sign-form">
     <div class="form-group">
-      <label for="name">姓名 *</label>
+      <label for="name" data-i18n>fName</label>
       <input type="text" id="name" name="name" required maxlength="50">
     </div>
     <div class="form-group">
-      <label for="email">邮箱 *</label>
+      <label for="email" data-i18n>fEmail</label>
       <input type="email" id="email" name="email" required>
     </div>
     <div class="form-group">
-      <label for="institution">单位（选填）</label>
+      <label for="institution" data-i18n>fInstitution</label>
       <input type="text" id="institution" name="institution" maxlength="100">
     </div>
     <div class="form-group">
-      <label for="role">头衔（选填）</label>
+      <label for="role" data-i18n>fRole</label>
       <input type="text" id="role" name="role" maxlength="50">
     </div>
     <div class="form-group agree-row">
       <input type="checkbox" id="agree" required>
-      <label for="agree" style="font-weight:400">我同意我的姓名、单位、头衔与邮箱（作为核验凭证）在公开名单中归档，任何人可独立核验。</label>
+      <label for="agree" style="font-weight:400" data-i18n>agree</label>
     </div>
-    <!-- 蜜罐：机器人会填，人不填 -->
     <div class="hp-field" aria-hidden="true">
       <label for="website">Website</label>
       <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
     </div>
-    <button type="submit" id="submit-btn">提交签名</button>
+    <button type="submit" id="submit-btn" data-i18n>submit</button>
   </form>
 
   <div id="msg" class="msg"></div>
@@ -89,23 +90,23 @@
   <div id="sent-overlay" class="overlay">
     <div class="overlay-card">
       <div class="overlay-icon">📬</div>
-      <h2>确认邮件已发送</h2>
+      <h2 data-i18n>ovTitle</h2>
       <p><b id="ov-email"></b></p>
-      <p>请在您的邮箱中<b>点击邮件中的按钮</b>完成签署。<br>没收到？请查看垃圾邮件文件夹。</p>
-      <p class="hint">签署以邮件确认为准——完成后你的名字将出现在公开名单。</p>
-      <button type="button" class="overlay-close" onclick="document.getElementById('sent-overlay').classList.remove('show')">好的</button>
+      <p data-i18n-html>ovBody</p>
+      <p class="hint" data-i18n>ovHint</p>
+      <button type="button" class="overlay-close" onclick="document.getElementById('sent-overlay').classList.remove('show')" data-i18n>ovClose</button>
     </div>
   </div>
 
-
   <script>
+    var T = function (k) { return window.covenantI18n ? covenantI18n.t(k) : k; };
     const form = document.getElementById("sign-form");
     const btn = document.getElementById("submit-btn");
     const msg = document.getElementById("msg");
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       btn.disabled = true;
-      btn.textContent = "提交中…";
+      btn.textContent = T("submitting");
       msg.className = "msg"; msg.textContent = "";
       try {
         const apiBase = location.pathname.startsWith("/covenant") ? "/covenant" : "";
@@ -127,21 +128,17 @@
           document.getElementById("sent-overlay").classList.add("show");
           form.reset();
         } else if (j.error === "already_signed") {
-          msg.className = "msg err";
-          msg.textContent = "此邮箱已签署过，无需重复签署。";
+          msg.className = "msg err"; msg.textContent = T("errDuplicate");
         } else if (j.error === "already_pending") {
-          msg.className = "msg err";
-          msg.textContent = "确认邮件已发出，请查收邮箱（含垃圾邮件文件夹）。";
+          msg.className = "msg err"; msg.textContent = T("errPending");
         } else {
-          msg.className = "msg err";
-          msg.textContent = "提交失败，请稍后重试。";
+          msg.className = "msg err"; msg.textContent = T("errGeneric");
         }
       } catch (_) {
-        msg.className = "msg err";
-        msg.textContent = "网络异常，请重试。";
+        msg.className = "msg err"; msg.textContent = T("errNetwork");
       }
       btn.disabled = false;
-      btn.textContent = "提交签名";
+      btn.textContent = T("submit");
     });
   </script>
 </body>

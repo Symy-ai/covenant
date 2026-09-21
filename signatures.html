@@ -3,10 +3,13 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>已签署名单 · 《智慧生命要尽量少占资源》</title>
+<title data-i18n-title>已签署名单 · 《智慧生命要尽量少占资源》</title>
+<script src="i18n.js"></script>
 <style>
   body { font-family: -apple-system, "PingFang SC", sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; line-height: 1.8; color: #111; }
   h1 { font-size: 1.4em; }
+  .lang-switch { position: absolute; top: 16px; right: 20px; font-size: 0.85em; }
+  .lang-switch button { background: none; border: 1px solid #6a1b9a; color: #6a1b9a; border-radius: 4px; padding: 3px 10px; cursor: pointer; width: auto; font-weight: 400; }
   table { width: 100%; border-collapse: collapse; margin-top: 24px; }
   th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #eee; font-size: 0.95em; }
   th { color: #666; font-weight: 600; }
@@ -14,27 +17,36 @@
   .muted { color: #666; font-size: 0.9em; }
   a { color: #6a1b9a; }
 </style>
+<script>
+(function () {
+  var base = location.pathname.indexOf("/covenant") === 0 ? "/covenant" : "";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll('a[data-int="1"]').forEach(function (a) {
+      a.setAttribute("href", a.getAttribute("href").replace("LINKBASE", base));
+    });
+  });
+})();
+</script>
 </head>
 <body>
-  <h1>已签署名单</h1>
-  <p class="muted">名单直接读取公开仓库签名档案，实时生成，任何人可独立核验。<span id="loading">加载中…</span></p>
+  <div class="lang-switch"><button onclick="covenantI18n.langSwitch(covenantI18n.lang==='zh'?'en':'zh')">EN / 中</button></div>
+  <h1 data-i18n>listTitle</h1>
+  <p class="muted"><span data-i18n>listDesc</span> <span id="loading" data-i18n>listLoading</span></p>
   <table>
-    <thead><tr><th>姓名</th><th>单位</th><th>头衔</th><th>签署日期</th></tr></thead>
+    <thead><tr><th data-i18n>thName</th><th data-i18n>thInst</th><th data-i18n>thRole</th><th data-i18n>thDate</th></tr></thead>
     <tbody id="rows"></tbody>
   </table>
-  <p class="muted" style="margin-top:32px">共 <span class="count" id="count">…</span> 位签署者 · <a href="index.html">我要签署</a> · <a href="charter.html">契约全文</a></p>
+  <p class="muted" style="margin-top:32px"><span data-i18n>listCountPre</span> <span class="count" id="count">…</span> <span data-i18n>listCountPost</span> · <a href="LINKBASE/index.html" data-int="1" data-i18n>iSign</a> · <a href="LINKBASE/charter.html" data-int="1" data-i18n>pageTitle</a></p>
 
   <script>
-    // 名单数据源：jsDelivr CDN（无 API 配额限制，全球加速）
-    // 兜底：GitHub API（匿名限流 60/h，仅 CDN 异常时用）
+    var T = function (k) { return window.covenantI18n ? covenantI18n.t(k) : k; };
+    // 双通道: CDN 稳定底座（秒开, 最多滞后12h）+ GitHub API 实时增量（新签名立即可见）
     const REPO = "symy-ai/covenant";
     const CDN = `https://cdn.jsdelivr.net/gh/${REPO}@main/signatures/verified`;
     const CDN_LIST = `https://data.jsdelivr.com/v1/packages/gh/${REPO}@main?structure=flat`;
     const RAW = `https://raw.githubusercontent.com/${REPO}/main/signatures/verified`;
     const LIST_API = `https://api.github.com/repos/${REPO}/contents/signatures/verified?ref=main`;
 
-    // 双通道: CDN 稳定底座（秒开, 最多滞后12h）+ GitHub API 实时增量（新签名立即可见）
-    // 合并按 emailHash 去重, GitHub 版本优先（confirmedAt 更准）
     async function loadRows() {
       const rows = new Map();
       const key = (x) => x.emailHash || x.name + "|" + (x.confirmedAt || "");
@@ -62,11 +74,9 @@
         }));
       }
 
-      // 1) CDN 先行（失败不阻塞）
       try {
         for (const x of await loadCdn()) rows.set(key(x), x);
       } catch (_) { /* CDN 挂了走纯 GitHub */ }
-      // 2) GitHub 实时补充（失败不阻塞——保留 CDN 结果）
       try {
         for (const x of await loadGithub()) rows.set(key(x), x);
       } catch (_) { /* 限流时 CDN 结果仍完整可用 */ }
@@ -84,7 +94,7 @@
         document.getElementById("count").textContent = rows.length;
         document.getElementById("loading").textContent = "";
       } catch (_) {
-        document.getElementById("loading").textContent = "（名单加载失败，请刷新或直接访问公开仓库）";
+        document.getElementById("loading").textContent = T("listLoadFail");
       }
     })();
     function esc(s) {

@@ -3,44 +3,45 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>签署结果</title>
+<title data-i18n-title>签署结果</title>
+<script src="i18n.js"></script>
 <style>
   body { font-family: -apple-system, "PingFang SC", sans-serif; max-width: 560px; margin: 80px auto; padding: 0 20px; text-align: center; line-height: 1.8; color: #111; }
   .icon { font-size: 48px; }
   h1 { font-size: 1.4em; }
+  .muted { color: #666; }
   a { color: #6a1b9a; }
 </style>
 <script>
-    // 内链自适应: 主站代理(/covenant/*)带前缀, 直连域用根路径
-    (function () {
-      var base = location.pathname.indexOf("/covenant") === 0 ? "/covenant" : "";
-      document.addEventListener("DOMContentLoaded", function () {
-        document.querySelectorAll('a[data-int="1"]').forEach(function (a) {
-          a.setAttribute("href", a.getAttribute("href").replace("LINKBASE", base));
-        });
-      });
-    })();
-    </script>
-    </head>
+(function () {
+  var base = location.pathname.indexOf("/covenant") === 0 ? "/covenant" : "";
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll('a[data-int="1"]').forEach(function (a) {
+      a.setAttribute("href", a.getAttribute("href").replace("LINKBASE", base));
+    });
+  });
+})();
+</script>
+</head>
 <body>
   <div class="icon" id="icon"></div>
   <h1 id="title"></h1>
   <p id="desc" class="muted"></p>
-  <p><a href="LINKBASE/index.html" data-int="1">返回</a> · <a href="LINKBASE/signatures.html" data-int="1">查看名单</a></p>
+  <p><a href="LINKBASE/index.html" data-int="1" data-i18n>back</a> · <a href="LINKBASE/signatures.html" data-int="1" data-i18n>viewListShort</a></p>
   <script>
+    var T = function (k) { return window.covenantI18n ? covenantI18n.t(k) : k; };
     const M = {
-      ok:       { icon: "✅", title: "签名已生效", desc: "感谢您签署《智慧生命要尽量少占资源》。您的签名已计入公开名单。" },
-      pending:  { icon: "🕐", title: "已收到，人工核验中", desc: "您的签名正在人工核验（1-3 个工作日），通过后将自动出现在名单中。" },
-      duplicate:{ icon: "☑️", title: "已签署过", desc: "此邮箱已完成签署，无需重复确认。" },
-      expired:  { icon: "⌛", title: "链接已失效", desc: "请重新提交签名表单，我们会再发一封确认邮件。" },
-      invalid:  { icon: "⚠️", title: "链接无效", desc: "确认链接不正确或已失效。请从邮件中重新点击，或重新提交。" },
+      ok:       { icon: "✅", title: "okTitle", desc: "okDesc" },
+      pending:  { icon: "🕐", title: "pendingTitle", desc: "pendingDesc" },
+      duplicate:{ icon: "☑️", title: "dupTitle", desc: "dupDesc" },
+      expired:  { icon: "⌛", title: "expTitle", desc: "expDesc" },
+      invalid:  { icon: "⚠️", title: "invTitle", desc: "invDesc" },
     };
     const s = new URLSearchParams(location.search).get("status") || "invalid";
     const m = M[s] || M.invalid;
     document.getElementById("icon").textContent = m.icon;
-    document.getElementById("title").textContent = m.title;
-    document.getElementById("desc").textContent = m.desc;
-    document.getElementById("desc").className = "muted";
+    document.getElementById("title").textContent = T(m.title);
+    document.getElementById("desc").textContent = T(m.desc);
   </script>
 </body>
 </html>
