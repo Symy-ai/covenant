@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title data-i18n-title>已签署名单 · 《智慧生命要尽量少占资源》</title>
+<title data-i18n-title="docTitle">已签署名单 · 《智慧生命要尽量少占资源》</title>
 <style>
   body { font-family: -apple-system, "PingFang SC", sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; line-height: 1.8; color: #111; }
   h1 { font-size: 1.4em; }
@@ -34,13 +34,13 @@
 </head>
 <body>
   <div class="lang-switch"><button onclick="covenantI18n.langSwitch(covenantI18n.lang==='zh'?'en':'zh')">EN / 中</button></div>
-  <h1 data-i18n>listTitle</h1>
-  <p class="muted"><span data-i18n>listDesc</span> <span id="loading" data-i18n>listLoading</span></p>
+  <h1 data-i18n="listTitle">listTitle</h1>
+  <p class="muted"><span data-i18n="listDesc">listDesc</span> <span id="loading" data-i18n="listLoading">listLoading</span></p>
   <table>
-    <thead><tr><th data-i18n>thName</th><th data-i18n>thInst</th><th data-i18n>thRole</th><th data-i18n>thDate</th></tr></thead>
+    <thead><tr><th data-i18n="thName">thName</th><th data-i18n="thInst">thInst</th><th data-i18n="thRole">thRole</th><th data-i18n="thDate">thDate</th></tr></thead>
     <tbody id="rows"></tbody>
   </table>
-  <p class="muted" style="margin-top:32px"><span data-i18n>listCountPre</span> <span class="count" id="count">…</span> <span data-i18n>listCountPost</span> · <a href="LINKBASE/index.html" data-int="1" data-i18n>iSign</a> · <a href="LINKBASE/charter.html" data-int="1" data-i18n>pageTitle</a></p>
+  <p class="muted" style="margin-top:32px"><span data-i18n="listCountPre">listCountPre</span> <span class="count" id="count">…</span> <span data-i18n="listCountPost">listCountPost</span> · <a href="LINKBASE/index.html" data-int="1" data-i18n="iSign">iSign</a> · <a href="LINKBASE/charter.html" data-int="1" data-i18n="pageTitle">pageTitle</a></p>
 
   <script>
     var T = function (k) { return window.covenantI18n ? covenantI18n.t(k) : k; };

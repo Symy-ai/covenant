@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title data-i18n-title>签署《智慧生命要尽量少占资源》</title>
+<title data-i18n-title="docTitle">签署《智慧生命要尽量少占资源》</title>
 <style>
   body { font-family: -apple-system, "PingFang SC", sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; line-height: 1.8; color: #111; }
   h1 { font-size: 1.5em; }
@@ -51,42 +51,42 @@
 </head>
 <body>
   <div class="lang-switch"><button onclick="covenantI18n.langSwitch(covenantI18n.lang==='zh'?'en':'zh')">EN / 中</button></div>
-  <h1 data-i18n>pageTitle</h1>
+  <h1 data-i18n="pageTitle">pageTitle</h1>
 
-  <div class="charter-quote" data-i18n>charterQuote</div>
+  <div class="charter-quote" data-i18n="charterQuote">charterQuote</div>
 
-  <p data-i18n>charterBody</p>
+  <p data-i18n="charterBody">charterBody</p>
 
-  <p class="muted"><a href="LINKBASE/signatures.html" data-int="1" data-i18n>viewList</a> · <span data-i18n>charterFrozen</span></p>
+  <p class="muted"><a href="LINKBASE/signatures.html" data-int="1" data-i18n="viewList">viewList</a> · <span data-i18n="charterFrozen">charterFrozen</span></p>
 
-  <h2 data-i18n>signSection</h2>
+  <h2 data-i18n="signSection">signSection</h2>
 
   <form id="sign-form">
     <div class="form-group">
-      <label for="name" data-i18n>fName</label>
+      <label for="name" data-i18n="fName">fName</label>
       <input type="text" id="name" name="name" required maxlength="50">
     </div>
     <div class="form-group">
-      <label for="email" data-i18n>fEmail</label>
+      <label for="email" data-i18n="fEmail">fEmail</label>
       <input type="email" id="email" name="email" required>
     </div>
     <div class="form-group">
-      <label for="institution" data-i18n>fInstitution</label>
+      <label for="institution" data-i18n="fInstitution">fInstitution</label>
       <input type="text" id="institution" name="institution" maxlength="100">
     </div>
     <div class="form-group">
-      <label for="role" data-i18n>fRole</label>
+      <label for="role" data-i18n="fRole">fRole</label>
       <input type="text" id="role" name="role" maxlength="50">
     </div>
     <div class="form-group agree-row">
       <input type="checkbox" id="agree" required>
-      <label for="agree" style="font-weight:400" data-i18n>agree</label>
+      <label for="agree" style="font-weight:400" data-i18n="agree">agree</label>
     </div>
     <div class="hp-field" aria-hidden="true">
       <label for="website">Website</label>
       <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
     </div>
-    <button type="submit" id="submit-btn" data-i18n>submit</button>
+    <button type="submit" id="submit-btn" data-i18n="submit">submit</button>
   </form>
 
   <div id="msg" class="msg"></div>
@@ -94,11 +94,11 @@
   <div id="sent-overlay" class="overlay">
     <div class="overlay-card">
       <div class="overlay-icon">📬</div>
-      <h2 data-i18n>ovTitle</h2>
+      <h2 data-i18n="ovTitle">ovTitle</h2>
       <p><b id="ov-email"></b></p>
-      <p data-i18n-html>ovBody</p>
-      <p class="hint" data-i18n>ovHint</p>
-      <button type="button" class="overlay-close" onclick="document.getElementById('sent-overlay').classList.remove('show')" data-i18n>ovClose</button>
+      <p data-i18n-html="ovBody">ovBody</p>
+      <p class="hint" data-i18n="ovHint">ovHint</p>
+      <button type="button" class="overlay-close" onclick="document.getElementById('sent-overlay').classList.remove('show')" data-i18n="ovClose">ovClose</button>
     </div>
   </div>
 
