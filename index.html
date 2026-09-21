@@ -75,7 +75,8 @@
       btn.textContent = "提交中…";
       msg.className = "msg"; msg.textContent = "";
       try {
-        const r = await fetch("/covenant/api/sign", {
+        const apiBase = location.pathname.startsWith("/covenant") ? "/covenant" : "";
+        const r = await fetch(`${apiBase}/api/sign`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
