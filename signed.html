@@ -4,7 +4,6 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title data-i18n-title>签署结果</title>
-<script src="i18n.js"></script>
 <style>
   body { font-family: -apple-system, "PingFang SC", sans-serif; max-width: 560px; margin: 80px auto; padding: 0 20px; text-align: center; line-height: 1.8; color: #111; }
   .icon { font-size: 48px; }
@@ -15,6 +14,11 @@
 <script>
 (function () {
   var base = location.pathname.indexOf("/covenant") === 0 ? "/covenant" : "";
+  (function () {
+    var sc = document.createElement("script");
+    sc.src = base + "/i18n.js";
+    document.head.appendChild(sc);
+  })();
   document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll('a[data-int="1"]').forEach(function (a) {
       a.setAttribute("href", a.getAttribute("href").replace("LINKBASE", base));
