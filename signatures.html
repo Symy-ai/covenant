@@ -44,16 +44,27 @@
 
   <script>
     var T = function (k) { return window.covenantI18n ? covenantI18n.t(k) : k; };
-    // 双通道: CDN 稳定底座（秒开, 最多滞后12h）+ GitHub API 实时增量（新签名立即可见）
+    // 主通道: 同源聚合端点(服务端拉数据, 绕开主站 CSP 对 jsdelivr/github 域名的拦截)
+    // 兜底: 直连域(无 CSP)下若同源 API 网关不可用, 回退 CDN+GitHub 直连双通道
     const REPO = "symy-ai/covenant";
     const CDN = `https://cdn.jsdelivr.net/gh/${REPO}@main/signatures/verified`;
     const CDN_LIST = `https://data.jsdelivr.com/v1/packages/gh/${REPO}@main?structure=flat`;
     const RAW = `https://raw.githubusercontent.com/${REPO}/main/signatures/verified`;
     const LIST_API = `https://api.github.com/repos/${REPO}/contents/signatures/verified?ref=main`;
+    const API_BASE = location.pathname.indexOf("/covenant") === 0 ? "/covenant" : "";
 
     async function loadRows() {
       const rows = new Map();
       const key = (x) => x.emailHash || x.name + "|" + (x.confirmedAt || "");
+
+      // 主通道: 同源聚合
+      try {
+        const r = await fetch(`${API_BASE}/api/list?t=${Date.now()}`);
+        if (!r.ok) throw new Error(r.status);
+        const j = await r.json();
+        for (const x of j.rows) rows.set(key(x), x);
+        if (rows.size) return Array.from(rows.values());
+      } catch (_) { /* 同源 API 不可用 → 走直连兜底 */ }
 
       async function loadCdn() {
         const r = await fetch(`${CDN_LIST}?t=${Date.now()}`);

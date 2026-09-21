@@ -8,7 +8,8 @@ import { DOMAIN_MATCHES, GENERIC_DOMAINS, SENSITIVE_INSTITUTIONS, SENSITIVE_ROLE
 import { logError, track, hashId } from "../lib/monitoring.js";
 
 const SITE = "https://symy.ai/covenant";
-const redirect = (status) => `https://symy.ai/covenant/signed.html?status=${status}`;
+// lang 穿透: 确认邮件按钮带 lang → 重定向 signed.html 继续透传(换设备点链接也保持语言)
+const redirect = (status, lang) => `https://symy.ai/covenant/signed.html?status=${status}&lang=${lang === "en" ? "en" : "zh"}`;
 
 /** 分级核验：auto | manual */
 function classify({ email, institution = "", role = "" }) {
@@ -37,14 +38,14 @@ export default async function handler(req, res) {
 
   const token = req.query.t;
   if (!token || !/^[0-9a-f-]{36}$/.test(token)) {
-    return res.redirect(302, redirect("invalid"));
+    return res.redirect(302, redirect("invalid", req.query.lang));
   }
 
   try {
     // 找 pending 文件（文件名 {emailHash}.{token}.json，令牌在末段——精确匹配）
     const pendings = await ghList("signatures/pending");
     const fileName = pendings.find((f) => f.endsWith(`.${token}.json`));
-    if (!fileName) return res.redirect(302, redirect("expired"));
+    if (!fileName) return res.redirect(302, redirect("expired", req.query.lang));
 
     const rec = await ghGet(`signatures/pending/${fileName}`);
     const data = rec.content;
@@ -56,7 +57,7 @@ export default async function handler(req, res) {
       // 清残留 pending（若有）
       await ghDelete(`signatures/pending/${fileName}`, rec.sha, `cleanup-dup: ${emailHash}`);
       await track(emailHash, "covenant_confirm_duplicate", {});
-      return res.redirect(302, redirect("duplicate"));
+      return res.redirect(302, redirect("duplicate", req.query.lang));
     }
 
     const level = classify(data);
@@ -69,7 +70,7 @@ export default async function handler(req, res) {
       );
       await ghDelete(`signatures/pending/${fileName}`, rec.sha, `confirm: ${emailHash}`);
       await track(emailHash, "covenant_confirm_success", { level: "auto" });
-      return res.redirect(302, redirect("ok"));
+      return res.redirect(302, redirect("ok", req.query.lang));
     }
 
     // manual → pending-review 分支（转人工）
@@ -82,9 +83,9 @@ export default async function handler(req, res) {
       // pending-review 分支可能不存在 → 从 main 建引用（空树提交由 GitHub 拒绝时退化：直接留在 main pending，人工扫表）
     });
     await track(emailHash, "covenant_confirm_success", { level: "manual" });
-    return res.redirect(302, redirect("pending"));
+    return res.redirect(302, redirect("pending", req.query.lang));
   } catch (e) {
     await logError(e, { stage: "confirm" });
-    return res.redirect(302, redirect("invalid"));
+    return res.redirect(302, redirect("invalid", req.query.lang));
   }
 }

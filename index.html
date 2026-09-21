@@ -124,6 +124,7 @@
             email: form.email.value.trim(),
             agree: form.agree.checked,
             website: form.website.value,
+            lang: window.covenantI18n ? covenantI18n.lang : "zh",
           }),
         });
         const j = await r.json().catch(() => ({}));

@@ -34,18 +34,28 @@
   <p><a href="LINKBASE/index.html" data-int="1" data-i18n="back">back</a> · <a href="LINKBASE/signatures.html" data-int="1" data-i18n="viewListShort">viewListShort</a></p>
   <script>
     var T = function (k) { return window.covenantI18n ? covenantI18n.t(k) : k; };
-    const M = {
-      ok:       { icon: "✅", title: "okTitle", desc: "okDesc" },
-      pending:  { icon: "🕐", title: "pendingTitle", desc: "pendingDesc" },
-      duplicate:{ icon: "☑️", title: "dupTitle", desc: "dupDesc" },
-      expired:  { icon: "⌛", title: "expTitle", desc: "expDesc" },
-      invalid:  { icon: "⚠️", title: "invTitle", desc: "invDesc" },
-    };
-    const s = new URLSearchParams(location.search).get("status") || "invalid";
-    const m = M[s] || M.invalid;
-    document.getElementById("icon").textContent = m.icon;
-    document.getElementById("title").textContent = T(m.title);
-    document.getElementById("desc").textContent = T(m.desc);
+    function render() {
+      const M = {
+        ok:       { icon: "✅", title: "okTitle", desc: "okDesc" },
+        pending:  { icon: "🕐", title: "pendingTitle", desc: "pendingDesc" },
+        duplicate:{ icon: "☑️", title: "dupTitle", desc: "dupDesc" },
+        expired:  { icon: "⌛", title: "expTitle", desc: "expDesc" },
+        invalid:  { icon: "⚠️", title: "invTitle", desc: "invDesc" },
+      };
+      const s = new URLSearchParams(location.search).get("status") || "invalid";
+      const m = M[s] || M.invalid;
+      document.getElementById("icon").textContent = m.icon;
+      document.getElementById("title").textContent = T(m.title);
+      document.getElementById("desc").textContent = T(m.desc);
+    }
+    // i18n.js 动态注入完成可能晚于本脚本 → 兼容两时序: 已加载立即渲染, 未加载等它就绪
+    if (window.covenantI18n) render();
+    else {
+      var wait = setInterval(function () {
+        if (window.covenantI18n) { clearInterval(wait); render(); }
+      }, 50);
+      setTimeout(function () { clearInterval(wait); render(); }, 3000); // 3s 兜底(字典缺失时显示中文默认)
+    }
   </script>
 </body>
 </html>

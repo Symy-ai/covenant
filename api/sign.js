@@ -9,23 +9,44 @@ import { logError, track, hashId } from "../lib/monitoring.js";
 const CHARTER_TITLE = "《智慧生命要尽量少占资源》";
 const SITE = "https://symy.ai/covenant";
 
-const MAIL_TEMPLATE = `<!DOCTYPE html>
+// 确认邮件双语（跟随签署页语言: 表单传 lang 参数, 缺省中文）
+const MAIL = {
+  zh: {
+    subject: `请确认您的签名 · ${CHARTER_TITLE}`,
+    greeting: "签名确认",
+    hello: (name) => `您好，${name}：`,
+    body: `您正在签署${CHARTER_TITLE}。请点击下方按钮确认您的签名：`,
+    button: "确认签署",
+    foot: "点击上方按钮即可完成签署，无需其他操作。如非本人操作，请忽略本邮件；如有疑问，可直接回复本邮件联系我们。",
+  },
+  en: {
+    subject: "Please confirm your signature · The Covenant",
+    greeting: "Confirm your signature",
+    hello: (name) => `Hello ${name},`,
+    body: "You are signing the Covenant: Intelligent life shall take fewer resources. Click the button below to confirm your signature:",
+    button: "Confirm signature",
+    foot: "Clicking the button above completes your signature — nothing else to do. If this wasn't you, simply ignore this email; questions? Just reply.",
+  },
+};
+
+function mailFor(lang) {
+  return MAIL[lang] || MAIL.zh;
+}
+
+const mailHtml = (m, name, confirmUrl) => `<!DOCTYPE html>
 <html><head><meta charset="utf-8"></head>
 <body style="font-family:-apple-system,sans-serif;margin:0;padding:20px;background:#f5f5f5;">
   <div style="max-width:560px;margin:0 auto;background:white;border-radius:8px;padding:32px;">
-    <h2 style="margin-top:0;">签名确认</h2>
-    <p>您好，{{NAME}}：</p>
-    <p>您正在签署${CHARTER_TITLE}。请点击下方按钮确认您的签名：</p>
+    <h2 style="margin-top:0;">${m.greeting}</h2>
+    <p>${m.hello(name)}</p>
+    <p>${m.body}</p>
     <div style="text-align:center;margin:32px 0;">
-      <a href="{{CONFIRM_URL}}"
+      <a href="${confirmUrl}"
          style="background:#6a1b9a;color:white;padding:14px 32px;text-decoration:none;border-radius:6px;font-weight:600;display:inline-block;">
-        确认签署
+        ${m.button}
       </a>
     </div>
-    <p style="font-size:13px;color:#666;">
-      点击上方按钮即可完成签署，无需其他操作。
-      如非本人操作，请忽略本邮件；如有疑问，可直接回复本邮件联系我们。
-    </p>
+    <p style="font-size:13px;color:#666;">${m.foot}</p>
   </div>
 </body></html>`;
 
@@ -35,7 +56,7 @@ export default async function handler(req, res) {
   if (req.method === "OPTIONS") return res.status(204).end();
   if (req.method !== "POST") return res.status(405).json({ error: "method_not_allowed" });
 
-  const { name, institution, role, email, agree, website } = req.body || {};
+  const { name, institution, role, email, agree, website, lang } = req.body || {};
 
   // 字段校验
   const errors = [];
@@ -75,11 +96,10 @@ export default async function handler(req, res) {
       `pending: ${name} (${emailHash})`,
     );
 
-    // 发确认邮件
-    const confirmUrl = `${SITE}/api/confirm?t=${token}`;
-    const html = MAIL_TEMPLATE
-      .replaceAll("{{NAME}}", name)
-      .replaceAll("{{CONFIRM_URL}}", confirmUrl);
+    // 发确认邮件（语言跟随签署页）
+    const confirmUrl = `${SITE}/api/confirm?t=${token}&lang=${lang === "en" ? "en" : "zh"}`;
+    const m = mailFor(lang);
+    const html = mailHtml(m, name, confirmUrl);
 
     const mailResp = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -91,7 +111,7 @@ export default async function handler(req, res) {
         from: "Symy <covenant@symy.ai>",
         reply_to: "covenant@symy.ai",
         to: [email],
-        subject: `请确认您的签名 · ${CHARTER_TITLE}`,
+        subject: m.subject,
         html,
       }),
     });
