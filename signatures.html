@@ -25,20 +25,43 @@
   <p class="muted" style="margin-top:32px">共 <span class="count" id="count">…</span> 位签署者 · <a href="index.html">我要签署</a> · <a href="charter.html">契约全文</a></p>
 
   <script>
-    // 直接拉公开仓库 raw 内容（无需认证；签名档案就是公开事实源）
+    // 名单数据源：jsDelivr CDN（无 API 配额限制，全球加速）
+    // 兜底：GitHub API（匿名限流 60/h，仅 CDN 异常时用）
     const REPO = "symy-ai/covenant";
+    const CDN = `https://cdn.jsdelivr.net/gh/${REPO}@main/signatures/verified`;
+    const CDN_LIST = `https://data.jsdelivr.com/v1/packages/gh/${REPO}@main?structure=flat`;
     const RAW = `https://raw.githubusercontent.com/${REPO}/main/signatures/verified`;
     const LIST_API = `https://api.github.com/repos/${REPO}/contents/signatures/verified?ref=main`;
 
-    (async () => {
+    async function loadRows() {
+      // 主通道: jsDelivr
       try {
-        const r = await fetch(`${LIST_API}?t=${Date.now()}`, { headers: { Accept: "application/vnd.github+json" } });
+        const r = await fetch(`${CDN_LIST}?t=${Date.now()}`);
+        if (!r.ok) throw new Error(r.status);
+        const pkg = await r.json();
+        const names = pkg.files
+          .map((f) => f.name.replace('/signatures/verified/', ''))
+          .filter((n) => n.endsWith(".json"));
+        if (!names.length) throw new Error("empty");
+        return await Promise.all(names.map(async (n) => {
+          const j = await (await fetch(`${CDN}/${n}?t=${Date.now()}`)).json();
+          return j;
+        }));
+      } catch (_) {
+        // 兜底: GitHub API
+        const r = await fetch(`${LIST_API}&t=${Date.now()}`, { headers: { Accept: "application/vnd.github+json" } });
         if (!r.ok) throw new Error(r.status);
         const files = (await r.json()).filter((x) => x.type === "file" && x.name.endsWith(".json"));
-        const rows = await Promise.all(files.map(async (f) => {
+        return await Promise.all(files.map(async (f) => {
           const j = await (await fetch(`${RAW}/${f.name}?t=${Date.now()}`)).json();
           return j;
         }));
+      }
+    }
+
+    (async () => {
+      try {
+        const rows = await loadRows();
         rows.sort((a, b) => (b.confirmedAt || "").localeCompare(a.confirmedAt || ""));
         document.getElementById("rows").innerHTML = rows.map((x) => `
           <tr><td>${esc(x.name)}</td><td>${esc(x.institution || "—")}</td><td>${esc(x.role || "")}</td><td>${(x.confirmedAt || "").slice(0, 10)}</td></tr>
