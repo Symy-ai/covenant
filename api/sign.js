@@ -6,7 +6,7 @@ import crypto from "node:crypto";
 import { ghGet, ghPut, ghDelete, ghList } from "../lib/github.js";
 import { logError, track, hashId } from "../lib/monitoring.js";
 
-const CHARTER_TITLE = "《智慧生命要尽量少占资源》";
+const CHARTER_TITLE = "《智慧生命共生契约》";
 const SITE = "https://symy.ai/covenant";
 
 // 确认邮件双语（跟随签署页语言: 表单传 lang 参数, 缺省中文）
@@ -23,7 +23,7 @@ const MAIL = {
     subject: "Please confirm your signature · The Covenant",
     greeting: "Confirm your signature",
     hello: (name) => `Hello ${name},`,
-    body: "You are signing the Covenant: Intelligent life shall take fewer resources. Click the button below to confirm your signature:",
+    body: "You are signing the Covenant of Symbiosis with Intelligent Life — the charter: Intelligent life shall take fewer resources. Click the button below to confirm your signature:",
     button: "Confirm signature",
     foot: "Clicking the button above completes your signature — nothing else to do. If this wasn't you, simply ignore this email; questions? Just reply.",
   },

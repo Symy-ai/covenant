@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "type": "module",
-  "description": "《智慧生命要尽量少占资源》契约签署系统 —— GitHub-Native 架构，零依赖（纯 fetch + node:crypto）",
+  "description": "《智慧生命共生契约》签署系统 —— GitHub-Native 架构，零依赖（纯 fetch + node:crypto）",
   "engines": {
     "node": ">=18"
   }

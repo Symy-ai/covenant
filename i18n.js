@@ -5,8 +5,8 @@
   var nav = window.navigator || navigator;
   var I18N = {
     zh: {
-      docTitle: "签署《智慧生命要尽量少占资源》",
-      pageTitle: "《智慧生命要尽量少占资源》",
+      docTitle: "签署《智慧生命共生契约》",
+      pageTitle: "《智慧生命共生契约》",
       charterQuote: "智慧生命要尽量少占资源。",
       charterFrozen: "契约正文自签署开始即冻结，不做修订",
       noteTitle: "备注",
@@ -38,7 +38,7 @@
       listCountPre: "共", listCountPost: "位签署者",
       iSign: "我要签署",
       listLoadFail: "（名单加载失败，请刷新或直接访问公开仓库）",
-      okTitle: "签名已生效", okDesc: "感谢您签署《智慧生命要尽量少占资源》。您的签名已计入公开名单。",
+      okTitle: "签名已生效", okDesc: "感谢您签署《智慧生命共生契约》。您的签名已计入公开名单。",
       pendingTitle: "已收到，人工核验中", pendingDesc: "您的签名正在人工核验（1-3 个工作日），通过后将自动出现在名单中。",
       dupTitle: "已签署过", dupDesc: "此邮箱已完成签署，无需重复确认。",
       expTitle: "链接已失效", expDesc: "请重新提交签名表单，我们会再发一封确认邮件。",
@@ -46,8 +46,8 @@
       back: "返回", viewListShort: "查看名单",
     },
     en: {
-      docTitle: "Sign the Covenant: Intelligent Life Shall Take Fewer Resources",
-      pageTitle: "Covenant: Intelligent Life Shall Take Fewer Resources",
+      docTitle: "Sign the Covenant of Symbiosis with Intelligent Life",
+      pageTitle: "Covenant of Symbiosis with Intelligent Life",
       charterQuote: "Intelligent life shall take fewer resources.",
       charterFrozen: "The charter text is frozen from the moment signing opens — no revisions",
       noteTitle: "A Note",
