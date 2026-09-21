@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>签署《智慧生命要尽量少占资源》</title>
+<style>
+  body { font-family: -apple-system, "PingFang SC", sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; line-height: 1.8; color: #111; }
+  h1 { font-size: 1.6em; }
+  .charter-quote { border-left: 4px solid #6a1b9a; padding: 12px 20px; background: #fafafa; margin: 24px 0; font-size: 1.05em; }
+  .muted { color: #666; font-size: 0.9em; }
+  .form-group { margin-bottom: 16px; }
+  label { display: block; margin-bottom: 6px; font-weight: 600; }
+  input[type=text], input[type=email] { width: 100%; padding: 12px; font-size: 16px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; }
+  button { background: #6a1b9a; color: #fff; border: none; border-radius: 6px; padding: 14px; width: 100%; font-size: 16px; font-weight: 600; cursor: pointer; }
+  button:disabled { background: #aaa; }
+  .agree-row { display: flex; gap: 8px; align-items: flex-start; font-size: 0.9em; color: #444; }
+  .msg { margin-top: 16px; padding: 12px; border-radius: 6px; display: none; }
+  .msg.ok { background: #e8f5e9; color: #1b5e20; display: block; }
+  .msg.err { background: #fdecea; color: #b71c1c; display: block; }
+  /* 蜜罐：人类不可见 */
+  .hp-field { position: absolute; left: -9999px; top: -9999px; opacity: 0; height: 0; overflow: hidden; }
+  a { color: #6a1b9a; }
+</style>
+</head>
+<body>
+  <h1>签署契约</h1>
+  <div class="charter-quote">智慧生命要尽量少占资源。</div>
+  <p class="muted"><a href="charter.html">阅读契约全文</a> · <a href="signatures.html">查看已签署名单</a></p>
+
+  <form id="sign-form">
+    <div class="form-group">
+      <label for="name">姓名 *</label>
+      <input type="text" id="name" name="name" required maxlength="50">
+    </div>
+    <div class="form-group">
+      <label for="institution">单位 *</label>
+      <input type="text" id="institution" name="institution" required maxlength="100">
+    </div>
+    <div class="form-group">
+      <label for="role">头衔（选填）</label>
+      <input type="text" id="role" name="role" maxlength="50">
+    </div>
+    <div class="form-group">
+      <label for="email">邮箱 *</label>
+      <input type="email" id="email" name="email" required>
+    </div>
+    <div class="form-group agree-row">
+      <input type="checkbox" id="agree" required>
+      <label for="agree" style="font-weight:400">我同意我的姓名、单位、头衔与邮箱（作为核验凭证）在公开名单中归档，任何人可独立核验。</label>
+    </div>
+    <!-- 蜜罐：机器人会填，人不填 -->
+    <div class="hp-field" aria-hidden="true">
+      <label for="website">Website</label>
+      <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+    </div>
+    <button type="submit" id="submit-btn">提交签名</button>
+  </form>
+
+  <div id="msg" class="msg"></div>
+
+  <script>
+    const form = document.getElementById("sign-form");
+    const btn = document.getElementById("submit-btn");
+    const msg = document.getElementById("msg");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      btn.disabled = true;
+      btn.textContent = "提交中…";
+      msg.className = "msg"; msg.textContent = "";
+      try {
+        const r = await fetch("/covenant/api/sign", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: form.name.value.trim(),
+            institution: form.institution.value.trim(),
+            role: form.role.value.trim(),
+            email: form.email.value.trim(),
+            agree: form.agree.checked,
+            website: form.website.value,
+          }),
+        });
+        const j = await r.json().catch(() => ({}));
+        if (r.ok) {
+          msg.className = "msg ok";
+          msg.textContent = "确认邮件已发送。请在方便时点击邮件中的按钮完成签署。";
+          form.reset();
+        } else if (j.error === "already_signed") {
+          msg.className = "msg err";
+          msg.textContent = "此邮箱已签署过，无需重复签署。";
+        } else if (j.error === "already_pending") {
+          msg.className = "msg err";
+          msg.textContent = "确认邮件已发出，请查收邮箱（含垃圾邮件文件夹）。";
+        } else {
+          msg.className = "msg err";
+          msg.textContent = "提交失败，请稍后重试。";
+        }
+      } catch (_) {
+        msg.className = "msg err";
+        msg.textContent = "网络异常，请重试。";
+      }
+      btn.disabled = false;
+      btn.textContent = "提交签名";
+    });
+  </script>
+</body>
+</html>

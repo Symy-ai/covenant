@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>已签署名单 · 《智慧生命要尽量少占资源》</title>
+<style>
+  body { font-family: -apple-system, "PingFang SC", sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; line-height: 1.8; color: #111; }
+  h1 { font-size: 1.4em; }
+  table { width: 100%; border-collapse: collapse; margin-top: 24px; }
+  th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #eee; font-size: 0.95em; }
+  th { color: #666; font-weight: 600; }
+  .count { color: #6a1b9a; font-weight: 600; }
+  .muted { color: #666; font-size: 0.9em; }
+  a { color: #6a1b9a; }
+</style>
+</head>
+<body>
+  <h1>已签署名单</h1>
+  <p class="muted">名单直接读取公开仓库签名档案，实时生成，任何人可独立核验。<span id="loading">加载中…</span></p>
+  <table>
+    <thead><tr><th>姓名</th><th>单位</th><th>头衔</th><th>签署日期</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <p class="muted" style="margin-top:32px">共 <span class="count" id="count">…</span> 位签署者 · <a href="index.html">我要签署</a> · <a href="charter.html">契约全文</a></p>
+
+  <script>
+    // 直接拉公开仓库 raw 内容（无需认证；签名档案就是公开事实源）
+    const REPO = "symy-ai/covenant";
+    const RAW = `https://raw.githubusercontent.com/${REPO}/main/signatures/verified`;
+    const LIST_API = `https://api.github.com/repos/${REPO}/contents/signatures/verified?ref=main`;
+
+    (async () => {
+      try {
+        const r = await fetch(`${LIST_API}?t=${Date.now()}`, { headers: { Accept: "application/vnd.github+json" } });
+        if (!r.ok) throw new Error(r.status);
+        const files = (await r.json()).filter((x) => x.type === "file" && x.name.endsWith(".json"));
+        const rows = await Promise.all(files.map(async (f) => {
+          const j = await (await fetch(`${RAW}/${f.name}?t=${Date.now()}`)).json();
+          return j;
+        }));
+        rows.sort((a, b) => (b.confirmedAt || "").localeCompare(a.confirmedAt || ""));
+        document.getElementById("rows").innerHTML = rows.map((x) => `
+          <tr><td>${esc(x.name)}</td><td>${esc(x.institution)}</td><td>${esc(x.role || "")}</td><td>${(x.confirmedAt || "").slice(0, 10)}</td></tr>
+        `).join("");
+        document.getElementById("count").textContent = rows.length;
+        document.getElementById("loading").textContent = "";
+      } catch (_) {
+        document.getElementById("loading").textContent = "（名单加载失败，请刷新或直接访问公开仓库）";
+      }
+    })();
+    function esc(s) {
+      return String(s || "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+    }
+  </script>
+</body>
+</html>
