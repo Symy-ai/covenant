@@ -40,7 +40,7 @@ export default async function handler(req, res) {
   // 字段校验
   const errors = [];
   if (!name || name.length < 2 || name.length > 50) errors.push("name");
-  if (!institution || institution.length > 100) errors.push("institution");
+  if (institution && institution.length > 100) errors.push("institution");
   if (role && role.length > 50) errors.push("role");
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push("email");
   if (!agree || agree !== true) errors.push("agree");

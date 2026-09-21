@@ -11,7 +11,7 @@ const SITE = "https://symy.ai/covenant";
 const redirect = (status) => `https://symy.ai/covenant/signed.html?status=${status}`;
 
 /** 分级核验：auto | manual */
-function classify({ email, institution, role }) {
+function classify({ email, institution = "", role = "" }) {
   const domain = email.split("@")[1] || "";
 
   // A 机构邮箱域名匹配申报单位 → 自动

@@ -41,7 +41,7 @@
         }));
         rows.sort((a, b) => (b.confirmedAt || "").localeCompare(a.confirmedAt || ""));
         document.getElementById("rows").innerHTML = rows.map((x) => `
-          <tr><td>${esc(x.name)}</td><td>${esc(x.institution)}</td><td>${esc(x.role || "")}</td><td>${(x.confirmedAt || "").slice(0, 10)}</td></tr>
+          <tr><td>${esc(x.name)}</td><td>${esc(x.institution || "—")}</td><td>${esc(x.role || "")}</td><td>${(x.confirmedAt || "").slice(0, 10)}</td></tr>
         `).join("");
         document.getElementById("count").textContent = rows.length;
         document.getElementById("loading").textContent = "";
