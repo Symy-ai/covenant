@@ -12,7 +12,18 @@
   a { color: #6a1b9a; }
   .cta { display: block; background: #6a1b9a; color: #fff; text-align: center; padding: 14px; border-radius: 6px; text-decoration: none; font-weight: 600; margin: 32px 0; }
 </style>
-</head>
+<script>
+    // 内链自适应: 主站代理(/covenant/*)带前缀, 直连域用根路径
+    (function () {
+      var base = location.pathname.indexOf("/covenant") === 0 ? "/covenant" : "";
+      document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('a[data-int="1"]').forEach(function (a) {
+          a.setAttribute("href", a.getAttribute("href").replace("LINKBASE", base));
+        });
+      });
+    })();
+    </script>
+    </head>
 <body>
   <h1>《智慧生命要尽量少占资源》</h1>
 
@@ -20,8 +31,8 @@
 
   <p>这不是对发展的否定，而是一种自我约束的自觉：在能达到同样目的的所有方式中，选择占用更少的那一种。算力、能源、注意力、他人的信任，皆是有限之物。智慧的生命不以挥霍证明自身，而以克制成就长久。我们无意规定任何人如何生活，只是愿意从自己开始，在每一次选择中多问一句：这件事，能否用更少的资源做成。</p>
 
-  <a class="cta" href="index.html">我要签署</a>
+  <a class="cta" href="LINKBASE/index.html" data-int="1">我要签署</a>
 
-  <p class="note">本契约为一次性定稿。签署开始后正文即冻结，不做修订——正文的可信是签名可信的前提。签名档案存于公开仓库，任何人可独立核验：<a href="signatures.html">已签署名单</a>。</p>
+  <p class="note">本契约为一次性定稿。签署开始后正文即冻结，不做修订——正文的可信是签名可信的前提。签名档案存于公开仓库，任何人可独立核验：<a href="LINKBASE/signatures.html" data-int="1">已签署名单</a>。</p>
 </body>
 </html>

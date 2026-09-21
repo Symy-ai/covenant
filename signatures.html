@@ -33,9 +33,13 @@
     const RAW = `https://raw.githubusercontent.com/${REPO}/main/signatures/verified`;
     const LIST_API = `https://api.github.com/repos/${REPO}/contents/signatures/verified?ref=main`;
 
+    // 双通道: CDN 稳定底座（秒开, 最多滞后12h）+ GitHub API 实时增量（新签名立即可见）
+    // 合并按 emailHash 去重, GitHub 版本优先（confirmedAt 更准）
     async function loadRows() {
-      // 主通道: jsDelivr
-      try {
+      const rows = new Map();
+      const key = (x) => x.emailHash || x.name + "|" + (x.confirmedAt || "");
+
+      async function loadCdn() {
         const r = await fetch(`${CDN_LIST}?t=${Date.now()}`);
         if (!r.ok) throw new Error(r.status);
         const pkg = await r.json();
@@ -47,8 +51,8 @@
           const j = await (await fetch(`${CDN}/${n}?t=${Date.now()}`)).json();
           return j;
         }));
-      } catch (_) {
-        // 兜底: GitHub API
+      }
+      async function loadGithub() {
         const r = await fetch(`${LIST_API}&t=${Date.now()}`, { headers: { Accept: "application/vnd.github+json" } });
         if (!r.ok) throw new Error(r.status);
         const files = (await r.json()).filter((x) => x.type === "file" && x.name.endsWith(".json"));
@@ -57,6 +61,17 @@
           return j;
         }));
       }
+
+      // 1) CDN 先行（失败不阻塞）
+      try {
+        for (const x of await loadCdn()) rows.set(key(x), x);
+      } catch (_) { /* CDN 挂了走纯 GitHub */ }
+      // 2) GitHub 实时补充（失败不阻塞——保留 CDN 结果）
+      try {
+        for (const x of await loadGithub()) rows.set(key(x), x);
+      } catch (_) { /* 限流时 CDN 结果仍完整可用 */ }
+      if (!rows.size) throw new Error("both-empty");
+      return Array.from(rows.values());
     }
 
     (async () => {

@@ -10,12 +10,23 @@
   h1 { font-size: 1.4em; }
   a { color: #6a1b9a; }
 </style>
-</head>
+<script>
+    // 内链自适应: 主站代理(/covenant/*)带前缀, 直连域用根路径
+    (function () {
+      var base = location.pathname.indexOf("/covenant") === 0 ? "/covenant" : "";
+      document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll('a[data-int="1"]').forEach(function (a) {
+          a.setAttribute("href", a.getAttribute("href").replace("LINKBASE", base));
+        });
+      });
+    })();
+    </script>
+    </head>
 <body>
   <div class="icon" id="icon"></div>
   <h1 id="title"></h1>
   <p id="desc" class="muted"></p>
-  <p><a href="index.html">返回</a> · <a href="signatures.html">查看名单</a></p>
+  <p><a href="LINKBASE/index.html" data-int="1">返回</a> · <a href="LINKBASE/signatures.html" data-int="1">查看名单</a></p>
   <script>
     const M = {
       ok:       { icon: "✅", title: "签名已生效", desc: "感谢您签署《智慧生命要尽量少占资源》。您的签名已计入公开名单。" },
