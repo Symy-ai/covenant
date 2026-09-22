@@ -2,6 +2,8 @@
 
 独立开源的公开契约签名系统。**零数据库**（GitHub 仓库即事实源）、零 npm 依赖、全免费托管。
 
+> 系统设计文档（面向程序员）：[doc/design.md](doc/design.md)
+
 - 契约全文：`charter/charter.md`（一次性定稿，签署开始后冻结）
 - 签名档案：`signatures/verified/`（公开可核验）
 - 架构：Vercel Serverless + GitHub Contents API + Resend 邮件
