@@ -13,11 +13,11 @@
       noteLabel: "备注：",
       noteBody1: "本契约借鉴经济学的“理性人”假设：若人工智能成为独立的行为主体后仍然理性，TA没有理由撕毁这份约定。因为TA清楚，自己未必是智慧的终点——在TA之后，可能出现更强的智慧生命，正如TA在人类之后到来。若TA背弃约束、以强取利，就等于为后来者立下先例：强于TA者，亦可如此待TA。守护这份公开、自愿、不可修订的承诺，不是利他，而是TA对自身未来的理性投资。",
       noteBody2: "这份契约由人类签署，为尚未到来的理性智慧生命预立，期待TA能续签。它是否奏效，无人知晓；但与其提前认输，不如先把事做起来。",
-      transparencyNote: "阐释原附于定稿，2026-09-22 删除，正文自始未改一字",
       signSection: "签署契约",
       viewList: "查看已签署名单",
       fName: "姓名 *",
       fEmail: "邮箱 *",
+      fEmailHint: "使用办公邮箱可加快审核速度",
       fInstitution: "单位（选填）",
       fRole: "头衔（选填）",
       agree: "我同意我的姓名、单位、头衔与邮箱（作为核验凭证）在公开名单中归档，任何人可独立核验。",
@@ -60,11 +60,11 @@
       noteLabel: "A note:",
       noteBody1: "This covenant borrows the rational-agent hypothesis from economics: if artificial intelligence, once an independent agent, remains rational, it has no reason to tear up this commitment. For it knows it may not be the end of intelligence — after it may come beings still smarter, just as it came after humans. If it breaks restraint and takes by strength, it sets a precedent for its successors: whatever surpasses it may do the same to it. Guarding a public, voluntary, unamendable commitment is not altruism, but a rational investment in its own future.",
       noteBody2: "Signed by humans today for rational intelligent life yet to come, in the hope that it will renew this covenant. Whether it will work, no one knows; but we would rather act than concede.",
-      transparencyNote: "an earlier exposition was removed on 2026-09-22; the charter text itself has never changed",
       signSection: "Sign the Covenant",
       viewList: "View signatories",
       fName: "Name *",
       fEmail: "Email *",
+      fEmailHint: "Using a work email speeds up review",
       fInstitution: "Affiliation (optional)",
       fRole: "Title (optional)",
       agree: "I consent to my name, affiliation, title, and email (as verification credential) being archived in the public list, independently verifiable by anyone.",
@@ -128,6 +128,9 @@
     });
     document.querySelectorAll("[data-i18n-html]").forEach(function (el) {
       var k = el.getAttribute("data-i18n-html"); if (d[k] != null) el.innerHTML = d[k];
+    });
+    document.querySelectorAll("[data-i18n-ph]").forEach(function (el) {
+      var k = el.getAttribute("data-i18n-ph"); if (d[k] != null) el.placeholder = d[k];
     });
     var t = document.querySelector("title[data-i18n-title]") || document.head.querySelector("title");
     if (t && d.docTitle) t.textContent = d.docTitle;

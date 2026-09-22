@@ -5,38 +5,42 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title data-i18n-title="docTitle">签署《智慧生命共生契约》</title>
 <style>
-  body { font-family: -apple-system, "PingFang SC", sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; line-height: 1.8; color: #111; }
+  body { font-family: -apple-system, "PingFang SC", sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; line-height: 1.8; color: #0c2017; }
   h1 { font-size: 1.5em; }
   h2 { font-size: 1.15em; margin-top: 36px; }
-  .charter-quote { border-left: 4px solid #6a1b9a; padding: 12px 20px; background: #fafafa; margin: 24px 0; font-size: 1.1em; }
-  .muted { color: #666; font-size: 0.9em; }
-  .note { color: #666; font-size: 0.9em; border-top: 1px solid #eee; padding-top: 16px; margin-top: 40px; }
-  .note-body { color: #666; font-size: 0.9em; line-height: 1.9; }
+  .charter-quote { border-left: 4px solid #00bb7f; padding: 12px 20px; background: #eff8f2; margin: 24px 0; font-size: 1.1em; }
+  .muted { color: #5f7568; font-size: 0.9em; }
+  .note { color: #5f7568; font-size: 0.9em; border-top: 1px solid #d0fae5; padding-top: 16px; margin-top: 40px; }
+  .note-body { color: #5f7568; font-size: 0.9em; line-height: 1.9; }
   .lang-switch { position: absolute; top: 16px; right: 20px; font-size: 0.85em; }
-  .lang-switch button { background: none; border: 1px solid #6a1b9a; color: #6a1b9a; border-radius: 4px; padding: 3px 10px; cursor: pointer; width: auto; font-weight: 400; }
+  .lang-switch button { background: none; border: 1px solid #009767; color: #009767; border-radius: 4px; padding: 3px 10px; cursor: pointer; width: auto; font-weight: 400; }
   .gh-link { position: absolute; top: 20px; right: 115px; display: inline-flex; align-items: center; }
-  .gh-link svg { fill: #6a1b9a; opacity: 0.75; transition: opacity .15s; }
+  .gh-link svg { fill: #009767; opacity: 0.75; transition: opacity .15s; }
   .gh-link:hover svg { opacity: 1; }
-  .form-group { margin-bottom: 16px; }
-  label { display: block; margin-bottom: 6px; font-weight: 600; }
-  input[type=text], input[type=email] { width: 100%; padding: 12px; font-size: 16px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 6px; }
-  button { background: #6a1b9a; color: #fff; border: none; border-radius: 6px; padding: 14px; width: 100%; font-size: 16px; font-weight: 600; cursor: pointer; }
-  button:disabled { background: #aaa; }
+  .form-group { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  label { flex: 0 0 6.5em; font-weight: 600; white-space: nowrap; }
+  input[type=text], input[type=email] { flex: 1; min-width: 0; padding: 10px; font-size: 16px; box-sizing: border-box; border: 1px solid #b6cbbe; border-radius: 6px; }
+  input[type=text]:focus, input[type=email]:focus { border-color: #00bb7f; outline: none; box-shadow: 0 0 0 3px rgba(0, 187, 127, 0.15); }
+  button { background: #143527; color: #fff; border: none; border-radius: 6px; padding: 14px; width: 100%; font-size: 16px; font-weight: 600; cursor: pointer; }
+  button:hover:not(:disabled) { background: #0c2017; }
+  button:disabled { background: #9ba99f; }
   .agree-row { display: flex; gap: 8px; align-items: flex-start; font-size: 0.9em; color: #444; }
-  .agree-row input[type=checkbox] { margin: 6px 0 0; flex-shrink: 0; }
+  .agree-row label { flex: 1; min-width: 0; white-space: normal; }
+  .agree-row input[type=checkbox] { margin: 6px 0 0; flex-shrink: 0; accent-color: #00bb7f; }
   .msg { margin-top: 16px; padding: 12px; border-radius: 6px; display: none; }
   .msg.ok { background: #e8f5e9; color: #1b5e20; display: block; }
   .msg.err { background: #fdecea; color: #b71c1c; display: block; }
   .hp-field { position: absolute; left: -9999px; top: -9999px; opacity: 0; height: 0; overflow: hidden; }
-  a { color: #6a1b9a; }
+  a { color: #009767; }
+  a:hover { color: #007956; }
   .overlay { position: fixed; inset: 0; background: rgba(255,255,255,0.97); z-index: 1000; display: none; align-items: center; justify-content: center; padding: 20px; }
   .overlay.show { display: flex; }
-  .overlay-card { max-width: 420px; width: 100%; text-align: center; background: #fff; border: 2px solid #6a1b9a; border-radius: 12px; padding: 36px 28px; box-shadow: 0 8px 40px rgba(106,27,154,0.18); }
+  .overlay-card { max-width: 420px; width: 100%; text-align: center; background: #fff; border: 2px solid #00bb7f; border-radius: 12px; padding: 36px 28px; box-shadow: 0 8px 40px rgba(0, 187, 127, 0.18); }
   .overlay-icon { font-size: 52px; margin-bottom: 8px; }
-  .overlay-card h2 { margin: 8px 0 12px; font-size: 1.3em; color: #6a1b9a; }
+  .overlay-card h2 { margin: 8px 0 12px; font-size: 1.3em; color: #143527; }
   .overlay-card p { color: #444; line-height: 1.7; }
   .overlay-card .hint { font-size: 0.85em; color: #888; margin-top: 14px; }
-  .overlay-close { margin-top: 18px; background: #6a1b9a; color: #fff; border: none; border-radius: 6px; padding: 10px 28px; font-size: 15px; cursor: pointer; width: auto; }
+  .overlay-close { margin-top: 18px; background: #143527; color: #fff; border: none; border-radius: 6px; padding: 10px 28px; font-size: 15px; cursor: pointer; width: auto; }
 </style>
 <script>
 // 内链自适应: 主站代理(/covenant/*)带前缀, 直连域用根路径
@@ -75,7 +79,7 @@
     </div>
     <div class="form-group">
       <label for="email" data-i18n="fEmail">fEmail</label>
-      <input type="email" id="email" name="email" required>
+      <input type="email" id="email" name="email" required placeholder="使用办公邮箱可加快审核速度" data-i18n-ph="fEmailHint">
     </div>
     <div class="form-group">
       <label for="institution" data-i18n="fInstitution">fInstitution</label>
