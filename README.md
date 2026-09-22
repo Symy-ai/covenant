@@ -62,3 +62,7 @@ pending-review 分支的 `signatures/pending/` 即审核队列：核对邮箱域
 - 机构邮箱域名匹配申报单位 → 自动放行
 - 通用邮箱 + 无敏感头衔/机构 → 自动放行
 - 其余（冒名高发组合）→ 人工审核 1-3 工作日
+
+## 开源协议
+
+[The Unlicense](LICENSE) —— 公共领域奉献（public domain dedication）。复制、修改、商用、闭源 fork 全部自由，无需署名。比 MIT 更宽松：连保留版权声明的要求都没有。

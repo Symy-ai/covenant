@@ -136,5 +136,6 @@ api/              sign（提交）/ confirm（确认分级）/ list（名单聚�
 lib/              GitHub API 封装 / 观测层
 charter/          契约正文的 markdown 源
 review-config.js  分级核验业务配置
-doc/              本文档
+doc/              设计文档
+LICENSE           The Unlicense（公共领域）
 ```

@@ -4,6 +4,7 @@
   "private": true,
   "type": "module",
   "description": "《智慧生命共生契约》签署系统 —— GitHub-Native 架构，零依赖（纯 fetch + node:crypto）",
+  "license": "Unlicense",
   "engines": {
     "node": ">=18"
   }
