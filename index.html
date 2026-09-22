@@ -105,17 +105,44 @@
 
   <div id="sent-overlay" class="overlay">
     <div class="overlay-card">
-      <div class="overlay-icon">📬</div>
-      <h2 data-i18n="ovTitle">ovTitle</h2>
-      <p><b id="ov-email"></b></p>
-      <p data-i18n-html="ovBody">ovBody</p>
-      <p class="hint" data-i18n="ovHint">ovHint</p>
+      <div class="overlay-icon" id="ov-icon">📬</div>
+      <h2 id="ov-title" data-i18n="ovTitle">ovTitle</h2>
+      <p id="ov-pending-email" style="display:none"><b id="ov-email"></b></p>
+      <p id="ov-body" data-i18n-html="ovBody">ovBody</p>
+      <p class="hint" id="ov-hint" data-i18n="ovHint">ovHint</p>
       <button type="button" class="overlay-close" onclick="document.getElementById('sent-overlay').classList.remove('show')" data-i18n="ovClose">ovClose</button>
     </div>
   </div>
 
   <script>
-    var T = function (k) { return window.covenantI18n ? covenantI18n.t(k) : k; };
+    const T = function (k) { return window.covenantI18n ? covenantI18n.t(k) : k; };
+    // 弹出确认对话框（成功发信/已签过/待确认 三态复用同一卡片）
+    function showDialog(mode) {
+      const overlay = document.getElementById("sent-overlay");
+      const icon = document.getElementById("ov-icon");
+      const title = document.getElementById("ov-title");
+      const emailRow = document.getElementById("ov-pending-email");
+      const body = document.getElementById("ov-body");
+      const hint = document.getElementById("ov-hint");
+      const closeBtn = overlay.querySelector(".overlay-close");
+      if (mode === "pending" || mode === "duplicate") {
+        icon.textContent = mode === "pending" ? "📬" : "✅";
+        title.textContent = T(mode === "pending" ? "ovPendingTitle" : "ovDupTitle");
+        emailRow.style.display = "none";
+        body.innerHTML = T(mode === "pending" ? "ovPendingBody" : "ovDupBody");
+        hint.textContent = T(mode === "pending" ? "ovPendingHint" : "ovDupHint");
+        closeBtn.textContent = T("ovClose");
+      } else {
+        icon.textContent = "📬";
+        title.textContent = T("ovTitle");
+        emailRow.style.display = "block";
+        document.getElementById("ov-email").textContent = form.email.value.trim();
+        body.innerHTML = T("ovBody");
+        hint.textContent = T("ovHint");
+        closeBtn.textContent = T("ovClose");
+      }
+      overlay.classList.add("show");
+    }
     const form = document.getElementById("sign-form");
     const btn = document.getElementById("submit-btn");
     const msg = document.getElementById("msg");
@@ -141,13 +168,12 @@
         });
         const j = await r.json().catch(() => ({}));
         if (r.ok) {
-          document.getElementById("ov-email").textContent = form.email.value.trim();
-          document.getElementById("sent-overlay").classList.add("show");
+          showDialog("sent");
           form.reset();
         } else if (j.error === "already_signed") {
-          msg.className = "msg err"; msg.textContent = T("errDuplicate");
+          showDialog("duplicate");
         } else if (j.error === "already_pending") {
-          msg.className = "msg err"; msg.textContent = T("errPending");
+          showDialog("pending");
         } else {
           msg.className = "msg err"; msg.textContent = T("errGeneric");
         }
