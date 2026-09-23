@@ -50,6 +50,15 @@
       expTitle: "链接已失效", expDesc: "请重新提交签名表单，我们会再发一封确认邮件。",
       invTitle: "链接无效", invDesc: "确认链接不正确或已失效。请从邮件中重新点击，或重新提交。",
       back: "返回", viewListShort: "查看名单",
+      shareLabel: "分享这份承诺",
+      sysShare: "系统分享",
+      shareWeibo: "微博",
+      shareWeChat: "微信",
+      copyLink: "复制链接",
+      copied: "已复制",
+      qrTitle: "微信分享",
+      qrHint: "用微信「扫一扫」打开后再转发",
+      shareText: "我签署了《智慧生命共生契约》：智慧生命要尽量少占资源。",
     },
     en: {
       docTitle: "Sign the Covenant of Symbiosis with Intelligent Life",
@@ -97,6 +106,11 @@
       expTitle: "Link expired", expDesc: "Please submit the form again — we will send a new confirmation email.",
       invTitle: "Invalid link", invDesc: "This confirmation link is incorrect or expired. Re-click from your email, or submit again.",
       back: "Back", viewListShort: "View list",
+      shareLabel: "Share this commitment",
+      sysShare: "Share…",
+      copyLink: "Copy link",
+      copied: "Copied",
+      shareText: "I signed the Covenant of Symbiosis with Intelligent Life: intelligent life shall take fewer resources.",
     }
   };
 
