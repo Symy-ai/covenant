@@ -11,13 +11,10 @@
   .muted { color: #5f7568; }
   a { color: #009767; }
   a:hover { color: #007956; }
-  .share-btn { display: inline-block; margin-top: 10px; padding: 6px 16px; border: 1px solid #009767; border-radius: 20px; cursor: pointer; color: #009767; text-decoration: none; font-size: 0.9em; }
-  .share-btn:hover { background: #009767; color: white; }
   .share-label { margin-top: 28px; font-size: .9em; color: #5f7568; }
   .share-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 10px 0 0; }
   .share-pill { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border: 1px solid #d8e5de; border-radius: 20px; background: #fff; color: #0c2017; font-size: .88em; cursor: pointer; text-decoration: none; transition: all .15s; }
   .share-pill:hover { border-color: #009767; color: #009767; }
-  .share-pill img { width: 16px; height: 16px; display: block; }
   .qr-overlay { position: fixed; inset: 0; background: rgba(12,32,23,.55); display: flex; align-items: center; justify-content: center; z-index: 99; }
   .qr-card { background: #fff; border-radius: 14px; padding: 24px 28px; text-align: center; max-width: 86vw; }
   .qr-card h3 { margin: 0 0 4px; font-size: 1em; }
@@ -28,22 +25,17 @@
   .qr-table td.on { background: #0c2017; }
 </style>
 <script>
+var base = location.pathname.indexOf("/covenant") === 0 ? "/covenant" : "";
 (function () {
-  var base = location.pathname.indexOf("/covenant") === 0 ? "/covenant" : "";
-  (function () {
-    var sc = document.createElement("script");
-    sc.src = base + "/i18n.js";
-    document.head.appendChild(sc);
-    var qrsc = document.createElement("script");
-    qrsc.src = base + "/lib/qrcode.js";
-    document.head.appendChild(qrsc);
-  })();
-  document.addEventListener("DOMContentLoaded", function () {
-    document.querySelectorAll('a[data-int="1"]').forEach(function (a) {
-      a.setAttribute("href", a.getAttribute("href").replace("LINKBASE", base));
-    });
-  });
+  var sc = document.createElement("script");
+  sc.src = base + "/i18n.js";
+  document.head.appendChild(sc);
 })();
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll('a[data-int="1"]').forEach(function (a) {
+    a.setAttribute("href", a.getAttribute("href").replace("LINKBASE", base));
+  });
+});
 </script>
 </head>
 <body>
@@ -109,27 +101,35 @@
       });
       const qrPill = () => pill(T("shareWeChat"), null, function (e) {
         e.preventDefault();
-        if (typeof qrcode !== "function") return;
-        const ov = document.createElement("div");
-        ov.className = "qr-overlay";
-        const card = document.createElement("div");
-        card.className = "qr-card";
-        const h = document.createElement("h3"); h.textContent = T("qrTitle");
-        const hint = document.createElement("p"); hint.className = "hint"; hint.textContent = T("qrHint");
-        const tb = document.createElement("table"); tb.className = "qr-table";
-        const qr = qrcode(0, "M"); qr.addData(CANONICAL); qr.make();
-        for (let r = 0; r < qr.getModuleCount(); r++) {
-          const tr = tb.insertRow(-1);
-          for (let c = 0; c < qr.getModuleCount(); c++) {
-            const td = tr.insertCell(-1);
-            if (qr.isDark(r, c)) td.className = "on";
+        const showQr = function () {
+          if (typeof qrcode !== "function") return;
+          const ov = document.createElement("div");
+          ov.className = "qr-overlay";
+          const card = document.createElement("div");
+          card.className = "qr-card";
+          const h = document.createElement("h3"); h.textContent = T("qrTitle");
+          const hint = document.createElement("p"); hint.className = "hint"; hint.textContent = T("qrHint");
+          const tb = document.createElement("table"); tb.className = "qr-table";
+          const qr = qrcode(0, "M"); qr.addData(CANONICAL); qr.make();
+          for (let r = 0; r < qr.getModuleCount(); r++) {
+            const tr = tb.insertRow(-1);
+            for (let c = 0; c < qr.getModuleCount(); c++) {
+              const td = tr.insertCell(-1);
+              if (qr.isDark(r, c)) td.className = "on";
+            }
           }
-        }
-        const btn = document.createElement("button"); btn.className = "qr-close"; btn.textContent = "×";
-        btn.onclick = function () { ov.remove(); };
-        ov.onclick = function (ev) { if (ev.target === ov) ov.remove(); };
-        card.appendChild(h); card.appendChild(hint); card.appendChild(tb); card.appendChild(btn);
-        ov.appendChild(card); document.body.appendChild(ov);
+          const btn = document.createElement("button"); btn.className = "qr-close"; btn.textContent = "×";
+          btn.onclick = function () { ov.remove(); };
+          ov.onclick = function (ev) { if (ev.target === ov) ov.remove(); };
+          card.appendChild(h); card.appendChild(hint); card.appendChild(tb); card.appendChild(btn);
+          ov.appendChild(card); document.body.appendChild(ov);
+        };
+        if (typeof qrcode === "function") { showQr(); return; }
+        const sc = document.createElement("script");
+        sc.src = base + "/lib/qrcode.js";
+        sc.onload = showQr;
+        sc.onerror = function () {};
+        document.head.appendChild(sc);
       });
       if (lang === "zh") {
         pill(T("shareWeibo"), "https://service.weibo.com/share/share.php?url=" + u + "&title=" + t);
