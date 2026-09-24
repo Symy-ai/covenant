@@ -23,6 +23,8 @@
   .form-group input.invalid { border-color: #b71c1c; }
   .form-group input.invalid:focus { border-color: #b71c1c; box-shadow: 0 0 0 3px rgba(183, 28, 28, 0.12); }
   label { flex: 0 0 6.5em; font-weight: 600; white-space: nowrap; }
+  .req { color: #c62828; font-style: normal; }
+  label .opt { color: #8a9a90; font-weight: 400; font-size: 0.85em; }
   input[type=text], input[type=email] { flex: 1; min-width: 0; padding: 10px; font-size: 16px; box-sizing: border-box; border: 1px solid #b6cbbe; border-radius: 6px; }
   input[type=text]:focus, input[type=email]:focus { border-color: #00bb7f; outline: none; box-shadow: 0 0 0 3px rgba(0, 187, 127, 0.15); }
   button { background: #143527; color: #fff; border: none; border-radius: 6px; padding: 14px; width: 100%; font-size: 16px; font-weight: 600; cursor: pointer; }
@@ -79,21 +81,21 @@
 
   <form id="sign-form">
     <div class="form-group">
-      <label for="name" data-i18n="fName">fName</label>
+      <label for="name" data-i18n-html="fName">fName</label>
       <input type="text" id="name" name="name" required maxlength="50" data-validate="name">
       <p class="field-err" data-err="name"></p>
     </div>
     <div class="form-group">
-      <label for="email" data-i18n="fEmail">fEmail</label>
+      <label for="email" data-i18n-html="fEmail">fEmail</label>
       <input type="email" id="email" name="email" required placeholder="使用办公邮箱可加快审核速度" data-i18n-ph="fEmailHint" data-validate="email">
       <p class="field-err" data-err="email"></p>
     </div>
     <div class="form-group">
-      <label for="institution" data-i18n="fInstitution">fInstitution</label>
+      <label for="institution" data-i18n-html="fInstitution">fInstitution</label>
       <input type="text" id="institution" name="institution" maxlength="100">
     </div>
     <div class="form-group">
-      <label for="role" data-i18n="fRole">fRole</label>
+      <label for="role" data-i18n-html="fRole">fRole</label>
       <input type="text" id="role" name="role" maxlength="50">
     </div>
     <div class="form-group agree-row">
