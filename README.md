@@ -21,6 +21,10 @@ fine-grained PAT：Repository access 仅勾 covenant；Permissions 仅 **Content
 
 ### 3. Resend 发件
 resend.com → Domains → 添加 `symy.ai` → 按 Cloudflare 指引加 TXT（SPF/DKIM）。
+补充（2026-09-24）：根域 SPF 与 DMARC 缺失会导致 QQ 邮箱等显示"由 send.symy.ai 代发"。需在 Cloudflare 加齐三条：
+- `symy.ai` TXT `v=spf1 include:amazonses.com ~all`（根域 SPF）
+- `_dmarc.symy.ai` TXT `v=DMARC1; p=none; rua=mailto:covenant@symy.ai`（DMARC，过 SPF/DKIM 对齐后客户端不再显示代发）
+- `resend._domainkey.symy.ai` TXT（DKIM 公钥，Resend 提供）
 
 ### 4. Cloudflare 收件
 symy.ai → Email Routing → Enable → `covenant@symy.ai` → Forward 到值班人员邮箱。
