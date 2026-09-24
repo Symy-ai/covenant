@@ -35,7 +35,8 @@ export default async function handler(req, res) {
 
     const rec = await ghGet(`signatures/pending/${fileName}`);
     const data = rec.content;
-    const emailHash = hashId(data.email);
+    // 隐私：pending 不存明文邮箱，哈希由 sign 阶段算好随文件携带
+    const emailHash = data.emailHash || hashId(data.email);
 
     // 幂等：已 verified → 直接提示已签署
     const already = await ghGet(`signatures/verified/${emailHash}.json`);

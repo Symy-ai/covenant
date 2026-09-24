@@ -62,6 +62,22 @@ async rewrites() {
 ## 人工审核（每周 ~15 分钟）
 pending-review 分支的 `signatures/pending/` 即审核队列：核对邮箱域名/单位官网/头衔公开信息 → 合格则把文件（改名为 `{emailHash}.json`）PUT 到 main 的 verified/（走 PR）；不合格删文件并在 `REVOKED.md` 记录。
 
+### 人工审核：邮箱核验 SOP（2026-09-24 起）
+
+隐私设计：公开仓不存明文邮箱，pending/审核文件只有 `emailHash`（sha256 截 16 hex）。
+邮箱归属核验走 Resend 发件记录：
+
+1. 审核文件含 `reviewQueuedAt`（转人工时间）与 `emailHash`
+2. 登录 Resend Dashboard → Emails → 按时间窗（`reviewQueuedAt` 往前 1 小时内）过滤 `请确认您的签名` 主题
+3. 双重锁定：对候选收件邮箱计算 `sha256(小写邮箱).hex 截 16 位`，与文件中 `emailHash` 一致即为目标（防拿错邻近提交）
+4. 核验"邮箱域名 ↔ 申报单位/头衔"是否相称 → 合格转 verified，不合格删除 + REVOKED.md
+5. 注意：Resend 发件记录保留约 30 天；超期未审的提交按无法核验处理（不通过），不保留明文回查通道
+
+### 隐私声明（历史数据说明）
+
+2026-09-24 前的测试期 pending 文件（git 历史中已删除的提交）含明文邮箱字段。
+均为主办方内部测试数据，发现问题后已修复（公开仓不再落明文）；历史提交按"测试过程记录"保留，不做历史重写。
+
 ## 核验分级（review-config.js，改配置即生效）
 - 机构邮箱域名匹配申报单位 → 自动放行
 - 通用邮箱 + 无敏感头衔/机构 → 自动放行
