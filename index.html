@@ -6,9 +6,11 @@
 <title data-i18n-title="docTitle">签署《智慧生命共生契约》</title>
 <style>
   body { font-family: -apple-system, "PingFang SC", sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; line-height: 1.8; color: #0c2017; }
-  h1 { font-size: 1.5em; }
+  h1 { font-size: 1.5em; text-align: center; }
   h2 { font-size: 1.15em; margin-top: 36px; }
-  .charter-quote { border-left: 4px solid #00bb7f; padding: 12px 20px; background: #eff8f2; margin: 24px 0; font-size: 1.1em; }
+  .charter-card { border: 1px solid #bfe8d2; background: #f2fbf6; border-radius: 10px; padding: 30px 22px; margin: 26px 0; }
+  .charter-section-title { text-align: center; font-size: 0.85em; letter-spacing: 0.35em; color: #5f7568; margin: 0 0 12px; }
+  blockquote.charter-quote { border: none; margin: 0; padding: 0; background: none; text-align: center; font-size: 1.4em; font-weight: 600; }
   .muted { color: #5f7568; font-size: 0.9em; }
   .note { color: #5f7568; font-size: 0.9em; border-top: 1px solid #d0fae5; padding-top: 16px; margin-top: 40px; }
   .note-body { color: #5f7568; font-size: 0.9em; line-height: 1.9; }
@@ -76,8 +78,10 @@
   <div class="lang-switch"><button onclick="covenantI18n.langSwitch(covenantI18n.lang==='zh'?'en':'zh')">EN / 中</button></div>
   <h1 data-i18n="pageTitle">pageTitle</h1>
 
-  <blockquote class="charter-quote" cite="charter.html" data-i18n="charterQuote">charterQuote</blockquote>
-
+  <div class="charter-card">
+    <p class="charter-section-title" data-i18n="charterSectionTitle">charterSectionTitle</p>
+    <blockquote class="charter-quote" cite="charter.html" data-i18n="charterQuote">charterQuote</blockquote>
+  </div>
   <h2 data-i18n="signSection">signSection</h2>
 
   <form id="sign-form">
