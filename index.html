@@ -21,6 +21,7 @@
   .gh-link:hover svg { opacity: 1; }
   .form-group { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
   .field-err { flex-basis: 100%; display: none; color: #b71c1c; font-size: 0.85em; margin: 4px 0 0 calc(6.5em + 12px); }
+  .email-privacy { color: #8a9a90; font-size: 0.85em; margin: -6px 0 14px calc(6.5em + 12px); }
   .field-err.show { display: block; }
   .form-group input.invalid { border-color: #b71c1c; }
   .form-group input.invalid:focus { border-color: #b71c1c; box-shadow: 0 0 0 3px rgba(183, 28, 28, 0.12); }
@@ -95,6 +96,7 @@
       <input type="email" id="email" name="email" required placeholder="使用办公邮箱可加快审核速度" data-i18n-ph="fEmailHint" data-validate="email">
       <p class="field-err" data-err="email"></p>
     </div>
+    <p class="email-privacy" data-i18n="emailPrivacy">emailPrivacy</p>
     <div class="form-group">
       <label for="institution" data-i18n-html="fInstitution">fInstitution</label>
       <input type="text" id="institution" name="institution" maxlength="100">
