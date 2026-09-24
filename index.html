@@ -14,6 +14,13 @@
   .muted { color: #5f7568; font-size: 0.9em; }
   .note { color: #5f7568; font-size: 0.9em; border-top: 1px solid #d0fae5; padding-top: 16px; margin-top: 40px; }
   .note-body { color: #5f7568; font-size: 0.9em; line-height: 1.9; }
+  .faq { margin-top: 48px; }
+  .faq h2 { font-size: 1.15em; margin-bottom: 12px; }
+  .faq details { border-bottom: 1px solid #e3efe8; padding: 10px 0; }
+  .faq details:first-of-type { border-top: 1px solid #e3efe8; }
+  .faq summary { cursor: pointer; font-weight: 600; font-size: 0.95em; line-height: 1.7; }
+  .faq summary:hover { color: #009767; }
+  .faq details p { color: #5f7568; font-size: 0.9em; line-height: 1.9; margin: 10px 0 4px; }
   .lang-switch { position: absolute; top: 16px; right: 20px; font-size: 0.85em; }
   .lang-switch button { background: none; border: 1px solid #009767; color: #009767; border-radius: 4px; padding: 3px 10px; cursor: pointer; width: auto; font-weight: 400; }
   .gh-link { position: absolute; top: 20px; right: 115px; display: inline-flex; align-items: center; }
@@ -123,6 +130,34 @@
     <p class="note-body"><b data-i18n="noteLabel">noteLabel</b> <span data-i18n="noteBody1">noteBody1</span></p>
     <p class="note-body"><span data-i18n="noteBody2">noteBody2</span></p>
   </div>
+
+  <section class="faq">
+    <h2 data-i18n="faqTitle">faqTitle</h2>
+    <details>
+      <summary data-i18n="faqQ1">faqQ1</summary>
+      <p data-i18n="faqA1">faqA1</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ2">faqQ2</summary>
+      <p data-i18n="faqA2">faqA2</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ3">faqQ3</summary>
+      <p data-i18n="faqA3">faqA3</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ4">faqQ4</summary>
+      <p data-i18n="faqA4">faqA4</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ5">faqQ5</summary>
+      <p data-i18n="faqA5">faqA5</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ6">faqQ6</summary>
+      <p data-i18n="faqA6">faqA6</p>
+    </details>
+  </section>
 
   <div id="sent-overlay" class="overlay">
     <div class="overlay-card">
