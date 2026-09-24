@@ -23,7 +23,15 @@ export default async function handler(req, res) {
     // 找 pending 文件（文件名 {emailHash}.{token}.json，令牌在末段——精确匹配）
     const pendings = await ghList("signatures/pending");
     const fileName = pendings.find((f) => f.endsWith(`.${token}.json`));
-    if (!fileName) return res.redirect(302, redirect("expired", req.query.lang));
+    if (!fileName) {
+      // 无 pending：查令牌墓碑——已确认过的链接重复打开，按确认结果回显，不误报失效
+      const tomb = await ghGet(`signatures/tokens/${token}.json`);
+      if (tomb) {
+        await track(tomb.content.emailHash, "covenant_confirm_reopen", { result: tomb.content.result });
+        return res.redirect(302, redirect(tomb.content.result === "auto" ? "ok" : "pending", req.query.lang));
+      }
+      return res.redirect(302, redirect("expired", req.query.lang));
+    }
 
     const rec = await ghGet(`signatures/pending/${fileName}`);
     const data = rec.content;
@@ -46,6 +54,8 @@ export default async function handler(req, res) {
         { name: data.name, institution: data.institution, role: data.role, emailHash, confirmedAt: new Date().toISOString() },
         `verified: ${data.name} (${emailHash})`,
       );
+      // 令牌墓碑：重复打开已确认链接时回显结果，不再误报"链接已失效"
+      await ghPut(`signatures/tokens/${token}.json`, { emailHash, result: "auto", confirmedAt: new Date().toISOString() }, `token-tombstone: ${emailHash}`);
       await ghDelete(`signatures/pending/${fileName}`, rec.sha, `confirm: ${emailHash}`);
       await track(emailHash, "covenant_confirm_success", { level: "auto" });
       return res.redirect(302, redirect("ok", req.query.lang));
@@ -60,6 +70,8 @@ export default async function handler(req, res) {
     ).catch(async () => {
       // pending-review 分支可能不存在 → 从 main 建引用（空树提交由 GitHub 拒绝时退化：直接留在 main pending，人工扫表）
     });
+    // 令牌墓碑（manual 同样需要：人工通过后用户重开链接应看到待核验而非失效）
+    await ghPut(`signatures/tokens/${token}.json`, { emailHash, result: "manual", confirmedAt: new Date().toISOString() }, `token-tombstone: ${emailHash}`);
     await track(emailHash, "covenant_confirm_success", { level: "manual" });
     return res.redirect(302, redirect("pending", req.query.lang));
   } catch (e) {

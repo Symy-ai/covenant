@@ -59,7 +59,18 @@ document.addEventListener("DOMContentLoaded", function () {
       document.getElementById("icon").textContent = m.icon;
       document.getElementById("title").textContent = T(m.title);
       document.getElementById("desc").textContent = T(m.desc);
-      if (s === "ok") buildShare();
+      // 签名已生效（含重复打开已确认链接）：名单入口高亮为按钮，并展示分享区
+      if (s === "ok") {
+        buildShare();
+        const viewBtn = document.createElement("p");
+        viewBtn.style.marginTop = "18px";
+        const a = document.createElement("a");
+        a.href = base + "/signatures.html";
+        a.textContent = T("okViewList");
+        a.style.cssText = "display:inline-block;border:1px solid #009767;border-radius:6px;padding:10px 26px;color:#009767;text-decoration:none;font-weight:600;";
+        viewBtn.appendChild(a);
+        document.getElementById("desc").after(viewBtn);
+      }
     }
     var shareBuilt = false;
     function buildShare() {
