@@ -68,8 +68,8 @@ pending-review 分支的 `signatures/pending/` 即审核队列：核对邮箱域
 邮箱归属核验走 Resend 发件记录：
 
 1. 审核文件含 `reviewQueuedAt`（转人工时间）与 `emailHash`
-2. 登录 Resend Dashboard → Emails → 按时间窗（`reviewQueuedAt` 往前 1 小时内）过滤 `请确认您的签名` 主题
-3. 双重锁定：对候选收件邮箱计算 `sha256(小写邮箱).hex 截 16 位`，与文件中 `emailHash` 一致即为目标（防拿错邻近提交）
+2. 登录 Resend Dashboard → Emails → 搜索框直接粘贴 `emailHash`（如 `2721d36b339643a2`）——2026-09-24 起确认邮件正文带 `ref: {emailHash}` 灰字 + `X-Covenant-Hash` 邮件头，可精确检索
+3. 老邮件（无 ref 标记）：按收件人域名过滤（如 `@qq.com`）+ `reviewQueuedAt` 前 1 小时时间窗 → 候选中比对 `sha256(小写邮箱).hex 截 16 位` == 文件 `emailHash`
 4. 核验"邮箱域名 ↔ 申报单位/头衔"是否相称 → 合格转 verified，不合格删除 + REVOKED.md
 5. 注意：Resend 发件记录保留约 30 天；超期未审的提交按无法核验处理（不通过），不保留明文回查通道
 

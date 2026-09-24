@@ -33,7 +33,7 @@ function mailFor(lang) {
   return MAIL[lang] || MAIL.zh;
 }
 
-const mailHtml = (m, name, confirmUrl) => `<!DOCTYPE html>
+const mailHtml = (m, name, confirmUrl, emailHash) => `<!DOCTYPE html>
 <html><head><meta charset="utf-8"></head>
 <body style="font-family:-apple-system,sans-serif;margin:0;padding:20px;background:#f5f5f5;">
   <div style="max-width:560px;margin:0 auto;background:white;border-radius:8px;padding:32px;">
@@ -47,6 +47,8 @@ const mailHtml = (m, name, confirmUrl) => `<!DOCTYPE html>
       </a>
     </div>
     <p style="font-size:13px;color:#666;">${m.foot}</p>
+    <!-- covenant-emailhash:${emailHash} 审核检索锚点：Resend 后台按此串搜索本邮件 -->
+    <p style="font-size:11px;color:#ccc;margin:16px 0 0;">ref: ${emailHash}</p>
   </div>
 </body></html>`;
 
@@ -101,7 +103,7 @@ export default async function handler(req, res) {
     // 发确认邮件（语言跟随签署页）
     const confirmUrl = `${SITE}/api/confirm?t=${token}&lang=${lang === "en" ? "en" : "zh"}`;
     const m = mailFor(lang);
-    const html = mailHtml(m, name, confirmUrl);
+    const html = mailHtml(m, name, confirmUrl, emailHash);
 
     const mailResp = await fetch("https://api.resend.com/emails", {
       method: "POST",
@@ -115,6 +117,8 @@ export default async function handler(req, res) {
         to: [email],
         subject: m.subject,
         html,
+        // 自定义头：Resend 后台详情页可见，供人工审核检索
+        headers: { "X-Covenant-Hash": emailHash },
       }),
     });
 
