@@ -4,34 +4,12 @@
 // 人工队列：写 pending-review 分支（保留 pending 原文件）
 // ============================================================
 import { ghGet, ghPut, ghDelete, ghList } from "../lib/github.js";
-import { DOMAIN_MATCHES, GENERIC_DOMAINS, SENSITIVE_INSTITUTIONS, SENSITIVE_ROLES } from "../review-config.js";
+import { classify } from "./classify.js";
 import { logError, track, hashId } from "../lib/monitoring.js";
 
 const SITE = "https://symy.ai/covenant";
 // lang 穿透: 确认邮件按钮带 lang → 重定向 signed.html 继续透传(换设备点链接也保持语言)
 const redirect = (status, lang) => `https://symy.ai/covenant/signed.html?status=${status}&lang=${lang === "en" ? "en" : "zh"}`;
-
-/** 分级核验：auto | manual */
-function classify({ email, institution = "", role = "" }) {
-  const domain = email.split("@")[1] || "";
-
-  // A 机构邮箱域名匹配申报单位 → 自动
-  for (const [dom, keywords] of Object.entries(DOMAIN_MATCHES)) {
-    if (domain === dom || domain.endsWith(`.${dom}`)) {
-      if (keywords.some((k) => institution.includes(k))) return "auto";
-    }
-  }
-
-  // B 通用邮箱 + 无敏感头衔 + 无敏感机构 → 自动
-  if (GENERIC_DOMAINS.includes(domain)) {
-    const institutionSensitive = SENSITIVE_INSTITUTIONS.some((k) => institution.includes(k));
-    const roleSensitive = role && SENSITIVE_ROLES.some((k) => role.toLowerCase().includes(k.toLowerCase()));
-    if (!institutionSensitive && !roleSensitive) return "auto";
-  }
-
-  // C 其余 → 人工
-  return "manual";
-}
 
 export default async function handler(req, res) {
   if (req.method !== "GET") return res.status(405).json({ error: "method_not_allowed" });
