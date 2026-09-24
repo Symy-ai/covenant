@@ -89,11 +89,12 @@ export default async function handler(req, res) {
     }
 
     // 生成令牌并写 pending/{emailHash}.{token}.json（文件名带哈希便于查重）
-    // 隐私：公开仓不落明文邮箱——只存 emailHash；邮箱本身仅在发确认邮件时使用
+    // 隐私：公开仓不落明文邮箱——只存 emailHash + emailDomain（分级规则需要域名；域名非个人标识符）
     const token = crypto.randomUUID();
+    const emailDomain = emailKey.slice(emailKey.lastIndexOf("@") + 1);
     await ghPut(
       `signatures/pending/${emailHash}.${token}.json`,
-      { name, institution, role: role || "", emailHash, token, createdAt: new Date().toISOString() },
+      { name, institution, role: role || "", emailHash, emailDomain, token, createdAt: new Date().toISOString() },
       `pending: ${name} (${emailHash})`,
     );
 

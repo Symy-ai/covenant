@@ -37,6 +37,8 @@ export default async function handler(req, res) {
     const data = rec.content;
     // 隐私：pending 不存明文邮箱，哈希由 sign 阶段算好随文件携带
     const emailHash = data.emailHash || hashId(data.email);
+    // 分级入参：隐私版 pending 只有 emailDomain（无完整 email），旧记录兜底从 email 提取
+    const classifyInput = { email: data.email || `a@${data.emailDomain || "unknown.invalid"}`, institution: data.institution, role: data.role };
 
     // 幂等：已 verified → 直接提示已签署
     const already = await ghGet(`signatures/verified/${emailHash}.json`);
@@ -47,7 +49,7 @@ export default async function handler(req, res) {
       return res.redirect(302, redirect("duplicate", req.query.lang));
     }
 
-    const level = classify(data);
+    const level = classify(classifyInput);
 
     if (level === "auto") {
       await ghPut(

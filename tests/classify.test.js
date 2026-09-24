@@ -29,6 +29,8 @@ const cases = [
   ["C 无 @ 容错",       { email: "not-an-email", institution: "清华大学", role: "" }, "manual"],
   ["P14b 多 @ 解析",    { email: "a@b@c.com", institution: "", role: "" }, "manual"],
   ["A7 邮箱大小写",     { email: "A@Mail.Tsinghua.Edu.CN", institution: "清华大学", role: "" }, "auto"],
+  ["PR1 隐私版记录qq",  { email: "a@qq.com", institution: "某科技公司", role: "前端工程师" }, "auto"],
+  ["PR2 隐私版无域名",  { email: "a@unknown.invalid", institution: "某公司", role: "工程师" }, "manual"],
 ];
 let failed = 0;
 for (const [name, input, expected] of cases) {
