@@ -162,6 +162,15 @@ document.addEventListener("DOMContentLoaded", function () {
         });
       }
     }
+    // 语言原地切换时：重渲染 + 分享区按新语言重建（页面不再 reload）
+    document.addEventListener("covenant:langchange", function () {
+      shareBuilt = false;
+      var area = document.getElementById("share-area");
+      if (area) area.textContent = "";
+      var btn = document.getElementById("view-list-btn");
+      if (btn) btn.remove();
+      render();
+    });
     // i18n.js 动态注入完成可能晚于本脚本 → 兼容两时序: 已加载立即渲染, 未加载等它就绪
     if (window.covenantI18n) render();
     else {

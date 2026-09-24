@@ -33,6 +33,7 @@
       ovDupTitle: "已签署过",
       ovDupBody: "此邮箱已完成签署，无需重复提交。",
       ovDupHint: "你的名字已在公开名单中。",
+      ovDupList: "查看公开名单",
       errDuplicate: "此邮箱已签署过，无需重复签署。",
       errPending: "确认邮件已发出，请查收邮箱（含垃圾邮件文件夹）。",
       errGeneric: "提交失败，请稍后重试。",
@@ -93,6 +94,7 @@
       ovDupTitle: "Already signed",
       ovDupBody: "This email has already completed signing. No need to submit again.",
       ovDupHint: "Your name is already on the public list.",
+      ovDupList: "View the public list",
       errDuplicate: "This email has already signed. No need to sign again.",
       errPending: "A confirmation email was sent. Please check your inbox (and spam folder).",
       errGeneric: "Submission failed. Please try again later.",
@@ -136,9 +138,19 @@
   window.covenantI18n = {
     lang: lang,
     t: function (k) { return dict[k] || I18N.zh[k] || k; },
+    // 原地切换：不刷新页面，已填表单内容保留；仅重渲染文本节点
     langSwitch: function (l) {
+      if (!I18N[l]) return;
+      lang = l; dict = I18N[l];
+      this.lang = l;
       try { localStorage.setItem("covenant-lang", l); } catch (_) {}
-      location.reload();
+      // URL 带 ?lang= 会在下次加载时压制 localStorage → 同步改写地址栏（不触发导航）
+      try {
+        var u = new URL(location.href);
+        if (u.searchParams.get("lang") !== null) { u.searchParams.set("lang", l); history.replaceState(null, "", u); }
+      } catch (_) {}
+      apply();
+      document.dispatchEvent(new CustomEvent("covenant:langchange", { detail: { lang: l } }));
     }
   };
 

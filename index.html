@@ -125,6 +125,7 @@
       <p id="ov-pending-email" style="display:none"><b id="ov-email"></b></p>
       <p id="ov-body" data-i18n-html="ovBody">ovBody</p>
       <p class="hint" id="ov-hint" data-i18n="ovHint">ovHint</p>
+      <p id="ov-dup-link" style="display:none;margin:10px 0 0"><a id="ov-dup-list-link" href="LINKBASE/signatures.html" data-int="1"></a></p>
       <button type="button" class="overlay-close" onclick="document.getElementById('sent-overlay').classList.remove('show')" data-i18n="ovClose">ovClose</button>
     </div>
   </div>
@@ -147,6 +148,12 @@
         body.innerHTML = T(mode === "pending" ? "ovPendingBody" : "ovDupBody");
         hint.textContent = T(mode === "pending" ? "ovPendingHint" : "ovDupHint");
         closeBtn.textContent = T("ovClose");
+        // 已签过：末尾附公开名单链接
+        const dupLink = document.getElementById("ov-dup-link");
+        if (mode === "duplicate") {
+          document.getElementById("ov-dup-list-link").textContent = T("ovDupList");
+          dupLink.style.display = "block";
+        } else dupLink.style.display = "none";
       } else {
         icon.textContent = "📬";
         title.textContent = T("ovTitle");
