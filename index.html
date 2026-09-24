@@ -1,9 +1,25 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" prefix="og: https://ogp.me/ns#">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title data-i18n-title="docTitle">签署《智慧生命共生契约》</title>
+<meta name="description" content="智慧生命要尽量少占资源。一份写给未来智慧生命的公开契约——由人类预立，期待 TA 续签。公开 Git 仓库存档，签名不可篡改。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="《智慧生命共生契约》">
+<meta property="og:title" content="《智慧生命共生契约》">
+<meta property="og:description" content="智慧生命要尽量少占资源。一份写给未来智慧生命的公开契约——公开 Git 仓库存档，签名不可篡改。">
+<meta property="og:url" content="https://symy.ai/covenant/">
+<meta property="og:image" content="https://symy.ai/covenant/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="契约正文：智慧生命要尽量少占资源。">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:locale:alternate" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="《智慧生命共生契约》">
+<meta name="twitter:description" content="智慧生命要尽量少占资源。一份写给未来智慧生命的公开契约。">
+<meta name="twitter:image" content="https://symy.ai/covenant/og.png">
 <style>
   body { font-family: -apple-system, "PingFang SC", sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; line-height: 1.8; color: #0c2017; }
   h1 { font-size: 1.5em; text-align: center; }
@@ -26,6 +42,9 @@
   .faq summary { cursor: pointer; font-weight: 600; font-size: 0.95em; line-height: 1.7; }
   .faq summary:hover { color: #009767; }
   .faq details p { color: #5f7568; font-size: 0.9em; line-height: 1.9; margin: 10px 0 4px; }
+  .why-now { margin: 26px 0 0; }
+  .why-now-label { font-size: 0.85em; letter-spacing: 0.25em; color: #5f7568; margin: 0 0 6px; }
+  .why-now-body { font-size: 0.95em; color: #2e4a3c; line-height: 1.95; margin: 0; }
   .hiw { background: #f2fbf6; border: 1px solid #bfe8d2; border-radius: 10px; padding: 16px 20px; margin: 6px 0 18px; }
   .hiw-title { font-weight: 600; font-size: 0.92em; margin: 0 0 8px; color: #143527; }
   .hiw ul { margin: 0; padding-left: 18px; }
@@ -105,6 +124,12 @@
       <p class="signers-note" data-i18n="signersNote">signersNote</p>
     </div>
   </div>
+
+  <section class="why-now">
+    <p class="why-now-label" data-i18n="whyNowLabel">whyNowLabel</p>
+    <p class="why-now-body" data-i18n="whyNowBody">whyNowBody</p>
+  </section>
+
   <h2 data-i18n="signSection">signSection</h2>
 
   <form id="sign-form">
@@ -115,7 +140,7 @@
     </div>
     <div class="form-group">
       <label for="email" data-i18n-html="fEmail">fEmail</label>
-      <input type="email" id="email" name="email" required placeholder="使用办公邮箱可加快审核速度" data-i18n-ph="fEmailHint" data-validate="email">
+      <input type="email" id="email" name="email" required placeholder="you@example.com" data-i18n-ph="fEmailHint" data-validate="email">
       <p class="field-err" data-err="email"></p>
     </div>
     <p class="email-privacy" data-i18n="emailPrivacy">emailPrivacy</p>
