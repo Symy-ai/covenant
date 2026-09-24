@@ -21,6 +21,10 @@
   .faq summary { cursor: pointer; font-weight: 600; font-size: 0.95em; line-height: 1.7; }
   .faq summary:hover { color: #009767; }
   .faq details p { color: #5f7568; font-size: 0.9em; line-height: 1.9; margin: 10px 0 4px; }
+  .hiw { background: #f2fbf6; border: 1px solid #bfe8d2; border-radius: 10px; padding: 16px 20px; margin: 6px 0 18px; }
+  .hiw-title { font-weight: 600; font-size: 0.92em; margin: 0 0 8px; color: #143527; }
+  .hiw ul { margin: 0; padding-left: 18px; }
+  .hiw li { color: #3d5a4b; font-size: 0.86em; line-height: 1.8; margin: 3px 0; }
   .lang-switch { position: absolute; top: 16px; right: 20px; font-size: 0.85em; }
   .lang-switch button { background: none; border: 1px solid #009767; color: #009767; border-radius: 4px; padding: 3px 10px; cursor: pointer; width: auto; font-weight: 400; }
   .gh-link { position: absolute; top: 20px; right: 115px; display: inline-flex; align-items: center; }
@@ -120,6 +124,14 @@
       <label for="website">Website</label>
       <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
     </div>
+    <div class="hiw">
+      <p class="hiw-title" data-i18n="hiwTitle">hiwTitle</p>
+      <ul>
+        <li data-i18n="hiw1">hiw1</li>
+        <li data-i18n="hiw2">hiw2</li>
+        <li data-i18n="hiw3">hiw3</li>
+      </ul>
+    </div>
     <button type="submit" id="submit-btn"><span class="spin"></span><span data-i18n="submit">submit</span></button>
   </form>
 
@@ -156,6 +168,14 @@
     <details>
       <summary data-i18n="faqQ6">faqQ6</summary>
       <p data-i18n="faqA6">faqA6</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ7">faqQ7</summary>
+      <p data-i18n="faqA7">faqA7</p>
+    </details>
+    <details>
+      <summary data-i18n="faqQ8">faqQ8</summary>
+      <p data-i18n="faqA8">faqA8</p>
     </details>
   </section>
 
