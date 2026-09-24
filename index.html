@@ -17,11 +17,18 @@
   .gh-link { position: absolute; top: 20px; right: 115px; display: inline-flex; align-items: center; }
   .gh-link svg { fill: #009767; opacity: 0.75; transition: opacity .15s; }
   .gh-link:hover svg { opacity: 1; }
-  .form-group { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .form-group { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; }
+  .field-err { flex-basis: 100%; display: none; color: #b71c1c; font-size: 0.85em; margin: 4px 0 0 calc(6.5em + 12px); }
+  .field-err.show { display: block; }
+  .form-group input.invalid { border-color: #b71c1c; }
+  .form-group input.invalid:focus { border-color: #b71c1c; box-shadow: 0 0 0 3px rgba(183, 28, 28, 0.12); }
   label { flex: 0 0 6.5em; font-weight: 600; white-space: nowrap; }
   input[type=text], input[type=email] { flex: 1; min-width: 0; padding: 10px; font-size: 16px; box-sizing: border-box; border: 1px solid #b6cbbe; border-radius: 6px; }
   input[type=text]:focus, input[type=email]:focus { border-color: #00bb7f; outline: none; box-shadow: 0 0 0 3px rgba(0, 187, 127, 0.15); }
   button { background: #143527; color: #fff; border: none; border-radius: 6px; padding: 14px; width: 100%; font-size: 16px; font-weight: 600; cursor: pointer; }
+    button .spin { display: none; width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.35); border-top-color: #fff; border-radius: 50%; animation: spin .7s linear infinite; vertical-align: -3px; margin-right: 8px; }
+    button.loading .spin { display: inline-block; }
+    @keyframes spin { to { transform: rotate(360deg); } }
   button:hover:not(:disabled) { background: #0c2017; }
   button:disabled { background: #9ba99f; }
   .agree-row { display: flex; gap: 8px; align-items: flex-start; font-size: 0.9em; color: #444; }
@@ -66,18 +73,20 @@
   <div class="lang-switch"><button onclick="covenantI18n.langSwitch(covenantI18n.lang==='zh'?'en':'zh')">EN / 中</button></div>
   <h1 data-i18n="pageTitle">pageTitle</h1>
 
-  <div class="charter-quote" data-i18n="charterQuote">charterQuote</div>
+  <blockquote class="charter-quote" cite="charter.html" data-i18n="charterQuote">charterQuote</blockquote>
 
   <h2 data-i18n="signSection">signSection</h2>
 
   <form id="sign-form">
     <div class="form-group">
       <label for="name" data-i18n="fName">fName</label>
-      <input type="text" id="name" name="name" required maxlength="50">
+      <input type="text" id="name" name="name" required maxlength="50" data-validate="name">
+      <p class="field-err" data-err="name"></p>
     </div>
     <div class="form-group">
       <label for="email" data-i18n="fEmail">fEmail</label>
-      <input type="email" id="email" name="email" required placeholder="使用办公邮箱可加快审核速度" data-i18n-ph="fEmailHint">
+      <input type="email" id="email" name="email" required placeholder="使用办公邮箱可加快审核速度" data-i18n-ph="fEmailHint" data-validate="email">
+      <p class="field-err" data-err="email"></p>
     </div>
     <div class="form-group">
       <label for="institution" data-i18n="fInstitution">fInstitution</label>
@@ -95,7 +104,7 @@
       <label for="website">Website</label>
       <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
     </div>
-    <button type="submit" id="submit-btn" data-i18n="submit">submit</button>
+    <button type="submit" id="submit-btn"><span class="spin"></span><span data-i18n="submit">submit</span></button>
   </form>
 
   <div id="msg" class="msg"></div>
@@ -149,10 +158,39 @@
     const form = document.getElementById("sign-form");
     const btn = document.getElementById("submit-btn");
     const msg = document.getElementById("msg");
+    // onBlur 实时校验：邮箱格式 / 姓名长度，错误显示在字段下方
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const validators = {
+      name: (v) => v.trim().length < 2 ? T("vNameShort") : "",
+      email: (v) => emailRe.test(v.trim()) ? "" : T("vEmailBad"),
+    };
+    function showErr(input, text) {
+      const p = input.closest(".form-group").querySelector("[data-err]");
+      if (text) {
+        p.textContent = text; p.classList.add("show"); input.classList.add("invalid");
+      } else {
+        p.textContent = ""; p.classList.remove("show"); input.classList.remove("invalid");
+      }
+    }
+    Object.keys(validators).forEach(function (k) {
+      const input = form.querySelector('[data-validate="' + k + '"]');
+      input.addEventListener("blur", () => showErr(input, validators[k](input.value)));
+      input.addEventListener("input", () => { if (input.classList.contains("invalid")) showErr(input, validators[k](input.value)); });
+    });
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
+      // 提交前再全量校验一次，错误字段不提交
+      let bad = null;
+      Object.keys(validators).forEach(function (k) {
+        const input = form.querySelector('[data-validate="' + k + '"]');
+        const err = validators[k](input.value);
+        showErr(input, err);
+        if (err && !bad) bad = input;
+      });
+      if (bad) { bad.focus(); return; }
       btn.disabled = true;
-      btn.textContent = T("submitting");
+      btn.classList.add("loading");
+      btn.querySelector('[data-i18n="submit"]').textContent = T("submitting");
       msg.className = "msg"; msg.textContent = "";
       try {
         const apiBase = location.pathname.startsWith("/covenant") ? "/covenant" : "";
@@ -184,7 +222,8 @@
         msg.className = "msg err"; msg.textContent = T("errNetwork");
       }
       btn.disabled = false;
-      btn.textContent = T("submit");
+      btn.classList.remove("loading");
+      btn.querySelector('[data-i18n="submit"]').textContent = T("submit");
     });
   </script>
 </body>
