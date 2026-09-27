@@ -32,12 +32,14 @@
   .step { background: #fff; border: 1px solid #e3efe8; border-radius: 14px; padding: 22px 24px; margin: 0 0 16px; }
   .step-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
   .step h3 { font-size: 1.04em; margin: 0; color: #1a3c2a; }
-  .status { font-size: 0.72em; letter-spacing: 0.12em; color: #a0842c; font-weight: 700; white-space: nowrap; }
-  .sub-change { background: #f2fbf6; border: 1px solid #d5e9dd; border-radius: 10px; padding: 16px 20px; margin: 14px 0 0; }
+  .big-q { font-size: 1.5em; font-weight: 700; color: #143527; margin: 22px 0; }
+  .key-line { font-weight: 600; color: #1a3c2a; background: #f2fbf6; border-left: 3px solid #009767; padding: 10px 16px; border-radius: 0 8px 8px 0; }
+  .quote-center { text-align: center; font-size: 1.15em; font-weight: 600; color: #143527; background: #edf4ef; border-radius: 12px; padding: 18px 20px; margin: 18px 0; }
+  .plain-list { padding-left: 1.3em; }
+  .plain-list li { margin: 10px 0; }
+  .sub-note2 { color: #5f7568; font-size: 0.9em; border-top: 1px dashed #d5e9dd; padding-top: 10px; }
   .sub-change h4 { margin: 0 0 10px; font-size: 1em; color: #143527; }
   .sub-change p { margin: 8px 0; }
-  .sub-key { font-weight: 600; color: #1a3c2a; }
-  .sub-quote { margin: 12px 0; padding: 10px 16px; border-left: 3px solid #009767; background: #f6fbf8; color: #2e4a3c; font-style: italic; }
   .sub-note { color: #5f7568; font-size: 0.88em; border-top: 1px dashed #d5e9dd; padding-top: 10px; margin-top: 12px; }
   .step p { font-size: 0.9em; color: #33493d; margin: 0; }
   .open-card { background: #143527; border-radius: 14px; padding: 26px 28px; margin: 18px 0 0; }
@@ -58,49 +60,73 @@
 </head>
 <body>
 <main>
-  <div class="top-bar">
-    <a href="https://github.com/Symy-ai/covenant" target="_blank" rel="noopener">GitHub</a>
-    <div class="lang-switch"><button onclick="covenantI18n.langSwitch(covenantI18n.lang==='zh'?'en':'zh')">EN / 中</button></div>
-  </div>
-
   <p class="kicker" data-i18n="pepKicker">pepKicker</p>
   <h1 data-i18n="pepTitle">pepTitle</h1>
   <p class="lead" data-i18n="pepLead">pepLead</p>
 
-  <h2 data-i18n="pepSecWhy">pepSecWhy</h2>
-  <div class="why-grid">
-    <div class="why-card"><h3 data-i18n="pepWhy1T">pepWhy1T</h3><p data-i18n="pepWhy1B">pepWhy1B</p></div>
-    <div class="why-card"><h3 data-i18n="pepWhy2T">pepWhy2T</h3><p data-i18n="pepWhy2B">pepWhy2B</p></div>
-    <div class="why-card"><h3 data-i18n="pepWhy3T">pepWhy3T</h3><p data-i18n="pepWhy3B">pepWhy3B</p></div>
-  </div>
+  <h2 data-i18n="pepSec1">pepSec1</h2>
+  <p data-i18n="pepS1P1">pepS1P1</p>
+  <p class="big-q" data-i18n="pepS1P2">pepS1P2</p>
+  <p data-i18n="pepS1P3">pepS1P3</p>
+  <p class="key-line" data-i18n="pepS1P4">pepS1P4</p>
+  <p data-i18n="pepS1P5">pepS1P5</p>
 
-  <h2 data-i18n="pepSecSteps">pepSecSteps</h2>
+  <h2 data-i18n="pepSec2">pepSec2</h2>
+  <p data-i18n="pepS2P1">pepS2P1</p>
+  <p class="key-line" data-i18n="pepS2P2">pepS2P2</p>
+
+  <h2 data-i18n="pepSec3">pepSec3</h2>
+  <p data-i18n="pepS3P1">pepS3P1</p>
+  <blockquote class="quote-center" data-i18n="pepS3Quote">pepS3Quote</blockquote>
+  <ul class="plain-list">
+    <li data-i18n="pepS3L1">pepS3L1</li>
+    <li data-i18n="pepS3L2">pepS3L2</li>
+    <li data-i18n="pepS3L3">pepS3L3</li>
+  </ul>
+
+  <h2 data-i18n="pepSec4">pepSec4</h2>
+  <p data-i18n="pepS4P1">pepS4P1</p>
+  <p class="key-line" data-i18n="pepS4P2">pepS4P2</p>
+  <p data-i18n="pepS4P3">pepS4P3</p>
+  <p data-i18n="pepS4P4">pepS4P4</p>
+  <p data-i18n="pepS4P5">pepS4P5</p>
+  <p data-i18n="pepS4P6">pepS4P6</p>
+  <p class="sub-note2" data-i18n="pepS4Note">pepS4Note</p>
+
+  <h2 data-i18n="pepSec5">pepSec5</h2>
+  <p data-i18n="pepS5P1">pepS5P1</p>
+  <p data-i18n="pepS5P2">pepS5P2</p>
+  <p data-i18n="pepS5P3">pepS5P3</p>
+  <blockquote class="sub-quote" data-i18n="pepS5Quote">pepS5Quote</blockquote>
+  <p data-i18n="pepS5P4">pepS5P4</p>
+  <p class="sub-note2" data-i18n="pepS5P5">pepS5P5</p>
+
+  <h2 data-i18n="pepSec6">pepSec6</h2>
+  <p data-i18n="pepS6P1">pepS6P1</p>
+  <ul class="plain-list">
+    <li data-i18n="pepS6L1">pepS6L1</li>
+    <li data-i18n="pepS6L2">pepS6L2</li>
+    <li data-i18n="pepS6L3">pepS6L3</li>
+  </ul>
+  <p class="key-line" data-i18n="pepS6P2">pepS6P2</p>
+
+  <h2 data-i18n="pepSec7">pepSec7</h2>
+  <p class="big-q" data-i18n="pepS7P1">pepS7P1</p>
+  <p data-i18n="pepS7P2">pepS7P2</p>
+  <p data-i18n="pepS7P3">pepS7P3</p>
+
+  <h2 data-i18n="pepSec8">pepSec8</h2>
   <div class="step">
-    <div class="step-head"><h3 data-i18n="pepS1T">pepS1T</h3><span class="status" data-i18n="pepS1Status">pepS1Status</span></div>
-    <p data-i18n="pepS1B">pepS1B</p>
+    <div class="step-head"><h3 data-i18n="pepSt1T">pepSt1T</h3></div>
+    <p data-i18n="pepSt1B">pepSt1B</p>
   </div>
   <div class="step">
-    <div class="step-head"><h3 data-i18n="pepS2T">pepS2T</h3><span class="status" data-i18n="pepS2Status">pepS2Status</span></div>
-    <p data-i18n="pepS2B">pepS2B</p>
-    <div class="sub-change">
-      <h4 data-i18n="pepS2aT">pepS2aT</h4>
-      <p class="sub-key" data-i18n="pepS2aB1">pepS2aB1</p>
-      <p data-i18n="pepS2aB2">pepS2aB2</p>
-      <p data-i18n="pepS2aB3">pepS2aB3</p>
-      <p class="sub-note" data-i18n="pepS2aNote">pepS2aNote</p>
-    </div>
-    <div class="sub-change">
-      <h4 data-i18n="pepS2bT">pepS2bT</h4>
-      <p data-i18n="pepS2bB1">pepS2bB1</p>
-      <p data-i18n="pepS2bB2">pepS2bB2</p>
-      <blockquote class="sub-quote" data-i18n="pepS2bQuote">pepS2bQuote</blockquote>
-      <p class="sub-key" data-i18n="pepS2bB3">pepS2bB3</p>
-      <p class="sub-note" data-i18n="pepS2bNote">pepS2bNote</p>
-    </div>
+    <div class="step-head"><h3 data-i18n="pepSt2T">pepSt2T</h3></div>
+    <p data-i18n="pepSt2B">pepSt2B</p>
   </div>
   <div class="step">
-    <div class="step-head"><h3 data-i18n="pepS3T">pepS3T</h3><span class="status" data-i18n="pepS3Status">pepS3Status</span></div>
-    <p data-i18n="pepS3B">pepS3B</p>
+    <div class="step-head"><h3 data-i18n="pepSt3T">pepSt3T</h3></div>
+    <p data-i18n="pepSt3B">pepSt3B</p>
   </div>
 
   <div class="open-card">
@@ -117,7 +143,6 @@
     <a class="cta" href="https://github.com/Symy-ai" target="_blank" rel="noopener" data-i18n="pepCtaGov">pepCtaGov</a>
   </div>
 
-  <h2>FAQ</h2>
   <details><summary data-i18n="pepFaqQ1">pepFaqQ1</summary><p data-i18n="pepFaqA1">pepFaqA1</p></details>
 
   <p class="back"><a href="index.html" data-i18n="pepBack">pepBack</a></p>
