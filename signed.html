@@ -55,6 +55,7 @@ document.addEventListener("DOMContentLoaded", function () {
         duplicate:{ icon: "☑️", title: "dupTitle", desc: "dupDesc" },
         expired:  { icon: "⌛", title: "expTitle", desc: "expDesc" },
         invalid:  { icon: "⚠️", title: "invTitle", desc: "invDesc" },
+        error:    { icon: "🔧", title: "errTitle", desc: "errDesc" },
       };
       const s = new URLSearchParams(location.search).get("status") || "invalid";
       const m = M[s] || M.invalid;

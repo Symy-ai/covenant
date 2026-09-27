@@ -422,7 +422,7 @@ test("confirm: 令牌长度合法但 pending 文件被删（中途消失）→ 3
   }
 });
 
-test("confirm: 读 pending 抛错（GitHub 故障）→ 302 invalid + logError（不崩）", async () => {
+test("confirm: 读 pending 抛错（GitHub 5xx）→ 302 error（非 invalid）+ logError（不崩）", async () => {
   installGitHub({
     ghList: async () => [`${HASH}.${TOKEN}.json`],
     ghGet: async (p) => {
@@ -433,14 +433,149 @@ test("confirm: 读 pending 抛错（GitHub 故障）→ 302 invalid + logError�
   logStub = captureLogError();
   try {
     const res = mockRes();
-    await confirmHandler(mockReq({ method: "GET", query: { t: TOKEN } }), res);
+    await confirmHandler(mockReq({ method: "GET", query: { t: TOKEN, lang: "en" } }), res);
     assert.equal(res.statusCode, 302);
-    assert.match(res.redirect.url, /status=invalid/, "读不到 pending 只能回 invalid");
+    assert.match(res.redirect.url, /status=error/, "上游故障是系统繁忙，不是链接失效");
+    assert.doesNotMatch(res.redirect.url, /status=invalid/);
+    assert.match(res.redirect.url, /lang=en/);
     assert.equal(logStub.errors.length, 1);
-    assert.equal(logStub.errors[0].context.stage, "confirm");
+    assert.equal(logStub.errors[0].context.stage, "confirm-pending-read");
   } finally {
     logStub.restore();
   }
+});
+
+// ---------- b122 边界护栏：故障 vs 失效 vs 数据损坏 ----------
+
+test("confirm [b122]: 读 pending 遇网络层故障（fetch reject）→ status=error，且不查 verified/不写任何文件", async () => {
+  const calls = installGitHub({
+    ghList: async () => [`${HASH}.${TOKEN}.json`],
+    ghGet: async (p) => {
+      if (p.startsWith("signatures/pending/")) {
+        const e = new Error("ghGet signatures/pending/x.json → network error: fetch failed");
+        e.status = 0;
+        throw e;
+      }
+      return null;
+    },
+  });
+  logStub = captureLogError();
+  try {
+    const res = mockRes();
+    await confirmHandler(mockReq({ method: "GET", query: { t: TOKEN } }), res);
+    assert.equal(res.statusCode, 302);
+    assert.match(res.redirect.url, /status=error/, "网络错 = 系统繁忙，不是链接失效");
+    assert.doesNotMatch(res.redirect.url, /status=invalid/);
+    assert.doesNotMatch(res.redirect.url, /status=expired/);
+    assert.equal(logStub.errors.length, 1, "上游故障必须上报");
+    assert.equal(logStub.errors[0].context.stage, "confirm-pending-read");
+    assert.equal(logStub.errors[0].context.fileName, `${HASH}.${TOKEN}.json`, "上报须带文件名便于定位");
+    const getPaths = calls.filter((c) => c.fn === "ghGet").map((c) => c.args[0]);
+    assert.ok(
+      getPaths.every((p) => p.startsWith("signatures/pending/")),
+      `故障后不得继续查 verified（读了才可能误判 duplicate/放行）：${JSON.stringify(getPaths)}`,
+    );
+    assert.equal(calls.filter((c) => c.fn === "ghPut").length, 0, "故障路径不得写任何文件");
+    assert.equal(calls.filter((c) => c.fn === "ghDelete").length, 0, "故障路径不得删 pending");
+  } finally {
+    logStub.restore();
+  }
+});
+
+test("confirm [b122]: pending 缺 name（数据损坏）→ 转人工（写 pending-review）而非 duplicate", async () => {
+  const HASH_OF_UNDEFINED = hashId(undefined); // 旧实现会拿它去撞 verified → 伪装成"已签署过"
+  const calls = installGitHub({
+    ghList: async (dir) => (dir === "signatures/pending" ? [`${HASH}.${TOKEN}.json`] : []),
+    ghGet: async (p) => {
+      if (p === `signatures/pending/${HASH}.${TOKEN}.json`) return { sha: "p1", content: { institution: "某大学", role: "教授" } };
+      if (p === `signatures/verified/${HASH_OF_UNDEFINED}.json`) return { sha: "v1", content: { name: "某个已签者" } };
+      return null;
+    },
+  });
+  logStub = captureLogError();
+  try {
+    const res = mockRes();
+    await confirmHandler(mockReq({ method: "GET", query: { t: TOKEN } }), res);
+    assert.equal(res.statusCode, 302);
+    assert.doesNotMatch(res.redirect.url, /status=duplicate/, "缺 name 的损坏记录不得被当作已签署");
+    assert.match(res.redirect.url, /status=pending/, "缺关键字段 → 转人工");
+
+    assert.ok(
+      !calls.some((c) => c.fn === "ghGet" && c.args[0] === `signatures/verified/${HASH_OF_UNDEFINED}.json`),
+      "不得对 undefined 求哈希后再查 verified（旧 bug 的误判入口）",
+    );
+    assert.equal(logStub.errors.length, 1, "损坏数据必须上报");
+    assert.equal(logStub.errors[0].message, "pending_malformed");
+    assert.equal(logStub.errors[0].context.stage, "confirm-malformed-pending");
+    assert.deepEqual(logStub.errors[0].context.missing, ["name", "emailHash/email"]);
+
+    const queued = putsTo(calls, `signatures/pending/${HASH}.${TOKEN}.json`, "pending-review");
+    assert.equal(queued.length, 1, "必须写入 pending-review 人工队列");
+    assert.ok(queued[0].args[1].reviewQueuedAt, "入队记录须带入队时间");
+    assert.equal(queued[0].args[1].institution, "某大学", "入队记录保留原字段，交人工判读");
+    assert.equal(putsTo(calls, `signatures/verified/${HASH}.${TOKEN}.json`).length, 0);
+    assert.equal(calls.filter((c) => c.fn === "ghGet" && c.args[0].startsWith("signatures/verified/")).length, 0, "损坏数据不查重");
+    assert.equal(calls.filter((c) => c.fn === "ghDelete").length, 0, "损坏数据不得删 pending 原件");
+    assert.equal(putsTo(calls, `signatures/tokens/${TOKEN}.json`).length, 0, "无身份来源 → 无从写墓碑");
+  } finally {
+    logStub.restore();
+  }
+});
+
+test("confirm [b122]: pending 读不到（真 404/ghGet→null）→ 仍是 invalid（旧行为不回归）", async () => {
+  // 契约层（桩返回 null，等价于 lib/github.js 对 404 的唯一降级路径）
+  const calls = installGitHub({
+    ghList: async () => [`${HASH}.${TOKEN}.json`],
+    ghGet: async () => null,
+  });
+  logStub = captureLogError();
+  try {
+    const res = mockRes();
+    await confirmHandler(mockReq({ method: "GET", query: { t: TOKEN } }), res);
+    assert.equal(res.statusCode, 302);
+    assert.match(res.redirect.url, /status=invalid/, "真 404 仍回 invalid（与上游故障区分）");
+    assert.doesNotMatch(res.redirect.url, /status=error/);
+    assert.ok(logStub.errors.length >= 1, "读空必须上报");
+    assert.equal(calls.filter((c) => c.fn === "ghPut").length, 0, "读不到不写任何文件");
+  } finally {
+    logStub.restore();
+  }
+});
+
+test("护栏·ghGet [b122]: 传输层故障绝不降级成 null（非 404 一律抛，带 status/cause）", async () => {
+  defaultGitHub();
+  // ① fetch 本身 reject（DNS/超时/连接重置）——此前会冒出 "fetch failed" 原生错，与业务错无法区分
+  fetchStub.restore();
+  fetchStub = installFetch(() => {
+    throw new TypeError("fetch failed");
+  });
+  await assert.rejects(
+    () => GH.ghGet("signatures/pending/x.json"),
+    (e) => {
+      assert.match(e.message, /ghGet signatures\/pending\/x\.json → network error: fetch failed/);
+      assert.equal(e.status, 0, "网络层故障 status=0，供上层分流");
+      assert.ok(e.cause instanceof TypeError, "原始错误挂在 cause 上，不丢栈");
+      return true;
+    },
+  );
+  assert.equal(fetchStub.calls.length, 1, "确实发起了请求（只是失败了），不是提前短路");
+
+  // ② 5xx：带状态码抛出，调用方据此判"上游故障"
+  fetchStub.restore();
+  fetchStub = installFetch(() => new Response("boom", { status: 503 }));
+  await assert.rejects(
+    () => GH.ghGet("signatures/pending/x.json"),
+    (e) => {
+      assert.equal(e.message, "ghGet signatures/pending/x.json → 503");
+      assert.equal(e.status, 503);
+      return true;
+    },
+  );
+
+  // ③ 404：唯一允许返回 null 的情形（文件真不存在）
+  fetchStub.restore();
+  fetchStub = installFetch(() => new Response("", { status: 404 }));
+  assert.equal(await GH.ghGet("signatures/pending/x.json"), null, "404 仍是 null（不回归）");
 });
 
 test("confirm: 已 verified（重复确认）→ 302 duplicate + 清理残留 pending", async () => {
