@@ -4,6 +4,17 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title data-i18n-title="docTitle">已签署名单 · 《智慧生命共生契约》</title>
+<meta name="description" content="《智慧生命共生契约》公开签署名单——实时读取公开 Git 仓库，每一条签名可独立核验。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="《智慧生命共生契约》">
+<meta property="og:title" content="已签署名单 · 《智慧生命共生契约》">
+<meta property="og:description" content="公开签署名单——实时读取公开 Git 仓库，每一条签名可独立核验。">
+<meta property="og:url" content="https://symy.ai/covenant/signatures.html">
+<meta property="og:image" content="https://symy.ai/covenant/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="已签署名单 · 《智慧生命共生契约》">
+<meta name="twitter:description" content="公开签署名单——每一条签名可独立核验。">
+<meta name="twitter:image" content="https://symy.ai/covenant/og.png">
 <style>
   body { font-family: -apple-system, "PingFang SC", sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; line-height: 1.8; color: #0c2017; }
   h1 { font-size: 1.4em; }
@@ -15,6 +26,7 @@
   table { width: 100%; border-collapse: collapse; margin-top: 24px; }
   th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid #d0fae5; font-size: 0.95em; }
   th { color: #5f7568; font-weight: 600; }
+  td a { white-space: nowrap; text-decoration-color: #bfe8d2; }
   .count { color: #009767; font-weight: 600; }
   .muted { color: #5f7568; font-size: 0.9em; }
   a { color: #009767; }
@@ -110,9 +122,14 @@
       try {
         const rows = await loadRows();
         rows.sort((a, b) => (b.confirmedAt || "").localeCompare(a.confirmedAt || ""));
-        document.getElementById("rows").innerHTML = rows.map((x) => `
-          <tr><td>${esc(x.name)}</td><td>${esc(x.institution || "—")}</td><td>${esc(x.role || "")}</td><td>${(x.confirmedAt || "").slice(0, 10)}</td></tr>
-        `).join("");
+        document.getElementById("rows").innerHTML = rows.map((x) => {
+          const commitLink = x.emailHash
+            ? `https://github.com/${REPO}/commits/main/signatures/verified/${encodeURIComponent(x.emailHash)}.json`
+            : null;
+          const date = esc((x.confirmedAt || "").slice(0, 10));
+          return `
+          <tr><td>${esc(x.name)}</td><td>${esc(x.institution || "—")}</td><td>${esc(x.role || "")}</td><td>${commitLink ? `<a href="${commitLink}" target="_blank" rel="noopener" title="${esc(T("verifyHint"))}" aria-label="${esc(T("verifyHint"))}">${date} ↗</a>` : date}</td></tr>
+        `;}).join("");
         document.getElementById("count").textContent = rows.length;
         document.getElementById("loading").textContent = "";
       } catch (_) {

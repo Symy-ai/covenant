@@ -35,20 +35,20 @@ function mailFor(lang) {
 
 const mailHtml = (m, name, confirmUrl, emailHash) => `<!DOCTYPE html>
 <html><head><meta charset="utf-8"></head>
-<body style="font-family:-apple-system,sans-serif;margin:0;padding:20px;background:#f5f5f5;">
+<body style="font-family:-apple-system,sans-serif;margin:0;padding:20px;background:#eff8f2;">
   <div style="max-width:560px;margin:0 auto;background:white;border-radius:8px;padding:32px;">
     <h2 style="margin-top:0;">${m.greeting}</h2>
     <p>${m.hello(name)}</p>
     <p>${m.body}</p>
     <div style="text-align:center;margin:32px 0;">
       <a href="${confirmUrl}"
-         style="background:#6a1b9a;color:white;padding:14px 32px;text-decoration:none;border-radius:6px;font-weight:600;display:inline-block;">
+         style="background:#143527;color:white;padding:14px 32px;text-decoration:none;border-radius:6px;font-weight:600;display:inline-block;">
         ${m.button}
       </a>
     </div>
-    <p style="font-size:13px;color:#666;">${m.foot}</p>
+    <p style="font-size:13px;color:#5f7568;">${m.foot}</p>
     <!-- covenant-emailhash:${emailHash} 审核检索锚点：Resend 后台按此串搜索本邮件 -->
-    <p style="font-size:11px;color:#ccc;margin:16px 0 0;">ref: ${emailHash}</p>
+    <p style="font-size:11px;color:#c9d8cf;margin:16px 0 0;">ref: ${emailHash}</p>
   </div>
 </body></html>`;
 
