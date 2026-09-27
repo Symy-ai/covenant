@@ -3,7 +3,7 @@
 // 自动放行：写 main:signatures/verified/{emailHash}.json + 删 pending
 // 人工队列：写 pending-review 分支（保留 pending 原文件）
 // ============================================================
-import { ghGet, ghPut, ghDelete, ghList } from "../lib/github.js";
+import { ghGet, ghPut, ghDelete, ghList, ghEnsureBranch } from "../lib/github.js";
 import { classify } from "./classify.js";
 import { logError, track, hashId } from "../lib/monitoring.js";
 
@@ -65,14 +65,26 @@ export default async function handler(req, res) {
     }
 
     // manual → pending-review 分支（转人工）
+    // 分支可能不存在 → Contents PUT 返 404：建引用后重试一次；仍失败则留 main pending（人工扫表兜底）
+    // 注意：此处不 re-throw——队列写入失败不应让用户看到 invalid
     await ghPut(
       `signatures/pending/${fileName}`,
       { ...data, reviewQueuedAt: new Date().toISOString() },
       `review-queue: ${data.name} (${emailHash})`,
       { branch: "pending-review" },
-    ).catch(async () => {
-      // pending-review 分支可能不存在 → 从 main 建引用（空树提交由 GitHub 拒绝时退化：直接留在 main pending，人工扫表）
-    });
+    )
+      .catch(async (e) => {
+        await ghEnsureBranch("pending-review");
+        return ghPut(
+          `signatures/pending/${fileName}`,
+          { ...data, reviewQueuedAt: new Date().toISOString() },
+          `review-queue: ${data.name} (${emailHash})`,
+          { branch: "pending-review" },
+        );
+      })
+      .catch(async (e) => {
+        await logError(e, { stage: "confirm-pending-review", emailHash });
+      });
     // 令牌墓碑（manual 同样需要：人工通过后用户重开链接应看到待核验而非失效）
     await ghPut(`signatures/tokens/${token}.json`, { emailHash, result: "manual", confirmedAt: new Date().toISOString() }, `token-tombstone: ${emailHash}`);
     await track(emailHash, "covenant_confirm_success", { level: "manual" });
