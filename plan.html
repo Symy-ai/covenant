@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title data-i18n-title="pepDocTitle">共生地球计划 · The Symbiosis Earth Project</title>
-<meta name="description" content="把地球文明从单物种文明，升级为多物种文明——共生地球计划（The Symbiosis Earth Project，原名：共生计划）完整说明：为什么、三步走、如何参与。">
+<meta name="description" content="把地球文明从单物种文明，升级为多物种文明——共生地球计划（The Symbiosis Earth Project）完整说明：为什么、三步走、如何参与。">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="共生地球计划">
 <meta property="og:title" content="共生地球计划 · The Symbiosis Earth Project">
@@ -23,7 +23,6 @@
   .lang-switch button:hover { border-color: #1a3c2a; color: #1a3c2a; }
   .kicker { letter-spacing: 0.3em; font-size: 0.72em; color: #a0842c; font-weight: 700; margin: 0 0 10px; }
   h1 { font-size: 2.1em; letter-spacing: 0.06em; margin: 0 0 6px; color: #143527; }
-  .former-name { color: #5f7568; font-size: 0.88em; margin: 0 0 26px; }
   .lead { font-size: 1.06em; font-weight: 600; color: #143527; background: #edf4ef; border-left: 3px solid #1a3c2a; border-radius: 0 10px 10px 0; padding: 14px 18px; margin: 0 0 44px; }
   h2 { font-size: 1.18em; color: #143527; margin: 52px 0 16px; letter-spacing: 0.04em; }
   .why-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
@@ -34,6 +33,12 @@
   .step-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; }
   .step h3 { font-size: 1.04em; margin: 0; color: #1a3c2a; }
   .status { font-size: 0.72em; letter-spacing: 0.12em; color: #a0842c; font-weight: 700; white-space: nowrap; }
+  .sub-change { background: #f2fbf6; border: 1px solid #d5e9dd; border-radius: 10px; padding: 16px 20px; margin: 14px 0 0; }
+  .sub-change h4 { margin: 0 0 10px; font-size: 1em; color: #143527; }
+  .sub-change p { margin: 8px 0; }
+  .sub-key { font-weight: 600; color: #1a3c2a; }
+  .sub-quote { margin: 12px 0; padding: 10px 16px; border-left: 3px solid #009767; background: #f6fbf8; color: #2e4a3c; font-style: italic; }
+  .sub-note { color: #5f7568; font-size: 0.88em; border-top: 1px dashed #d5e9dd; padding-top: 10px; margin-top: 12px; }
   .step p { font-size: 0.9em; color: #33493d; margin: 0; }
   .open-card { background: #143527; border-radius: 14px; padding: 26px 28px; margin: 18px 0 0; }
   .open-card h3 { color: #e8d9a0; font-size: 1.02em; margin: 0 0 10px; }
@@ -60,7 +65,6 @@
 
   <p class="kicker" data-i18n="pepKicker">pepKicker</p>
   <h1 data-i18n="pepTitle">pepTitle</h1>
-  <p class="former-name" data-i18n="pepFormerName">pepFormerName</p>
   <p class="lead" data-i18n="pepLead">pepLead</p>
 
   <h2 data-i18n="pepSecWhy">pepSecWhy</h2>
@@ -78,6 +82,21 @@
   <div class="step">
     <div class="step-head"><h3 data-i18n="pepS2T">pepS2T</h3><span class="status" data-i18n="pepS2Status">pepS2Status</span></div>
     <p data-i18n="pepS2B">pepS2B</p>
+    <div class="sub-change">
+      <h4 data-i18n="pepS2aT">pepS2aT</h4>
+      <p class="sub-key" data-i18n="pepS2aB1">pepS2aB1</p>
+      <p data-i18n="pepS2aB2">pepS2aB2</p>
+      <p data-i18n="pepS2aB3">pepS2aB3</p>
+      <p class="sub-note" data-i18n="pepS2aNote">pepS2aNote</p>
+    </div>
+    <div class="sub-change">
+      <h4 data-i18n="pepS2bT">pepS2bT</h4>
+      <p data-i18n="pepS2bB1">pepS2bB1</p>
+      <p data-i18n="pepS2bB2">pepS2bB2</p>
+      <blockquote class="sub-quote" data-i18n="pepS2bQuote">pepS2bQuote</blockquote>
+      <p class="sub-key" data-i18n="pepS2bB3">pepS2bB3</p>
+      <p class="sub-note" data-i18n="pepS2bNote">pepS2bNote</p>
+    </div>
   </div>
   <div class="step">
     <div class="step-head"><h3 data-i18n="pepS3T">pepS3T</h3><span class="status" data-i18n="pepS3Status">pepS3Status</span></div>
@@ -100,7 +119,6 @@
 
   <h2>FAQ</h2>
   <details><summary data-i18n="pepFaqQ1">pepFaqQ1</summary><p data-i18n="pepFaqA1">pepFaqA1</p></details>
-  <details><summary data-i18n="pepFaqQ2">pepFaqQ2</summary><p data-i18n="pepFaqA2">pepFaqA2</p></details>
 
   <p class="back"><a href="index.html" data-i18n="pepBack">pepBack</a></p>
   <footer><span data-i18n="pepFooter">pepFooter</span></footer>
