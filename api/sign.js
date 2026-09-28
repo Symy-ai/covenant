@@ -10,9 +10,10 @@ const CHARTER_TITLE = "《智慧生命共生契约》";
 const SITE = "https://symy.ai/covenant";
 
 // 确认邮件双语（跟随签署页语言: 表单传 lang 参数, 缺省中文）
+// 标题以收件人姓名开头：既是一封"写给本人"的信，也方便审核按姓名检索核验
 const MAIL = {
   zh: {
-    subject: `请确认您的签名 · ${CHARTER_TITLE}`,
+    subject: (name) => `${name}，请确认您的签名 · ${CHARTER_TITLE}`,
     greeting: "签名确认",
     hello: (name) => `您好，${name}：`,
     body: `您正在签署${CHARTER_TITLE}。请点击下方按钮确认您的签名：`,
@@ -20,7 +21,7 @@ const MAIL = {
     foot: "点击上方按钮即可完成签署，无需其他操作。如非本人操作，请忽略本邮件；如有疑问，可直接回复本邮件联系我们。",
   },
   en: {
-    subject: "Please confirm your signature · The Covenant",
+    subject: (name) => `${name}, please confirm your signature · The Covenant`,
     greeting: "Confirm your signature",
     hello: (name) => `Hello ${name},`,
     body: "You are signing the Covenant of Symbiosis with Intelligent Life — the charter: Intelligent life shall take fewer resources. Click the button below to confirm your signature:",
@@ -115,7 +116,7 @@ export default async function handler(req, res) {
         from: "Symy <covenant@symy.ai>",
         reply_to: "covenant@symy.ai",
         to: [email],
-        subject: m.subject,
+        subject: m.subject(name),
         html,
         // 自定义头：Resend 后台详情页可见，供人工审核检索
         headers: { "X-Covenant-Hash": emailHash },
