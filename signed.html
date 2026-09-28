@@ -45,9 +45,48 @@ document.addEventListener("DOMContentLoaded", function () {
   <h1 id="title"></h1>
   <p id="desc" class="muted"></p>
   <div id="share-area"></div>
-  <p><a href="LINKBASE/index.html" data-int="1" data-i18n="back">back</a> · <a href="LINKBASE/signatures.html" data-int="1" data-i18n="viewListShort">viewListShort</a></p>
+  <p><a href="LINKBASE/index.html" data-int="1" data-i18n="back">返回</a> · <a href="LINKBASE/signatures.html" data-int="1" data-i18n="viewListShort">查看名单</a></p>
   <script>
-    var T = function (k) { return window.covenantI18n ? covenantI18n.t(k) : k; };
+    // ===== 内置兜底词典：网络差 i18n.js 加载失败时，本页仍能立即完整显示（中英）=====
+    var FALLBACK = {
+      zh: {
+        docTitle: "签署《智慧生命共生契约》", back: "返回", viewListShort: "查看名单",
+        okTitle: "签名已生效", okDesc: "感谢您签署《智慧生命共生契约》。您的签名已计入公开名单。", okViewList: "查看已签署名单",
+        pendingTitle: "已收到，人工核验中", pendingDesc: "您的签名正在人工核验（1-3 个工作日），通过后将自动出现在名单中。",
+        dupTitle: "已签署过", dupDesc: "此邮箱已完成签署，无需重复确认。",
+        expTitle: "链接已失效", expDesc: "请重新提交签名表单，我们会再发一封确认邮件。",
+        invTitle: "链接无效", invDesc: "确认链接不正确或已失效。请从邮件中重新点击，或重新提交。",
+        errTitle: "系统繁忙", errDesc: "我们暂时无法读取您的签名状态，您的确认链接仍然有效。请稍后从邮件中重新点击，无需重新提交。",
+        shareLabel: "分享这份承诺", shareText: "我签署了《智慧生命共生契约》：智慧生命要尽量少占资源。",
+        shareWeibo: "微博", shareWeChat: "微信", copyLink: "复制链接", copied: "已复制",
+        qrTitle: "微信分享", qrHint: "用微信「扫一扫」打开后再转发", sysShare: "系统分享",
+        pageTitle: "《智慧生命共生契约》"
+      },
+      en: {
+        docTitle: "Sign the Covenant of Symbiosis with Intelligent Life", back: "Back", viewListShort: "View list",
+        okTitle: "Signature confirmed", okDesc: "Thank you for signing. Your signature is now on the public list.", okViewList: "View the signatory list",
+        pendingTitle: "Received — under review", pendingDesc: "Your signature is being reviewed (1–3 business days) and will appear on the list once approved.",
+        dupTitle: "Already signed", dupDesc: "This email has already completed signing. No further action needed.",
+        expTitle: "Link expired", expDesc: "Please submit the form again — we will send a new confirmation email.",
+        invTitle: "Invalid link", invDesc: "This confirmation link is incorrect or expired. Re-click from your email, or submit again.",
+        errTitle: "Temporarily unavailable", errDesc: "We couldn't read your signature status just now — your confirmation link is still valid. Please re-click it from the email in a moment; no need to submit again.",
+        shareLabel: "Share this commitment", shareText: "I signed the Covenant of Symbiosis with Intelligent Life: intelligent life shall take fewer resources.",
+        copyLink: "Copy link", copied: "Copied", sysShare: "Share…",
+        pageTitle: "Covenant of Symbiosis with Intelligent Life"
+      }
+    };
+    // 语言判定与 i18n.js 同序：URL ?lang= → localStorage → 浏览器语言
+    function fallbackLang() {
+      var q = new URLSearchParams(location.search).get("lang");
+      if (q === "zh" || q === "en") return q;
+      try { var s = localStorage.getItem("covenant-lang"); if (s === "zh" || s === "en") return s; } catch (_) {}
+      return ((navigator.language || "zh").toLowerCase().indexOf("zh") === 0) ? "zh" : "en";
+    }
+    var fLang = fallbackLang();
+    var T = function (k) {
+      if (window.covenantI18n) { var v = covenantI18n.t(k); if (v && v !== k) return v; }
+      return (FALLBACK[fLang] && FALLBACK[fLang][k]) || k;
+    };
     function render() {
       const M = {
         ok:       { icon: "✅", title: "okTitle", desc: "okDesc" },
@@ -83,7 +122,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (shareBuilt) return;
       shareBuilt = true;
       const area = document.getElementById("share-area");
-      const lang = (window.covenantI18n && covenantI18n.lang) || "zh";
+      const lang = (window.covenantI18n && covenantI18n.lang) || fLang;
       const CANONICAL = "https://symy.ai/covenant";
       const text = T("shareText");
       const u = encodeURIComponent(CANONICAL);
@@ -174,14 +213,24 @@ document.addEventListener("DOMContentLoaded", function () {
       if (btn) btn.remove();
       render();
     });
-    // i18n.js 动态注入完成可能晚于本脚本 → 兼容两时序: 已加载立即渲染, 未加载等它就绪
-    if (window.covenantI18n) render();
-    else {
-      var wait = setInterval(function () {
-        if (window.covenantI18n) { clearInterval(wait); render(); }
-      }, 50);
-      setTimeout(function () { clearInterval(wait); render(); }, 3000); // 3s 兜底(字典缺失时显示中文默认)
-    }
+    // i18n.js 已到立即用完整词典渲染，未到先用内置兜底立即渲染（不再白屏等待/裸显 key）
+    render();
+    var usedFallback = !window.covenantI18n;
+    var wait = setInterval(function () {
+      if (window.covenantI18n) {
+        clearInterval(wait);
+        if (!usedFallback) return; // 本来就是完整词典，无需重渲染
+        // i18n.js 晚到：切换到完整词典重渲染（分享区/名单按钮一并重建）
+        usedFallback = false;
+        shareBuilt = false;
+        var area = document.getElementById("share-area");
+        if (area) area.textContent = "";
+        var btn = document.getElementById("view-list-btn");
+        if (btn) btn.remove();
+        render();
+      }
+    }, 100);
+    setTimeout(function () { clearInterval(wait); }, 30000); // 网络持续失败则停留在兜底词典，不再无限轮询
   </script>
 </body>
 </html>
