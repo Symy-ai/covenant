@@ -49,7 +49,7 @@
 </script>
 <script>
 // ===== 兜底 i18n：网络差 i18n.js 加载失败时本页仍完整显示（初始文本已内置中文；i18n.js 到达后自动接管）=====
-var COV_FB = {"zh":{"iSign":"我要签署","listCountPost":"位签署者","listCountPre":"共","listDesc":"名单直接读取公开仓库签名档案，实时生成；点击日期可核验该签名在 GitHub 上的提交记录。","listDocTitle":"已签署名单 · 《智慧生命共生契约》","listLoadFail":"（名单加载失败，请刷新或直接访问公开仓库）","listLoading":"加载中…","listTitle":"已签署名单","pageTitle":"《智慧生命共生契约》","thDate":"签署日期","thInst":"单位","thName":"姓名","thRole":"头衔","verifyHint":"在 GitHub 上核验这条签名"},"en":{"iSign":"Sign the Covenant","listCountPost":" signatories","listCountPre":"共","listDesc":"This list reads directly from the public signature archive — generated live. Click a date to verify the commit behind that signature on GitHub.","listDocTitle":"Signatories · Covenant of Symbiosis with Intelligent Life","listLoadFail":"(Failed to load the list — refresh or visit the public repository)","listLoading":"Loading…","listTitle":"Signatories","pageTitle":"Covenant of Symbiosis with Intelligent Life","thDate":"Signed","thInst":"Affiliation","thName":"Name","thRole":"Title","verifyHint":"Verify this signature on GitHub"}};
+var COV_FB = {"zh":{"iSign":"我要签署","listCountPost":"位签署者","listCountPre":"共","listDesc":"名单直接读取公开仓库签名档案，实时生成；点击日期可核验该签名在 GitHub 上的提交记录。","listDocTitle":"已签署名单 · 《智慧生命共生契约》","listLoadFail":"（名单加载失败，请刷新或直接访问公开仓库）","listLoading":"加载中…","listTitle":"已签署名单","pageTitle":"《智慧生命共生契约》","thDate":"签署日期","thInst":"单位","thName":"姓名","thRole":"职务","verifyHint":"在 GitHub 上核验这条签名"},"en":{"iSign":"Sign the Covenant","listCountPost":" signatories","listCountPre":"共","listDesc":"This list reads directly from the public signature archive — generated live. Click a date to verify the commit behind that signature on GitHub.","listDocTitle":"Signatories · Covenant of Symbiosis with Intelligent Life","listLoadFail":"(Failed to load the list — refresh or visit the public repository)","listLoading":"Loading…","listTitle":"Signatories","pageTitle":"Covenant of Symbiosis with Intelligent Life","thDate":"Signed","thInst":"Affiliation","thName":"Name","thRole":"Job Title","verifyHint":"Verify this signature on GitHub"}};
 var COV_FB_LANG = (function () {
   var q = new URLSearchParams(location.search).get("lang");
   if (q === "zh" || q === "en") return q;
@@ -86,7 +86,7 @@ document.addEventListener("DOMContentLoaded", function () { if (!window.covenant
   <h1 data-i18n="listTitle">已签署名单</h1>
   <p class="muted"><span data-i18n="listDesc">名单直接读取公开仓库签名档案，实时生成；点击日期可核验该签名在 GitHub 上的提交记录。</span> <span id="loading" data-i18n="listLoading">加载中…</span></p>
   <table>
-    <thead><tr><th data-i18n="thName">姓名</th><th data-i18n="thInst">单位</th><th data-i18n="thRole">头衔</th><th data-i18n="thDate">签署日期</th></tr></thead>
+    <thead><tr><th data-i18n="thName">姓名</th><th data-i18n="thInst">单位</th><th data-i18n="thRole">职务</th><th data-i18n="thDate">签署日期</th></tr></thead>
     <tbody id="rows"></tbody>
   </table>
   <p class="muted" style="margin-top:32px"><span data-i18n="listCountPre">共</span> <span class="count" id="count">…</span> <span data-i18n="listCountPost">位签署者</span> · <a href="LINKBASE/index.html" data-int="1" data-i18n="iSign">我要签署</a> · <a href="LINKBASE/charter.html" data-int="1" data-i18n="pageTitle">《智慧生命共生契约》</a></p>
