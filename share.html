@@ -287,8 +287,7 @@ document.addEventListener("DOMContentLoaded", function () {
         document.head.appendChild(sc);
       }); };
       if (isWeChat()) {
-        // 已在微信内：直接给转发引导，别再让用户扫码
-        if (lang === "zh") pill(T("shareWeibo"), "https://service.weibo.com/share/share.php?url=" + u + "&title=" + t);
+        // 已在微信内：直接给转发引导，别再让用户扫码；外部平台分享在微信内会被拦截，不放
         pill(T("wxForward"), null, function (e) { e.preventDefault(); showWxGuide(); });
       } else {
         if (lang === "zh") {
