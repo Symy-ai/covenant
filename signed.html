@@ -23,6 +23,14 @@
   .qr-card .hint { font-size: .82em; color: #5f7568; margin: 6px 0 12px; }
   .qr-close { border: none; background: #009767; color: #fff; border-radius: 18px; padding: 6px 20px; cursor: pointer; font-size: .88em; }
   .qr-table { border-collapse: collapse; margin: 8px auto 0; }
+  .wx-overlay { position: fixed; inset: 0; background: rgba(12,32,23,.62); display: flex; align-items: center; justify-content: center; z-index: 99; }
+  .wx-card { background: #fff; border-radius: 14px; padding: 24px 28px; text-align: center; max-width: 86vw; }
+  .wx-card h3 { margin: 0 0 4px; font-size: 1em; }
+  .wx-card .hint { font-size: .82em; color: #5f7568; margin: 6px 0 12px; }
+  .wx-close { border: none; background: #009767; color: #fff; border-radius: 18px; padding: 6px 20px; cursor: pointer; font-size: .88em; }
+  .wx-dots { font-size: 1.6em; letter-spacing: .12em; color: #009767; font-weight: 700; margin: 10px 0 2px; }
+  .wx-arrow { position: fixed; top: 18px; right: 26px; font-size: 2.2em; color: #ffd766; text-shadow: 0 2px 10px rgba(0,0,0,.4); animation: wxBob 1.1s ease-in-out infinite; }
+  @keyframes wxBob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
   .qr-table td { width: 5px; height: 5px; padding: 0; border: none; }
   .qr-table td.on { background: #0c2017; }
 </style>
@@ -57,9 +65,10 @@ document.addEventListener("DOMContentLoaded", function () {
         expTitle: "链接已失效", expDesc: "请重新提交签名表单，我们会再发一封确认邮件。",
         invTitle: "链接无效", invDesc: "确认链接不正确或已失效。请从邮件中重新点击，或重新提交。",
         errTitle: "系统繁忙", errDesc: "我们暂时无法读取您的签名状态，您的确认链接仍然有效。请稍后从邮件中重新点击，无需重新提交。",
-        shareLabel: "分享这份承诺", shareText: "我签署了《智慧生命共生契约》：智慧生命要尽量少占资源。",
+        shareLabel: "分享这份承诺", shareText: "我签署了《智慧生命共生契约》，你也来签吧！",
         shareWeibo: "微博", shareWeChat: "微信", copyLink: "复制链接", copied: "已复制",
         qrTitle: "微信分享", qrHint: "用微信「扫一扫」打开后再转发", sysShare: "系统分享",
+        wxForward: "转发给朋友", wxForwardHint: "点右上角「···」，选择「发送给朋友」或「分享到朋友圈」",
         pageTitle: "《智慧生命共生契约》"
       },
       en: {
@@ -70,8 +79,9 @@ document.addEventListener("DOMContentLoaded", function () {
         expTitle: "Link expired", expDesc: "Please submit the form again — we will send a new confirmation email.",
         invTitle: "Invalid link", invDesc: "This confirmation link is incorrect or expired. Re-click from your email, or submit again.",
         errTitle: "Temporarily unavailable", errDesc: "We couldn't read your signature status just now — your confirmation link is still valid. Please re-click it from the email in a moment; no need to submit again.",
-        shareLabel: "Share this commitment", shareText: "I signed the Covenant of Symbiosis with Intelligent Life: intelligent life shall take fewer resources.",
+        shareLabel: "Share this commitment", shareText: "I signed the Covenant of Symbiosis with Intelligent Life — come sign it too!",
         copyLink: "Copy link", copied: "Copied", sysShare: "Share…",
+        wxForward: "Forward to friends", wxForwardHint: "Tap \"···\" at the top-right, then \"Send to Friend\" or \"Share to Moments\"",
         pageTitle: "Covenant of Symbiosis with Intelligent Life"
       }
     };
@@ -103,6 +113,8 @@ document.addEventListener("DOMContentLoaded", function () {
       document.getElementById("desc").textContent = T(m.desc);
       // 签名已生效（含重复打开已确认链接）：名单入口高亮为按钮，并展示分享区
       if (s === "ok") {
+        // title 换成分享文案：微信内点「···」转发时，卡片标题即这句话
+        document.title = T("shareText");
         buildShare();
         if (!document.getElementById("view-list-btn")) {
           const viewBtn = document.createElement("p");
@@ -124,8 +136,14 @@ document.addEventListener("DOMContentLoaded", function () {
       const area = document.getElementById("share-area");
       const lang = (window.covenantI18n && covenantI18n.lang) || fLang;
       const CANONICAL = "https://symy.ai/covenant";
+      // 分享链接指向专门分享页（带签名者指纹 h，share.html 名单校验后展示个人卡）
+      const H_PARAM = (function () {
+        const h = new URLSearchParams(location.search).get("h") || "";
+        return /^[0-9a-f]{16}$/.test(h) ? h : "";
+      })();
+      const shareLink = H_PARAM ? CANONICAL + "/share.html?lang=" + lang + "&h=" + H_PARAM : CANONICAL;
       const text = T("shareText");
-      const u = encodeURIComponent(CANONICAL);
+      const u = encodeURIComponent(shareLink);
       const t = encodeURIComponent(text);
       const label = document.createElement("p");
       label.className = "share-label";
@@ -146,14 +164,39 @@ document.addEventListener("DOMContentLoaded", function () {
       const copyPill = () => pill(T("copyLink"), null, function (e) {
         e.preventDefault();
         const self = this, old = self.textContent;
-        (navigator.clipboard ? navigator.clipboard.writeText(CANONICAL) : Promise.reject())
+        (navigator.clipboard ? navigator.clipboard.writeText(shareLink) : Promise.reject())
           .catch(function () {
             const ta = document.createElement("textarea");
-            ta.value = CANONICAL; document.body.appendChild(ta); ta.select();
+            ta.value = shareLink; document.body.appendChild(ta); ta.select();
             try { document.execCommand("copy"); } catch (_) {}
             ta.remove();
           })
           .finally(function () { self.textContent = T("copied"); setTimeout(function () { self.textContent = old; }, 1500); });
+      });
+      // 已在微信内：直接给转发引导浮层，不再让用户扫码
+      const showWxGuide = () => {
+        const ov = document.createElement("div");
+        ov.className = "wx-overlay";
+        const arrow = document.createElement("div");
+        arrow.className = "wx-arrow";
+        arrow.textContent = "↗";
+        const card = document.createElement("div");
+        card.className = "wx-card";
+        const dots = document.createElement("div");
+        dots.className = "wx-dots";
+        dots.textContent = "···";
+        const h = document.createElement("h3"); h.textContent = T("wxForward");
+        const hint = document.createElement("p"); hint.className = "hint"; hint.textContent = T("wxForwardHint");
+        const btn = document.createElement("button"); btn.className = "wx-close"; btn.textContent = "×";
+        btn.onclick = function () { ov.remove(); };
+        ov.onclick = function (ev) { if (ev.target === ov) ov.remove(); };
+        card.appendChild(dots); card.appendChild(h); card.appendChild(hint); card.appendChild(btn);
+        ov.appendChild(card); ov.appendChild(arrow);
+        document.body.appendChild(ov);
+      };
+      const wxForwardPill = () => pill(T("wxForward"), null, function (e) {
+        e.preventDefault();
+        showWxGuide();
       });
       const qrPill = () => pill(T("shareWeChat"), null, function (e) {
         e.preventDefault();
@@ -166,7 +209,7 @@ document.addEventListener("DOMContentLoaded", function () {
           const h = document.createElement("h3"); h.textContent = T("qrTitle");
           const hint = document.createElement("p"); hint.className = "hint"; hint.textContent = T("qrHint");
           const tb = document.createElement("table"); tb.className = "qr-table";
-          const qr = qrcode(0, "M"); qr.addData(CANONICAL); qr.make();
+          const qr = qrcode(0, "M"); qr.addData(shareLink); qr.make();
           for (let r = 0; r < qr.getModuleCount(); r++) {
             const tr = tb.insertRow(-1);
             for (let c = 0; c < qr.getModuleCount(); c++) {
@@ -187,7 +230,11 @@ document.addEventListener("DOMContentLoaded", function () {
         sc.onerror = function () {};
         document.head.appendChild(sc);
       });
-      if (lang === "zh") {
+      const isWeChat = /MicroMessenger/i.test(navigator.userAgent || "");
+      if (isWeChat) {
+        // 已在微信内置浏览器：扫码无意义，直接引导右上角转发
+        wxForwardPill();
+      } else if (lang === "zh") {
         pill(T("shareWeibo"), "https://service.weibo.com/share/share.php?url=" + u + "&title=" + t);
         qrPill();
       } else {
@@ -200,7 +247,7 @@ document.addEventListener("DOMContentLoaded", function () {
       if (navigator.share) {
         pill(T("sysShare"), null, function (e) {
           e.preventDefault();
-          navigator.share({ title: T("pageTitle"), text: text, url: CANONICAL }).catch(function () {});
+          navigator.share({ title: T("pageTitle"), text: text, url: shareLink }).catch(function () {});
         });
       }
     }

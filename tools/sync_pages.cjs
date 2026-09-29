@@ -31,7 +31,7 @@ for (const l of ['zh', 'en']) for (const k of Object.keys(newD[l])) {
 if (!changed.length) { console.log('词典无变更，无需同步'); process.exit(0); }
 console.log('词典变更 ' + changed.length + ' 项（' + changed.map(c => c.lang + ':' + c.k).join(', ') + '）');
 
-for (const p of ['index.html', 'plan.html', 'signatures.html', 'charter.html', 'signed.html']) {
+for (const p of ['index.html', 'plan.html', 'signatures.html', 'charter.html', 'signed.html', 'share.html']) {
   let h = fs.readFileSync(p, 'utf8'), n = 0;
   for (const c of changed) {
     if (c.old == null) continue; // 新增 key：初始文本不存在，COV_FB 需 rebuild 流程，此处跳过并报告
@@ -52,9 +52,9 @@ for (const p of ['index.html', 'plan.html', 'signatures.html', 'charter.html', '
 }
 
 // 自检：COV_FB 块必须是合法 JSON（key 名被误改会在这里炸出来）
-for (const p of ['index.html', 'plan.html', 'signatures.html', 'charter.html']) {
-  const m = fs.readFileSync(p, 'utf8').match(/var COV_FB = (\{.*?\});\n/s);
+for (const p of ['index.html', 'plan.html', 'signatures.html', 'charter.html', 'share.html']) {
+  const m = fs.readFileSync(p, 'utf8').match(/var (?:COV_FB|FALLBACK) = (\{.*?\});\n/s);
   if (!m) { console.log(p + ': ⚠️ COV_FB 未找到'); continue; }
-  try { JSON.parse(m[1]); console.log(p + ': COV_FB JSON ✓'); }
-  catch (e) { console.log(p + ': ✗ COV_FB JSON 损坏——' + e.message); process.exit(1); }
+  try { new Function('return ' + m[1]); console.log(p + ': 兜底词典语法 ✓'); }
+  catch (e) { console.log(p + ': ✗ 兜底词典语法损坏——' + e.message); process.exit(1); }
 }

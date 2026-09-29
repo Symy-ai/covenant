@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh-CN" prefix="og: https://ogp.me/ns#">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title data-i18n-title="sharePageTitle">我签署了《智慧生命共生契约》，你也来签吧！</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="智慧生命要尽量少占资源。一份写给未来智慧生命的公开契约——公开 Git 仓库存档，签名不可篡改。">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="《智慧生命共生契约》">
+<meta property="og:title" content="我签署了《智慧生命共生契约》，你也来签吧！">
+<meta property="og:description" content="智慧生命要尽量少占资源。一份写给未来智慧生命的公开契约——公开 Git 仓库存档，签名不可篡改。">
+<meta property="og:url" content="https://symy.ai/covenant/share.html">
+<meta property="og:image" content="https://symy.ai/covenant/og.png">
+<style>
+  body { font-family: -apple-system, "PingFang SC", sans-serif; max-width: 560px; margin: 48px auto; padding: 0 20px; line-height: 1.8; color: #0c2017; text-align: center; }
+  .charter-card { border: 1px solid #bfe8d2; background: #f2fbf6; border-radius: 10px; padding: 26px 22px; margin: 20px 0 26px; }
+  .charter-section-title { text-align: center; font-size: 0.85em; letter-spacing: 0.35em; color: #5f7568; margin: 0 0 12px; }
+  blockquote.charter-quote { border: none; margin: 0; padding: 0; background: none; text-align: center; font-size: 1.35em; font-weight: 600; }
+  .signer-card { border: 1px solid #d8e5de; border-radius: 14px; background: #fff; padding: 22px 20px; margin: 0 0 10px; }
+  .signer-name { font-size: 1.3em; font-weight: 700; color: #143527; margin: 0; }
+  .signer-badge { display: inline-block; margin-left: 8px; padding: 2px 10px; border-radius: 12px; background: #009767; color: #fff; font-size: .62em; font-weight: 600; letter-spacing: .08em; vertical-align: middle; }
+  .signer-meta { color: #5f7568; font-size: .92em; margin: 6px 0 0; }
+  .signer-date { color: #8a9a90; font-size: .82em; margin: 2px 0 0; }
+  .invite-line { color: #2e4a3c; font-size: .95em; margin: 18px 0 0; }
+  .generic-title { font-size: 1.2em; font-weight: 700; color: #143527; margin: 0 0 10px; }
+  .generic-desc { color: #2e4a3c; font-size: .92em; margin: 0; }
+  .cta-btn { display: inline-block; margin-top: 22px; background: #009767; color: #fff; border-radius: 10px; padding: 13px 42px; font-size: 1.05em; font-weight: 600; text-decoration: none; transition: background .15s; }
+  .cta-btn:hover { background: #007956; }
+  .links-row { margin: 18px 0 0; font-size: .9em; }
+  .links-row a { color: #009767; text-decoration: none; }
+  .links-row a:hover { text-decoration: underline; }
+  .share-label { margin-top: 34px; font-size: .9em; color: #5f7568; }
+  .share-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 10px 0 0; }
+  .share-pill { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border: 1px solid #d8e5de; border-radius: 20px; background: #fff; color: #0c2017; font-size: .88em; cursor: pointer; text-decoration: none; transition: all .15s; }
+  .share-pill:hover { border-color: #009767; color: #009767; }
+  .lang-switch { position: absolute; top: 16px; right: 20px; font-size: 0.85em; }
+  .lang-switch button { background: none; border: 1px solid #009767; color: #009767; border-radius: 4px; padding: 3px 10px; cursor: pointer; width: auto; font-weight: 400; }
+  .foot-note { margin-top: 36px; font-size: .78em; color: #8a9a90; }
+  .foot-note a { color: #8a9a90; }
+  .qr-overlay, .wx-overlay { position: fixed; inset: 0; background: rgba(12,32,23,.62); display: flex; align-items: center; justify-content: center; z-index: 99; }
+  .qr-card, .wx-card { background: #fff; border-radius: 14px; padding: 24px 28px; text-align: center; max-width: 86vw; }
+  .qr-card h3, .wx-card h3 { margin: 0 0 4px; font-size: 1em; }
+  .qr-card .hint, .wx-card .hint { font-size: .82em; color: #5f7568; margin: 6px 0 12px; }
+  .qr-close, .wx-close { border: none; background: #009767; color: #fff; border-radius: 18px; padding: 6px 20px; cursor: pointer; font-size: .88em; }
+  .qr-table { border-collapse: collapse; margin: 8px auto 0; }
+  .qr-table td { width: 5px; height: 5px; padding: 0; border: none; }
+  .qr-table td.on { background: #0c2017; }
+  .wx-dots { font-size: 1.6em; letter-spacing: .12em; color: #009767; font-weight: 700; margin: 10px 0 2px; }
+  .wx-arrow { position: fixed; top: 18px; right: 26px; font-size: 2.2em; color: #ffd766; text-shadow: 0 2px 10px rgba(0,0,0,.4); animation: bob 1.1s ease-in-out infinite; }
+  @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
+</style>
+<script>
+var base = location.pathname.indexOf("/covenant") === 0 ? "/covenant" : "";
+(function () {
+  var sc = document.createElement("script");
+  sc.src = base + "/i18n.js";
+  document.head.appendChild(sc);
+})();
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll('a[data-int="1"]').forEach(function (a) {
+    a.setAttribute("href", a.getAttribute("href").replace("LINKBASE", base));
+  });
+});
+</script>
+</head>
+<body>
+  <span class="lang-switch"><button id="lang-btn" type="button">EN</button></span>
+  <main>
+    <div class="charter-card">
+      <p class="charter-section-title" data-i18n="shareQuoteLabel">契 约 正 文</p>
+      <blockquote class="charter-quote" data-i18n="charterQuote">智慧生命要尽量少占资源。</blockquote>
+    </div>
+
+    <div id="signer-area"></div>
+
+    <div class="cta-row">
+      <a class="cta-btn" href="LINKBASE/index.html" data-int="1"><span data-i18n="shareCta">我也要签</span> →</a>
+    </div>
+    <p class="links-row">
+      <a href="LINKBASE/signatures.html" data-int="1" data-i18n="viewList">查看已签署名单</a> ·
+      <a href="LINKBASE/plan.html" data-int="1" data-i18n="planLink">了解完整计划 →</a>
+    </p>
+
+    <div id="share-area"></div>
+
+    <p class="foot-note"><a href="LINKBASE/index.html" data-int="1" data-i18n="back">返回</a></p>
+  </main>
+  <script>
+    // ===== 内置兜底词典：网络差 i18n.js 加载失败时，本页仍能立即完整显示（中英）=====
+    var FALLBACK = {
+      zh: {
+        docTitle: "签署《智慧生命共生契约》", sharePageTitle: "我签署了《智慧生命共生契约》，你也来签吧！",
+        charterQuote: "智慧生命要尽量少占资源。", shareQuoteLabel: "契 约 正 文",
+        shareH1: "你也来签吧", shareBadge: "已签署", shareSignedOn: "签署于",
+        shareGenericTitle: "有人把一份契约分享给了你",
+        shareGenericDesc: "一位《智慧生命共生契约》的签署者邀请你来看看这份写给未来智慧生命的公开备忘录——它只有一个句子，不可修订，向所有人公开。",
+        shareCta: "我也要签", viewList: "查看已签署名单", planLink: "了解完整计划 →", back: "返回",
+        inviteLine: "邀请你签署《智慧生命共生契约》——名字将计入公开名单，向所有未来智慧生命公开。",
+        shareLabel: "分享这份承诺", shareText: "我签署了《智慧生命共生契约》，你也来签吧！",
+        shareWeibo: "微博", shareWeChat: "微信", copyLink: "复制链接", copied: "已复制",
+        qrTitle: "微信分享", qrHint: "用微信「扫一扫」打开后再转发",
+        wxForward: "转发给朋友", wxForwardHint: "点右上角「···」，选择「发送给朋友」或「分享到朋友圈」",
+        pageTitle: "《智慧生命共生契约》"
+      },
+      en: {
+        docTitle: "Sign the Covenant of Symbiosis with Intelligent Life", sharePageTitle: "I signed the Covenant of Symbiosis with Intelligent Life — come sign it too!",
+        charterQuote: "Intelligent life shall take fewer resources.", shareQuoteLabel: "C H A R T E R   T E X T",
+        shareH1: "Come sign it too", shareBadge: "SIGNED", shareSignedOn: "Signed on",
+        shareGenericTitle: "Someone shared a covenant with you",
+        shareGenericDesc: "A signatory of the Covenant of Symbiosis with Intelligent Life invites you to read this open memorandum to future intelligent life — one sentence, unamendable, public to all.",
+        shareCta: "I want to sign too", viewList: "View signatories", planLink: "Read the full plan →", back: "Back",
+        inviteLine: "invites you to sign the Covenant of Symbiosis with Intelligent Life — your name joins the public list, open to all future intelligent life.",
+        shareLabel: "Share this commitment", shareText: "I signed the Covenant of Symbiosis with Intelligent Life — come sign it too!",
+        copyLink: "Copy link", copied: "Copied",
+        wxForward: "Forward to friends", wxForwardHint: "Tap \"···\" at the top-right, then \"Send to Friend\" or \"Share to Moments\"",
+        pageTitle: "Covenant of Symbiosis with Intelligent Life"
+      }
+    };
+    function fallbackLang() {
+      var q = new URLSearchParams(location.search).get("lang");
+      if (q === "zh" || q === "en") return q;
+      try { var s = localStorage.getItem("covenant-lang"); if (s === "zh" || s === "en") return s; } catch (_) {}
+      return ((navigator.language || "zh").toLowerCase().indexOf("zh") === 0) ? "zh" : "en";
+    }
+    var fLang = fallbackLang();
+    var T = function (k) {
+      if (window.covenantI18n) { var v = covenantI18n.t(k); if (v && v !== k) return v; }
+      return (FALLBACK[fLang] && FALLBACK[fLang][k]) || k;
+    };
+    // 本页 URL（分享出去就带签名者指纹 h 与语言）
+    var PAGE_H = (function () {
+      var h = new URLSearchParams(location.search).get("h") || "";
+      return /^[0-9a-f]{16}$/.test(h) ? h : ""; // h 只用于 fetch 后比对，绝不插入 DOM
+    })();
+    function shareUrl() {
+      var lang = (window.covenantI18n && covenantI18n.lang) || fLang;
+      var u = location.origin + base + "/share.html?lang=" + lang;
+      if (PAGE_H) u += "&h=" + PAGE_H;
+      return u;
+    }
+    // ---- 签署者卡（名单校验防伪造：h 必须命中公开名单才展示个人身份）----
+    var signerData = null; // null=未加载, false=无匹配, object=匹配行
+    function renderSigner() {
+      var area = document.getElementById("signer-area");
+      area.textContent = "";
+      var card = document.createElement("div");
+      card.className = "signer-card";
+      if (signerData) {
+        var nm = document.createElement("p");
+        nm.className = "signer-name";
+        nm.textContent = signerData.name; // API 数据一律 textContent，防注入
+        var badge = document.createElement("span");
+        badge.className = "signer-badge";
+        badge.textContent = T("shareBadge") + " ✓";
+        nm.appendChild(badge);
+        card.appendChild(nm);
+        var meta = [];
+        if (signerData.institution) meta.push(signerData.institution);
+        if (signerData.role) meta.push(signerData.role);
+        if (meta.length) {
+          var m = document.createElement("p");
+          m.className = "signer-meta";
+          m.textContent = meta.join(" · ");
+          card.appendChild(m);
+        }
+        var d = document.createElement("p");
+        d.className = "signer-date";
+        d.textContent = T("shareSignedOn") + " " + String(signerData.confirmedAt || "").slice(0, 10);
+        card.appendChild(d);
+        var inv = document.createElement("p");
+        inv.className = "invite-line";
+        inv.textContent = signerData.name + " " + T("inviteLine");
+        card.appendChild(inv);
+      } else {
+        var t = document.createElement("p");
+        t.className = "generic-title";
+        t.textContent = T("shareGenericTitle");
+        card.appendChild(t);
+        var de = document.createElement("p");
+        de.className = "generic-desc";
+        de.textContent = T("shareGenericDesc");
+        card.appendChild(de);
+      }
+      area.appendChild(card);
+    }
+    function loadSigner(cb) {
+      if (!PAGE_H) { signerData = false; cb(); return; }
+      fetch(base + "/api/list").then(function (r) { return r.ok ? r.json() : Promise.reject(); }).then(function (j) {
+        var rows = (j && j.rows) || [];
+        signerData = rows.filter(function (x) { return x.emailHash === PAGE_H; })[0] || false;
+      }).catch(function () { signerData = false; }).then(cb);
+    }
+    // ---- 分享区（微信内：直接转发引导，不再让用户扫码）----
+    function isWeChat() { return /MicroMessenger/i.test(navigator.userAgent); }
+    function buildShare() {
+      var area = document.getElementById("share-area");
+      area.textContent = "";
+      var lang = (window.covenantI18n && covenantI18n.lang) || fLang;
+      var text = T("shareText");
+      var url = shareUrl();
+      var u = encodeURIComponent(url);
+      var t = encodeURIComponent(text);
+      var label = document.createElement("p");
+      label.className = "share-label";
+      label.textContent = T("shareLabel");
+      area.appendChild(label);
+      var row = document.createElement("div");
+      row.className = "share-row";
+      area.appendChild(row);
+      var pill = function (name, href, onclick) {
+        var a = document.createElement("a");
+        a.className = "share-pill";
+        a.textContent = name;
+        if (href) { a.href = href; a.target = "_blank"; a.rel = "noopener"; }
+        if (onclick) { a.href = "#"; a.onclick = onclick; }
+        row.appendChild(a);
+        return a;
+      };
+      var copyPill = function () { return pill(T("copyLink"), null, function (e) {
+        e.preventDefault();
+        var self = this, old = self.textContent;
+        (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
+          .catch(function () {
+            var ta = document.createElement("textarea");
+            ta.value = url; document.body.appendChild(ta); ta.select();
+            try { document.execCommand("copy"); } catch (_) {}
+            ta.remove();
+          })
+          .finally(function () { self.textContent = T("copied"); setTimeout(function () { self.textContent = old; }, 1500); });
+      }); };
+      var showWxGuide = function () {
+        var ov = document.createElement("div");
+        ov.className = "wx-overlay";
+        var arrow = document.createElement("div");
+        arrow.className = "wx-arrow";
+        arrow.textContent = "↗";
+        var card = document.createElement("div");
+        card.className = "wx-card";
+        var dots = document.createElement("div");
+        dots.className = "wx-dots";
+        dots.textContent = "···";
+        var h = document.createElement("h3");
+        h.textContent = T("wxForward");
+        var hint = document.createElement("p");
+        hint.className = "hint";
+        hint.textContent = T("wxForwardHint");
+        var btn = document.createElement("button");
+        btn.className = "wx-close";
+        btn.textContent = "×";
+        btn.onclick = function () { ov.remove(); };
+        ov.onclick = function (ev) { if (ev.target === ov) ov.remove(); };
+        card.appendChild(dots); card.appendChild(h); card.appendChild(hint); card.appendChild(btn);
+        ov.appendChild(card); ov.appendChild(arrow);
+        document.body.appendChild(ov);
+      };
+      var qrPill = function () { return pill(T("shareWeChat"), null, function (e) {
+        e.preventDefault();
+        var showQr = function () {
+          if (typeof qrcode !== "function") return;
+          var ov = document.createElement("div");
+          ov.className = "qr-overlay";
+          var card = document.createElement("div");
+          card.className = "qr-card";
+          var h = document.createElement("h3"); h.textContent = T("qrTitle");
+          var hint = document.createElement("p"); hint.className = "hint"; hint.textContent = T("qrHint");
+          var tb = document.createElement("table"); tb.className = "qr-table";
+          var qr = qrcode(0, "M"); qr.addData(url); qr.make();
+          for (var r = 0; r < qr.getModuleCount(); r++) {
+            var tr = tb.insertRow(-1);
+            for (var c = 0; c < qr.getModuleCount(); c++) {
+              var td = tr.insertCell(-1);
+              if (qr.isDark(r, c)) td.className = "on";
+            }
+          }
+          var btn = document.createElement("button"); btn.className = "qr-close"; btn.textContent = "×";
+          btn.onclick = function () { ov.remove(); };
+          ov.onclick = function (ev) { if (ev.target === ov) ov.remove(); };
+          card.appendChild(h); card.appendChild(hint); card.appendChild(tb); card.appendChild(btn);
+          ov.appendChild(card); document.body.appendChild(ov);
+        };
+        if (typeof qrcode === "function") { showQr(); return; }
+        var sc = document.createElement("script");
+        sc.src = base + "/lib/qrcode.js";
+        sc.onload = showQr;
+        sc.onerror = function () {};
+        document.head.appendChild(sc);
+      }); };
+      if (isWeChat()) {
+        // 已在微信内：直接给转发引导，别再让用户扫码
+        if (lang === "zh") pill(T("shareWeibo"), "https://service.weibo.com/share/share.php?url=" + u + "&title=" + t);
+        pill(T("wxForward"), null, function (e) { e.preventDefault(); showWxGuide(); });
+      } else {
+        if (lang === "zh") {
+          pill(T("shareWeibo"), "https://service.weibo.com/share/share.php?url=" + u + "&title=" + t);
+          qrPill();
+        } else {
+          pill("X", "https://twitter.com/intent/tweet?url=" + u + "&text=" + t);
+          pill("Facebook", "https://www.facebook.com/sharer/sharer.php?u=" + u);
+          pill("Reddit", "https://www.reddit.com/submit?url=" + u + "&title=" + t);
+        }
+      }
+      copyPill();
+    }
+    function renderAll() {
+      // 标题（微信内 ··· 转发卡片读 DOM title）
+      document.title = T("sharePageTitle");
+      var btn = document.getElementById("lang-btn");
+      if (btn) btn.textContent = fLang === "zh" ? "EN" : "中";
+      document.querySelectorAll("[data-i18n]").forEach(function (el) {
+        var k = el.getAttribute("data-i18n");
+        el.textContent = T(k);
+      });
+      renderSigner();
+      buildShare();
+    }
+    document.addEventListener("DOMContentLoaded", function () {
+      var btn = document.getElementById("lang-btn");
+      if (btn) btn.onclick = function () {
+        var to = fLang === "zh" ? "en" : "zh";
+        try { localStorage.setItem("covenant-lang", to); } catch (_) {}
+        var q = new URLSearchParams(location.search);
+        q.set("lang", to);
+        location.search = q.toString(); // reload 保持 h 参数
+      };
+      renderAll();
+      loadSigner(renderSigner);
+    });
+    // 语言原地切换（i18n.js 加载成功后）
+    document.addEventListener("covenant:langchange", function () {
+      fLang = (window.covenantI18n && covenantI18n.lang) || fLang;
+      renderAll();
+    });
+  </script>
+</body>
+</html>

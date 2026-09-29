@@ -22,7 +22,7 @@ for (const l of ['zh','en']) {
 console.log('词典 key 总数: zh=' + Object.keys(D.zh).length + ' en=' + Object.keys(D.en).length);
 
 // 每页 key 提取
-const pages = ['index.html','plan.html','signatures.html','charter.html','signed.html'];
+const pages = ['index.html','plan.html','signatures.html','charter.html','signed.html','share.html'];
 const result = {};
 for (const p of pages) {
   const html = fs.readFileSync(p, 'utf8');

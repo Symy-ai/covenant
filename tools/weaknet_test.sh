@@ -23,7 +23,7 @@ sleep 2  # close 是异步退出：立即 route 会挂到垂死实例，随后�
 agent-browser network route "**/i18n.js" --abort > /dev/null 2>&1
 
 FAIL=0; INVALID=0; PASS=0
-for pg in index plan signatures charter signed; do
+for pg in index plan signatures charter signed share; do
   for lg in zh en; do
     agent-browser open "$URL/$pg.html?lang=$lg&wt=$RANDOM" > /dev/null 2>&1
     agent-browser wait 700 > /dev/null 2>&1

@@ -9,7 +9,8 @@ import { logError, track, hashId } from "../lib/monitoring.js";
 
 const SITE = "https://symy.ai/covenant";
 // lang 穿透: 确认邮件按钮带 lang → 重定向 signed.html 继续透传(换设备点链接也保持语言)
-const redirect = (status, lang) => `https://symy.ai/covenant/signed.html?status=${status}&lang=${lang === "en" ? "en" : "zh"}`;
+// h 穿透: 已生效/已签署态带 emailHash → signed.html 分享链接指向个人化 share.html（名单校验防伪造）
+const redirect = (status, lang, h) => `https://symy.ai/covenant/signed.html?status=${status}&lang=${lang === "en" ? "en" : "zh"}${h ? `&h=${h}` : ""}`;
 
 /**
  * 写入 pending-review 分支（转人工队列）——manual 与数据损坏两条路径共用
@@ -103,7 +104,7 @@ export default async function handler(req, res) {
       // 清残留 pending（若有）
       await ghDelete(`signatures/pending/${fileName}`, rec.sha, `cleanup-dup: ${emailHash}`);
       await track(emailHash, "covenant_confirm_duplicate", {});
-      return res.redirect(302, redirect("duplicate", req.query.lang));
+      return res.redirect(302, redirect("duplicate", req.query.lang, emailHash));
     }
 
     const level = classify(classifyInput);
@@ -118,7 +119,7 @@ export default async function handler(req, res) {
       await ghPut(`signatures/tokens/${token}.json`, { emailHash, result: "auto", confirmedAt: new Date().toISOString() }, `token-tombstone: ${emailHash}`);
       await ghDelete(`signatures/pending/${fileName}`, rec.sha, `confirm: ${emailHash}`);
       await track(emailHash, "covenant_confirm_success", { level: "auto" });
-      return res.redirect(302, redirect("ok", req.query.lang));
+      return res.redirect(302, redirect("ok", req.query.lang, emailHash));
     }
 
     // manual → pending-review 分支（转人工）
