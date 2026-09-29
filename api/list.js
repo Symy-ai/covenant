@@ -25,7 +25,7 @@ async function fromJsdelivr() {
     .map((f) => f.name)
     .filter((n) => n.startsWith("/signatures/verified/") && n.endsWith(".json"))
     .map((n) => n.slice("/signatures/verified/".length));
-  if (!names.length) throw new Error("cdn-empty");
+  if (!names.length) return []; // 空目录是合法状态（名单真空），非故障
   const settled = await Promise.allSettled(
     names.map(async (n) => {
       const r2 = await fetch(`${CDN}/${n}?t=${Date.now()}`, { cache: "no-store" });
@@ -40,7 +40,7 @@ async function fromJsdelivr() {
 
 async function fromGithub() {
   const names = await ghList("signatures/verified");
-  if (!names.length) throw new Error("gh-empty");
+  if (!names.length) return []; // 空目录是合法状态（名单真空），非故障
   const settled = await Promise.allSettled(
     names
       .filter((n) => n.endsWith(".json"))
@@ -72,7 +72,9 @@ export default async function handler(req, res) {
     sources.push("github");
   } catch (_) { /* 限流时 CDN 结果仍完整可用 */ }
 
-  if (!merged.size) {
+  // 空态判定：sources 非空 = 至少一个上游活着。0 条签名是合法状态（如初始化/清空后），返回 200 空名单；
+  // 仅当两个通道都异常（无 source）才是真故障。
+  if (!sources.length) {
     await logError(new Error("list: both channels empty"), { stage: "list" });
     return res.status(502).json({ error: "upstream_empty" });
   }
