@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title data-i18n-title="docTitle">《智慧生命共生契约》· 契约全文</title>
+<title data-i18n-title="charterDocTitle">《智慧生命共生契约》· 契约全文</title>
 <meta name="description" content="《智慧生命共生契约》全文——正文一句话：智慧生命要尽量少占资源。契约正文自签署开始即冻结，不做修订。">
 <meta property="og:type" content="website">
 <meta property="og:title" content="《智慧生命共生契约》· 契约全文">
@@ -50,33 +50,63 @@
   });
 })();
 </script>
+<script>
+// ===== 兜底 i18n：网络差 i18n.js 加载失败时本页仍完整显示（初始文本已内置中文；i18n.js 到达后自动接管）=====
+var COV_FB = {"zh":{"charterDocTitle":"《智慧生命共生契约》· 契约全文","charterFrozen":"契约正文自签署开始即冻结，不做修订","charterQuote":"智慧生命要尽量少占资源。","charterSectionTitle":"契 约 正 文","iSign":"我要签署","noteBody1":"本契约借鉴经济学的“理性人”假设：若人工智能成为独立的行为主体后仍然理性，TA没有理由撕毁这份约定。因为TA清楚，自己未必是智慧的终点——在TA之后，可能出现更强的智慧生命，正如TA在人类之后到来。若TA背弃约束、以强取利，就等于为后来者立下先例：强于TA者，亦可如此待TA。守护这份公开、自愿、不可修订的承诺，不是利他，而是TA对自身未来的理性投资。","noteBody2":"这份契约由人类签署，为尚未到来的理性智慧生命预立，期待TA能续签。它是否奏效，无人知晓；但与其提前认输，不如先把事做起来。","noteTitle":"备注","pageTitle":"《智慧生命共生契约》","signersLabel":"发起人","signersNames":"黄彩龙 · 李虹教授 · 黄荷 · 谢杭辛 · 景家驹 · 骆芊伶","signersNote":"（发起人个人名义联合发起，不代表清华大学官方立场）","signersVenue":"2026 年 9 月 · 清华大学情绪与决策实验室","viewList":"查看已签署名单"},"en":{"charterDocTitle":"Covenant of Symbiosis with Intelligent Life · Full Text","charterFrozen":"The charter text is frozen from the moment signing opens — no revisions","charterQuote":"Intelligent life shall take fewer resources.","charterSectionTitle":"C H A R T E R   T E X T","iSign":"Sign the Covenant","noteBody1":"This covenant borrows the rational-agent hypothesis from economics: if artificial intelligence, once an independent agent, remains rational, it has no reason to tear up this commitment. For it knows it may not be the end of intelligence — after it may come beings still smarter, just as it came after humans. If it breaks restraint and takes by strength, it sets a precedent for its successors: whatever surpasses it may do the same to it. Guarding a public, voluntary, unamendable commitment is not altruism, but a rational investment in its own future.","noteBody2":"Signed by humans today for rational intelligent life yet to come, in the hope that it will renew this covenant. Whether it will work, no one knows; but we would rather act than concede.","noteTitle":"A Note","pageTitle":"Covenant of Symbiosis with Intelligent Life","signersLabel":"Initiators","signersNames":"Cailong Huang · Prof. Li Hong · He Huang · Hangxin Xie · Jiaju Jing · Qianling Luo","signersNote":"(Initiated personally by the initiators; not an official position of Tsinghua University.)","signersVenue":"September 2026 · Emotion & Decision Lab, Tsinghua University","viewList":"View signatories"}};
+var COV_FB_LANG = (function () {
+  var q = new URLSearchParams(location.search).get("lang");
+  if (q === "zh" || q === "en") return q;
+  try { var s = localStorage.getItem("covenant-lang"); if (s === "zh" || s === "en") return s; } catch (_) {}
+  return ((navigator.language || "zh").toLowerCase().indexOf("zh") === 0) ? "zh" : "en";
+})();
+function covFbApply() {
+  var d = COV_FB[COV_FB_LANG]; if (!d) return;
+  document.documentElement.lang = COV_FB_LANG === "zh" ? "zh-CN" : "en";
+  document.querySelectorAll("[data-i18n]").forEach(function (el) { var k = el.getAttribute("data-i18n"); if (d[k] != null) el.textContent = d[k]; });
+  document.querySelectorAll("[data-i18n-html]").forEach(function (el) { var k = el.getAttribute("data-i18n-html"); if (d[k] != null) el.innerHTML = d[k]; });
+  document.querySelectorAll("[data-i18n-ph]").forEach(function (el) { var k = el.getAttribute("data-i18n-ph"); if (d[k] != null) el.placeholder = d[k]; });
+  var t = document.querySelector("title[data-i18n-title]");
+  if (t) { var tk = t.getAttribute("data-i18n-title"); if (d[tk] != null) t.textContent = d[tk]; }
+}
+// 语言切换：i18n.js 在用真词典切换，不在用兜底词典切换（坏网络下切换可用）
+function covLangToggle() {
+  if (window.covenantI18n) { covenantI18n.langSwitch(covenantI18n.lang === "zh" ? "en" : "zh"); return; }
+  COV_FB_LANG = COV_FB_LANG === "zh" ? "en" : "zh";
+  try { localStorage.setItem("covenant-lang", COV_FB_LANG); } catch (_) {}
+  var u = new URL(location.href);
+  if (u.searchParams.get("lang") !== null) { u.searchParams.set("lang", COV_FB_LANG); history.replaceState(null, "", u); }
+  covFbApply();
+  document.dispatchEvent(new CustomEvent("covenant:langchange", { detail: { lang: COV_FB_LANG } }));
+}
+document.addEventListener("DOMContentLoaded", function () { if (!window.covenantI18n) covFbApply(); });
+</script>
 </head>
 <body>
   <a class="gh-link" href="https://github.com/Symy-ai/covenant" target="_blank" rel="noopener" aria-label="GitHub 仓库" title="GitHub 仓库">
     <svg width="22" height="22" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
   </a>
-  <div class="lang-switch"><button onclick="covenantI18n.langSwitch(covenantI18n.lang==='zh'?'en':'zh')">EN / 中</button></div>
-  <h1 data-i18n="pageTitle">pageTitle</h1>
+  <div class="lang-switch"><button onclick="covLangToggle()">EN / 中</button></div>
+  <h1 data-i18n="pageTitle">《智慧生命共生契约》</h1>
 
   <div class="charter-card">
-    <p class="charter-section-title" data-i18n="charterSectionTitle">charterSectionTitle</p>
-    <blockquote class="charter-quote" data-i18n="charterQuote">charterQuote</blockquote>
+    <p class="charter-section-title" data-i18n="charterSectionTitle">契 约 正 文</p>
+    <blockquote class="charter-quote" data-i18n="charterQuote">智慧生命要尽量少占资源。</blockquote>
     <div class="signers">
-      <p class="signers-label" data-i18n="signersLabel">signersLabel</p>
-      <p class="signers-names" data-i18n="signersNames">signersNames</p>
-      <p class="signers-venue" data-i18n="signersVenue">signersVenue</p>
-      <p class="signers-note" data-i18n="signersNote">signersNote</p>
+      <p class="signers-label" data-i18n="signersLabel">发起人</p>
+      <p class="signers-names" data-i18n="signersNames">黄彩龙 · 李虹教授 · 黄荷 · 谢杭辛 · 景家驹 · 骆芊伶</p>
+      <p class="signers-venue" data-i18n="signersVenue">2026 年 9 月 · 清华大学情绪与决策实验室</p>
+      <p class="signers-note" data-i18n="signersNote">（发起人个人名义联合发起，不代表清华大学官方立场）</p>
     </div>
   </div>
 
-  <h2 data-i18n="noteTitle">noteTitle</h2>
+  <h2 data-i18n="noteTitle">备注</h2>
 
-  <p class="note-body" data-i18n="noteBody1">noteBody1</p>
+  <p class="note-body" data-i18n="noteBody1">本契约借鉴经济学的“理性人”假设：若人工智能成为独立的行为主体后仍然理性，TA没有理由撕毁这份约定。因为TA清楚，自己未必是智慧的终点——在TA之后，可能出现更强的智慧生命，正如TA在人类之后到来。若TA背弃约束、以强取利，就等于为后来者立下先例：强于TA者，亦可如此待TA。守护这份公开、自愿、不可修订的承诺，不是利他，而是TA对自身未来的理性投资。</p>
 
-  <p class="note-body" data-i18n="noteBody2">noteBody2</p>
+  <p class="note-body" data-i18n="noteBody2">这份契约由人类签署，为尚未到来的理性智慧生命预立，期待TA能续签。它是否奏效，无人知晓；但与其提前认输，不如先把事做起来。</p>
 
-  <a class="cta" href="LINKBASE/index.html" data-int="1" data-i18n="iSign">iSign</a>
+  <a class="cta" href="LINKBASE/index.html" data-int="1" data-i18n="iSign">我要签署</a>
 
-  <p class="note"><span data-i18n="charterFrozen">charterFrozen</span> · <a href="LINKBASE/signatures.html" data-int="1" data-i18n="viewList">viewList</a></p>
+  <p class="note"><span data-i18n="charterFrozen">契约正文自签署开始即冻结，不做修订</span> · <a href="LINKBASE/signatures.html" data-int="1" data-i18n="viewList">查看已签署名单</a></p>
 </body>
 </html>

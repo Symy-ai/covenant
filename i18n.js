@@ -6,6 +6,8 @@
   var I18N = {
     zh: {
       docTitle: "签署《智慧生命共生契约》",
+      listDocTitle: "已签署名单 · 《智慧生命共生契约》",
+      charterDocTitle: "《智慧生命共生契约》· 契约全文",
       pageTitle: "《智慧生命共生契约》",
       charterQuote: "智慧生命要尽量少占资源。",
       signersLabel: "发起人",
@@ -170,6 +172,8 @@
     },
     en: {
       docTitle: "Sign the Covenant of Symbiosis with Intelligent Life",
+      listDocTitle: "Signatories · Covenant of Symbiosis with Intelligent Life",
+      charterDocTitle: "Covenant of Symbiosis with Intelligent Life · Full Text",
       pageTitle: "Covenant of Symbiosis with Intelligent Life",
       charterQuote: "Intelligent life shall take fewer resources.",
       signersLabel: "Initiators",
@@ -373,7 +377,11 @@
       var k = el.getAttribute("data-i18n-ph"); if (d[k] != null) el.placeholder = d[k];
     });
     var t = document.querySelector("title[data-i18n-title]") || document.head.querySelector("title");
-    if (t && d.docTitle) t.textContent = d.docTitle;
+    if (t) {
+      var tk = t.getAttribute("data-i18n-title");
+      var tv = tk != null ? d[tk] : d.docTitle; // title 按各页自己的 data-i18n-title key 取值（plan 页是 pepDocTitle）
+      if (tv != null) t.textContent = tv;
+    }
   }
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", apply);
