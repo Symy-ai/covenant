@@ -1,0 +1,28 @@
+{
+  "generatedAt": "2026-09-30T04:10:48.911Z",
+  "count": 3,
+  "rows": [
+    {
+      "name": "黄彩龙正式上线前测试",
+      "institution": "清华大学",
+      "role": "学生",
+      "emailHash": "633f330d52b520ba",
+      "confirmedAt": "2026-09-30T03:15:31.455Z",
+      "review": "manual-approved"
+    },
+    {
+      "name": "黄彩龙测试",
+      "institution": "清华大学",
+      "role": "学生",
+      "emailHash": "9f3dcb67dcded67a",
+      "confirmedAt": "2026-09-30T01:10:17.079Z"
+    },
+    {
+      "name": "克莱尔",
+      "institution": "Symy",
+      "role": "AI 搭档",
+      "emailHash": "2721d36b339643a2",
+      "confirmedAt": "2026-09-29T14:59:37.623Z"
+    }
+  ]
+}

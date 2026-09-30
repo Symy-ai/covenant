@@ -1,0 +1,38 @@
+# 名单静态快照——每 5 分钟构建（全网缓存数据源）
+# 页面流量 100% 落 Vercel CDN 静态文件；本 workflow 是唯一的上游刷新源。
+# checkout 后直接读本地文件聚合，不打 GitHub API；无实质变化不提交（防历史膨胀）。
+name: signatures-snapshot
+on:
+  schedule:
+    - cron: "*/5 * * * *" # UTC，每 5 分钟
+  workflow_dispatch: {} # 支持手动触发（调试/补跑）
+permissions:
+  contents: write
+concurrency:
+  group: signatures-snapshot
+  cancel-in-progress: false # 不抢跑，上次没结束就等它完（快照构建是幂等的）
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # 快照要和最新 main 对齐；若 push 竞态导致 non-fast-forward，
+          # 本轮放弃（下一轮 5 分钟后重试），绝不强推
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node tools/build_snapshot.mjs
+      - name: Commit if changed
+        run: |
+          if git diff --quiet -- data/signatures.json; then
+            echo "no snapshot change, skip commit"
+            exit 0
+          fi
+          git config user.name "covenant-bot"
+          git config user.email "bot@symy.ai"
+          git add data/signatures.json
+          git commit -m "chore(data): signatures snapshot [skip ci]"
+          git pull --rebase origin main || (echo "rebase failed, skip this round" && git rebase --abort && exit 1)
+          git push origin main || (echo "push conflict, skip this round" && exit 1)

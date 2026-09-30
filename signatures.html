@@ -18,6 +18,7 @@
 <style>
   body { font-family: -apple-system, "PingFang SC", sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; line-height: 1.8; color: #0c2017; }
   h1 { font-size: 1.4em; margin: 14px 0 0; text-align: center; }
+  .updated-at { color: #8a9a90; }
   .page-sub { text-align: center; color: #5f7568; font-size: .98em; font-weight: 400; margin: 4px 0 8px; }
   .lang-switch { position: absolute; top: 16px; right: 20px; font-size: 0.85em; }
   .lang-switch button { background: none; border: 1px solid #009767; color: #009767; border-radius: 4px; padding: 3px 10px; cursor: pointer; width: auto; font-weight: 400; }
@@ -50,7 +51,7 @@
 </script>
 <script>
 // ===== 兜底 i18n：网络差 i18n.js 加载失败时本页仍完整显示（初始文本已内置中文；i18n.js 到达后自动接管）=====
-var COV_FB = {"zh":{"iSign":"我要签署","listCountPost":"位签署者","listCountPre":"共","listDesc":"名单直接读取公开仓库签名档案，实时生成；点击日期可核验该签名在 GitHub 上的提交记录。","listDocTitle":"已签署名单 · 《智慧生命共生契约》","listLoadFail":"（名单加载失败，请刷新或直接访问公开仓库）","listLoading":"加载中…","listTitle":"已签署名单","pageTitle":"《智慧生命共生契约》","thDate":"签署日期","thInst":"单位","thName":"姓名","thRole":"职务","verifyHint":"在 GitHub 上核验这条签名","listSubTitle":"—— 让弱肉强食到此为止的人"},"en":{"iSign":"Sign the Covenant","listCountPost":" signatories","listCountPre":"共","listDesc":"This list reads directly from the public signature archive — generated live. Click a date to verify the commit behind that signature on GitHub.","listDocTitle":"Signatories · Covenant of Symbiosis with Intelligent Life","listLoadFail":"(Failed to load the list — refresh or visit the public repository)","listLoading":"Loading…","listTitle":"Signatories","pageTitle":"Covenant of Symbiosis with Intelligent Life","thDate":"Signed","thInst":"Affiliation","thName":"Name","thRole":"Job Title","verifyHint":"Verify this signature on GitHub","listSubTitle":"— Those who ended the law of the jungle"}};
+var COV_FB = {"zh":{"iSign":"我要签署","listCountPost":"位签署者","listCountPre":"共","listDesc":"名单读取公开仓库签名档案，每 5 分钟自动刷新；点击日期可核验该签名在 GitHub 上的提交记录。","listDocTitle":"已签署名单 · 《智慧生命共生契约》","listLoadFail":"（名单加载失败，请刷新或直接访问公开仓库）","listLoading":"加载中…","listTitle":"已签署名单","pageTitle":"《智慧生命共生契约》","thDate":"签署日期","thInst":"单位","thName":"姓名","thRole":"职务","verifyHint":"在 GitHub 上核验这条签名","listSubTitle":"—— 让弱肉强食到此为止的人","listUpdated":"更新于 "},"en":{"iSign":"Sign the Covenant","listCountPost":" signatories","listCountPre":"共","listDesc":"This list reads from the public signature archive and auto-refreshes every 5 minutes. Click a date to verify the commit behind that signature on GitHub.","listDocTitle":"Signatories · Covenant of Symbiosis with Intelligent Life","listLoadFail":"(Failed to load the list — refresh or visit the public repository)","listLoading":"Loading…","listTitle":"Signatories","pageTitle":"Covenant of Symbiosis with Intelligent Life","thDate":"Signed","thInst":"Affiliation","thName":"Name","thRole":"Job Title","verifyHint":"Verify this signature on GitHub","listSubTitle":"— Those who ended the law of the jungle","listUpdated":"Updated "}};
 var COV_FB_LANG = (function () {
   var q = new URLSearchParams(location.search).get("lang");
   if (q === "zh" || q === "en") return q;
@@ -86,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function () { if (!window.covenant
   <div class="lang-switch"><button onclick="covLangToggle()">EN / 中</button></div>
   <h1 data-i18n="listTitle">已签署名单</h1>
   <p class="page-sub" data-i18n="listSubTitle">—— 让弱肉强食到此为止的人</p>
-  <p class="muted"><span data-i18n="listDesc">名单直接读取公开仓库签名档案，实时生成；点击日期可核验该签名在 GitHub 上的提交记录。</span> <span id="loading" data-i18n="listLoading">加载中…</span></p>
+  <p class="muted"><span data-i18n="listDesc">名单读取公开仓库签名档案，每 5 分钟自动刷新；点击日期可核验该签名在 GitHub 上的提交记录。</span> <span id="updated-at" class="updated-at"></span> <span id="loading" data-i18n="listLoading">加载中…</span></p>
   <table>
     <thead><tr><th data-i18n="thName">姓名</th><th data-i18n="thInst">单位</th><th data-i18n="thRole">职务</th><th data-i18n="thDate">签署日期</th></tr></thead>
     <tbody id="rows"></tbody>
@@ -105,12 +106,20 @@ document.addEventListener("DOMContentLoaded", function () { if (!window.covenant
     const API_BASE = location.pathname.indexOf("/covenant") === 0 ? "/covenant" : "";
 
     async function loadRows() {
+      // 主通道: 静态快照（全站 CDN 缓存，零函数调用零上游配额；Actions 每 5 分钟构建）
+      try {
+        const r = await fetch(`${API_BASE}/data/signatures.json`);
+        if (r.ok) {
+          const j = await r.json();
+          if (j && Array.isArray(j.rows)) return j.rows; // 空数组=真空名单，同样是合法快照
+        }
+      } catch (_) { /* 快照不可用 → 次通道 */ }
+
+      // 次通道: 同源聚合 API（边缘缓存，动态兜底——快照刚更新间隙/构建故障时）
       const rows = new Map();
       const key = (x) => x.emailHash || x.name + "|" + (x.confirmedAt || "");
-
-      // 主通道: 同源聚合
       try {
-        const r = await fetch(`${API_BASE}/api/list?t=${Date.now()}`);
+        const r = await fetch(`${API_BASE}/api/list`); // 不带 t= 时间戳——让浏览器/边缘 HTTP 缓存生效
         if (!r.ok) throw new Error(r.status);
         const j = await r.json();
         for (const x of j.rows) rows.set(key(x), x);
@@ -150,24 +159,59 @@ document.addEventListener("DOMContentLoaded", function () { if (!window.covenant
       return Array.from(rows.values());
     }
 
-    (async () => {
+    // ---- 名单缓存层（9-30 性能改版：定时刷新替代逐访实时拉取）----
+    // localStorage 秒开旧名单，TTL 5 分钟；页面常驻时每 5 分钟自动刷新；
+    // 切回标签页时若已过期立即刷新。失败且有旧缓存 → 保留旧数据不报错。
+    const LIST_TTL = 5 * 60 * 1000;
+    const CACHE_KEY = "covenant-list";
+    function readCache() {
       try {
-        const rows = await loadRows();
-        rows.sort((a, b) => (b.confirmedAt || "").localeCompare(a.confirmedAt || ""));
-        document.getElementById("rows").innerHTML = rows.map((x) => {
-          const commitLink = x.emailHash
-            ? `https://github.com/${REPO}/commits/main/signatures/verified/${encodeURIComponent(x.emailHash)}.json`
-            : null;
-          const date = esc((x.confirmedAt || "").slice(0, 10));
-          return `
+        const c = JSON.parse(localStorage.getItem(CACHE_KEY) || "null");
+        if (c && c.at && Array.isArray(c.rows)) return c;
+      } catch (_) {}
+      return null;
+    }
+    function writeCache(rows) {
+      try { localStorage.setItem(CACHE_KEY, JSON.stringify({ at: Date.now(), rows })); } catch (_) {}
+    }
+    function fmtTime(ts) {
+      const d = new Date(ts);
+      return ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2);
+    }
+    function showUpdated(at) {
+      const el = document.getElementById("updated-at");
+      if (el) el.textContent = "· " + T("listUpdated") + fmtTime(at);
+    }
+    function render(rows, at) {
+      rows.sort((a, b) => (b.confirmedAt || "").localeCompare(a.confirmedAt || ""));
+      document.getElementById("rows").innerHTML = rows.map((x) => {
+        const commitLink = x.emailHash
+          ? `https://github.com/${REPO}/commits/main/signatures/verified/${encodeURIComponent(x.emailHash)}.json`
+          : null;
+        const date = esc((x.confirmedAt || "").slice(0, 10));
+        return `
           <tr><td>${esc(x.name)}</td><td>${esc(x.institution || "—")}</td><td>${esc(x.role || "")}</td><td>${commitLink ? `<a href="${commitLink}" target="_blank" rel="noopener" title="${esc(T("verifyHint"))}" aria-label="${esc(T("verifyHint"))}">${date} ↗</a>` : date}</td></tr>
         `;}).join("");
-        document.getElementById("count").textContent = rows.length;
-        document.getElementById("loading").textContent = "";
+      document.getElementById("count").textContent = rows.length;
+      document.getElementById("loading").style.display = "none"; // display 控制：i18n 重排 data-i18n 文案也不会顶回来
+      showUpdated(at);
+    }
+    async function refreshList() {
+      const c = readCache();
+      const fresh = c && Date.now() - c.at < LIST_TTL;
+      if (c) render(c.rows, c.at); // 缓存秒开（哪怕过期也先显示旧的）
+      if (fresh) return;
+      try {
+        const rows = await loadRows();
+        render(rows, Date.now());
+        writeCache(rows);
       } catch (_) {
-        document.getElementById("loading").textContent = T("listLoadFail");
+        if (!c) { const l = document.getElementById("loading"); l.style.display = ""; l.textContent = T("listLoadFail"); } // 无任何数据才报错
       }
-    })();
+    }
+    refreshList();
+    setInterval(function () { if (!document.hidden) refreshList(); }, LIST_TTL); // 常驻页面定时刷新
+    document.addEventListener("visibilitychange", function () { if (!document.hidden) refreshList(); }); // 切回标签页重查
     function esc(s) {
       return String(s || "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
     }

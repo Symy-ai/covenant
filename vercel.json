@@ -3,5 +3,25 @@
     "api/**/*.js": {
       "maxDuration": 60
     }
-  }
+  },
+  "headers": [
+    {
+      "source": "/data/signatures.json",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=120, stale-while-revalidate=480"
+        }
+      ]
+    },
+    {
+      "source": "/covenant/data/signatures.json",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=120, stale-while-revalidate=480"
+        }
+      ]
+    }
+  ]
 }
