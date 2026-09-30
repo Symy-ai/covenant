@@ -97,7 +97,8 @@ if (pendings.length) console.log(`✓ main pending 删除 ×${pendings.length}`)
 let queueTokens = [];
 let queueFiles = [];
 try {
-  sh("git fetch origin pending-review 2>/dev/null || true");
+  // fetch refspec 显式建 tracking ref——bare "git fetch origin <branch>" 只写 FETCH_HEAD 不建 refs/remotes，origin/pending-review 引用会静默失败（假阴性实锤）
+  sh("git fetch origin pending-review:refs/remotes/origin/pending-review 2>/dev/null || git fetch origin 2>/dev/null || true");
   const QUEUE = "origin/pending-review";
   queueFiles = sh(`git ls-tree -r --name-only ${QUEUE} signatures/pending/ 2>/dev/null || true`)
     .trim().split("\n").filter((f) => f && path.basename(f).startsWith(h + "."));
