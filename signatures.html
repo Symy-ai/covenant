@@ -113,7 +113,11 @@ document.addEventListener("DOMContentLoaded", function () { if (!window.covenant
         const r = await fetch(`${API_BASE}/data/signatures.json`);
         if (r.ok) {
           const j = await r.json();
-          if (j && Array.isArray(j.rows)) return j.rows; // 空数组=真空名单，同样是合法快照
+          if (j && Array.isArray(j.rows)) {
+            // 保活：快照超过 10 分钟没更新（cron/Actions 故障）→ 视为 stale 走 API 次通道
+            const age = j.generatedAt ? Date.now() - new Date(j.generatedAt).getTime() : Infinity;
+            if (age < 10 * 60 * 1000) return j.rows; // 空数组=真空名单，同样是合法快照
+          }
         }
       } catch (_) { /* 快照不可用 → 次通道 */ }
       }
