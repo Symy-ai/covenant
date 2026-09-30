@@ -3,7 +3,6 @@
   "institution": "清华大学",
   "role": "学生",
   "emailHash": "633f330d52b520ba",
-  "emailDomain": "qq.com",
-  "token": "25dbafc8-66f5-4a1f-bc67-217b536436e8",
-  "createdAt": "2026-09-30T03:09:06.426Z"
+  "confirmedAt": "2026-09-30T03:15:31.455Z",
+  "review": "manual-approved"
 }
