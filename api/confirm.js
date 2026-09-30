@@ -55,7 +55,9 @@ export default async function handler(req, res) {
       const tomb = await ghGet(`signatures/tokens/${token}.json`);
       if (tomb) {
         await track(tomb.content.emailHash, "covenant_confirm_reopen", { result: tomb.content.result });
-        return res.redirect(302, redirect(tomb.content.result === "auto" ? "ok" : "pending", req.query.lang));
+        // 墓碑终态：auto=自动确认已生效；ok=人工审核放行（tools/approve.js 写入）——两者都回成功页
+        const okStates = ["auto", "ok"];
+        return res.redirect(302, redirect(okStates.includes(tomb.content.result) ? "ok" : "pending", req.query.lang, tomb.content.emailHash));
       }
       return res.redirect(302, redirect("expired", req.query.lang));
     }
