@@ -187,6 +187,7 @@
       inviteSub: "——签下名字，让内卷到此为止。",
       shareQuoteLabel: "契 约 正 文",
       wxForward: "转发给朋友",
+      wxCopiedTip: "邀请文案已复制 ✓ 转发时直接粘贴即可",
       wxForwardHint: "点右上角「···」，选择「发送给朋友」或「分享到朋友圈」",
     },
     en: {
@@ -368,6 +369,7 @@
       inviteSub: "— Sign your name, and let the rat race end here.",
       shareQuoteLabel: "C H A R T E R   T E X T",
       wxForward: "Forward to friends",
+      wxCopiedTip: "Invitation copied ✓ just paste when forwarding",
       wxForwardHint: "Tap \"···\" at the top-right, then \"Send to Friend\" or \"Share to Moments\"",
     }
   };

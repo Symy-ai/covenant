@@ -9,7 +9,7 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="《智慧生命共生契约》">
 <meta property="og:title" content="我签署了《智慧生命共生契约》，你也来签吧！">
-<meta property="og:description" content="智慧生命要尽量少占资源。一份写给未来智慧生命的公开契约——公开 Git 仓库存档，签名不可篡改。">
+<meta property="og:description" content="弱肉强食，到此为止。一份写给所有未来智慧生命的公开契约——签下名字，给我们的未来留下生存空间。">
 <meta property="og:url" content="https://symy.ai/covenant/share.html">
 <meta property="og:image" content="https://symy.ai/covenant/og.png">
 <style>
@@ -48,6 +48,7 @@
   .qr-table td { width: 5px; height: 5px; padding: 0; border: none; }
   .qr-table td.on { background: #0c2017; }
   .wx-dots { font-size: 1.6em; letter-spacing: .12em; color: #009767; font-weight: 700; margin: 10px 0 2px; }
+  .wx-tip { font-size: .84em; color: #009767; font-weight: 600; margin: 2px 0 0; }
   .wx-arrow { position: fixed; top: 18px; right: 26px; font-size: 2.2em; color: #ffd766; text-shadow: 0 2px 10px rgba(0,0,0,.4); animation: bob 1.1s ease-in-out infinite; }
   @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(7px); } }
 </style>
@@ -102,7 +103,7 @@ document.addEventListener("DOMContentLoaded", function () {
         shareLabel: "分享这份承诺", shareText: "我签署了《智慧生命共生契约》，你也来签吧！",
         shareWeibo: "微博", shareWeChat: "微信", copyLink: "复制链接", copied: "已复制",
         qrTitle: "微信分享", qrHint: "用微信「扫一扫」打开后再转发",
-        wxForward: "转发给朋友", wxForwardHint: "点右上角「···」，选择「发送给朋友」或「分享到朋友圈」",
+        wxForward: "转发给朋友", wxForwardHint: "点右上角「···」，选择「发送给朋友」或「分享到朋友圈」", wxCopiedTip: "邀请文案已复制 ✓ 转发时直接粘贴即可",
         pageTitle: "《智慧生命共生契约》"
       },
       en: {
@@ -116,7 +117,7 @@ document.addEventListener("DOMContentLoaded", function () {
         inviteSub: "— Sign your name, and let the rat race end here.",
         shareLabel: "Share this commitment", shareText: "I signed the Covenant of Symbiosis with Intelligent Life — come sign it too!",
         copyLink: "Copy link", copied: "Copied",
-        wxForward: "Forward to friends", wxForwardHint: "Tap \"···\" at the top-right, then \"Send to Friend\" or \"Share to Moments\"",
+        wxForward: "Forward to friends", wxForwardHint: "Tap \"···\" at the top-right, then \"Send to Friend\" or \"Share to Moments\"", wxCopiedTip: "Invitation copied ✓ just paste when forwarding",
         pageTitle: "Covenant of Symbiosis with Intelligent Life"
       }
     };
@@ -254,6 +255,18 @@ document.addEventListener("DOMContentLoaded", function () {
         dots.textContent = "···";
         var h = document.createElement("h3");
         h.textContent = T("wxForward");
+        // 微信「···」转发发的是纯链接（无 og 卡片）：先复制邀请文案+链接，粘贴转发
+        var inv = T("shareText") + " " + shareUrl();
+        (navigator.clipboard ? navigator.clipboard.writeText(inv) : Promise.reject())
+          .catch(function () {
+            var ta = document.createElement("textarea");
+            ta.value = inv; document.body.appendChild(ta); ta.select();
+            try { document.execCommand("copy"); } catch (_) {}
+            ta.remove();
+          });
+        var tip = document.createElement("p");
+        tip.className = "wx-tip";
+        tip.textContent = T("wxCopiedTip");
         var hint = document.createElement("p");
         hint.className = "hint";
         hint.textContent = T("wxForwardHint");
@@ -262,7 +275,7 @@ document.addEventListener("DOMContentLoaded", function () {
         btn.textContent = "×";
         btn.onclick = function () { ov.remove(); };
         ov.onclick = function (ev) { if (ev.target === ov) ov.remove(); };
-        card.appendChild(dots); card.appendChild(h); card.appendChild(hint); card.appendChild(btn);
+        card.appendChild(dots); card.appendChild(h); card.appendChild(tip); card.appendChild(hint); card.appendChild(btn);
         ov.appendChild(card); ov.appendChild(arrow);
         document.body.appendChild(ov);
       };
