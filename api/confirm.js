@@ -128,7 +128,14 @@ export default async function handler(req, res) {
     // 注意：此处不 re-throw——队列写入失败不应让用户看到 invalid
     await queueReview({ ...data, reviewQueuedAt: new Date().toISOString() }, data.name, fileName, emailHash);
     // 令牌墓碑（manual 同样需要：人工通过后用户重开链接应看到待核验而非失效）
-    await ghPut(`signatures/tokens/${token}.json`, { emailHash, result: "manual", confirmedAt: new Date().toISOString() }, `token-tombstone: ${emailHash}`);
+    // 幂等守卫（0930 巡检实锤）：main pending 在 manual 路径保留 → 重开会重复走到这里，
+    // 墓碑已存在时 Contents PUT 不带 sha 返 422（ghPut 只认 409 为 conflict）→ throw →
+    // 用户重开看到「系统繁忙」。已存在则跳过写入。
+    let tombExists = false;
+    try { tombExists = !!(await ghGet(`signatures/tokens/${token}.json`)); } catch (_) { /* 读失败按不存在处理，写入失败仍有外层兜底 */ }
+    if (!tombExists) {
+      await ghPut(`signatures/tokens/${token}.json`, { emailHash, result: "manual", confirmedAt: new Date().toISOString() }, `token-tombstone: ${emailHash}`);
+    }
     await track(emailHash, "covenant_confirm_success", { level: "manual" });
     return res.redirect(302, redirect("pending", req.query.lang));
   } catch (e) {
