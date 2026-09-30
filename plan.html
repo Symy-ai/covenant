@@ -23,9 +23,8 @@
   .lang-switch button { background: none; border: 1px solid #cfe3d6; border-radius: 6px; color: #5f7568; padding: 4px 10px; cursor: pointer; font-size: 0.92em; }
   .lang-switch button:hover { border-color: #1a3c2a; color: #1a3c2a; }
   .kicker { letter-spacing: 0.3em; font-size: 0.72em; color: #a0842c; font-weight: 700; margin: 0 0 10px; }
-  .title-row { text-align: center; margin: 0 0 6px; }
-  .title-row h1 { display: inline; font-size: 2.1em; letter-spacing: 0.06em; margin: 0; color: #143527; }
-  .title-sub { font-size: 1.15em; color: #5f7568; letter-spacing: normal; }
+  h1 { font-size: 2.1em; letter-spacing: 0.06em; margin: 0 0 6px; color: #143527; text-align: center; }
+  .page-sub { text-align: center; color: #5f7568; font-size: 1.05em; font-weight: 400; margin: 4px 0 6px; }
   .lead { font-size: 1.06em; font-weight: 600; color: #143527; background: #edf4ef; border-left: 3px solid #1a3c2a; border-radius: 0 10px 10px 0; padding: 14px 18px; margin: 0 0 44px; }
   h2 { font-size: 1.18em; color: #143527; margin: 52px 0 16px; letter-spacing: 0.04em; }
   .why-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px; }
@@ -111,9 +110,8 @@ document.addEventListener("DOMContentLoaded", function () { if (!window.covenant
   <div class="lang-switch"><button onclick="covLangToggle()">EN / 中</button></div>
 <main>
   <p class="kicker" data-i18n="pepKicker">THE SYMBIOSIS EARTH PROJECT</p>
-  <div class="title-row">
-    <h1 data-i18n="pepTitle">共生地球计划</h1> <span class="title-sub" data-i18n="pepSubTitle">—— 给我们的未来留下生存空间</span>
-  </div>
+  <h1 data-i18n="pepTitle">共生地球计划</h1>
+  <p class="page-sub" data-i18n="pepSubTitle">—— 给我们的未来留下生存空间</p>
   <p class="lead" data-i18n="pepLead">一个方向、一份契约、两个改变——赶在第二种智慧生命到来之前，为「物种之间如何相处」写下第三种剧本。</p>
 
   <h2 data-i18n="pepSec1">一 · 先讲一个场景</h2>
