@@ -60,7 +60,17 @@ async rewrites() {
 - [ ] 旧确认链接再点 → 提示已签署（幂等）
 
 ## 人工审核（每周 ~15 分钟）
-pending-review 分支的 `signatures/pending/` 即审核队列：核对邮箱域名/单位官网/头衔公开信息 → 合格则把文件（改名为 `{emailHash}.json`）PUT 到 main 的 verified/（走 PR）；不合格删文件并在 `REVOKED.md` 记录。
+pending-review 分支的 `signatures/pending/` 即审核队列：核对邮箱域名/单位官网/头衔公开信息 → 合格则放行，不合格删文件并在 `REVOKED.md` 记录。
+
+### 放行：一条命令（2026-09-30 起，必须走脚本）
+
+```bash
+node tools/approve.mjs <emailHash> --note "放行理由"
+```
+
+脚本自动完成四步（单 commit）：写 `verified/{emailHash}.json`（`review: manual-approved` 留痕）→ 删 main pending → **token 墓碑 `result: "ok"`** → 清 pending-review 队列。幂等：verified 已存在时跳过重写但补齐墓碑/队列。
+
+**为什么必须走脚本（勿手工）**：放行是四步联动操作，2026-09-30 手工放行漏改墓碑语义（写了 `result:"ok"` 但 confirm.js 当时只认 `"auto"`），用户重开确认链接仍显示「人工核验中」。confirm.js 现已同时接受 `auto | ok` 两种墓碑终态，但脚本保证以后不会再有漏步——墓碑值、verified 格式、队列清理一处都不会错。
 
 ### 人工审核：邮箱核验 SOP（2026-09-24 起）
 

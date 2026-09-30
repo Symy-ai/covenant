@@ -91,17 +91,21 @@ for (const f of pendings) fs.rmSync(path.join(pendDir, f));
 if (pendings.length) console.log(`✓ main pending 删除 ×${pendings.length}`);
 
 // 5. 墓碑 → ok
-//    （main pending 刚删的 token 一定有记录；顺带把 pending-review 队列里
-//     同 emailHash 文件的 token 也扫进来——队列文件就是 pending 文件副本）
+//    （main pending 的 token + pending-review 队列同 emailHash 文件的 token——
+//     队列文件就是 pending 文件副本。先 fetch 队列分支并记 ref，避免 FETCH_HEAD 时序坑：
+//     第 1 步 fetch main 后 FETCH_HEAD=main，此时 ls-tree 拿不到队列内容——首跑实锤 bug）
 let queueTokens = [];
+let queueFiles = [];
 try {
-  const qlist = sh("git ls-tree -r --name-only FETCH_HEAD signatures/pending/ 2>/dev/null || true")
+  sh("git fetch origin pending-review 2>/dev/null || true");
+  const QUEUE = "origin/pending-review";
+  queueFiles = sh(`git ls-tree -r --name-only ${QUEUE} signatures/pending/ 2>/dev/null || true`)
     .trim().split("\n").filter((f) => f && path.basename(f).startsWith(h + "."));
-  for (const f of qlist) {
-    const rec = JSON.parse(sh(`git show FETCH_HEAD:${f}`));
+  for (const f of queueFiles) {
+    const rec = JSON.parse(sh(`git show ${QUEUE}:${f}`));
     if (rec.token) queueTokens.push(rec.token);
   }
-} catch (_) { /* 无 FETCH_HEAD 或无匹配 */ }
+} catch (_) { /* 队列分支不存在或无匹配 */ }
 const allTokens = [...new Set([...tokens, ...queueTokens])];
 for (const t of allTokens) {
   const tPath = `signatures/tokens/${t}.json`;
@@ -112,10 +116,10 @@ for (const t of allTokens) {
 }
 if (allTokens.length) console.log(`✓ token 墓碑 → ok ×${allTokens.length}`);
 
-// 6. commit + push main
-const changed = sh("git status --porcelain").trim();
+// 6. commit + push main（只提交签名数据——绝不卷入工作区无关变更，脏 commit 教训）
+const changed = sh("git status --porcelain signatures/").trim();
 if (changed) {
-  sh("git add -A");
+  sh("git add signatures/");
   sh(`git commit -m "review: 放行 ${h}${name ? `（${name}）` : ""}${note ? "——" + note : ""} [approve.mjs]"`);
   sh("git push origin main");
   console.log("✓ main 已推送");
@@ -123,13 +127,11 @@ if (changed) {
   console.log("· main 无变更（幂等完成）");
 }
 
-// 7. 清 pending-review 队列
-sh("git fetch origin pending-review 2>/dev/null || true");
+// 7. 清 pending-review 队列（队列 ref 已在第 5 步 fetch，queueFiles 已在手）
 try {
-  const qlist = sh("git ls-tree -r --name-only FETCH_HEAD signatures/pending/")
-    .trim().split("\n").filter((f) => f && path.basename(f).startsWith(h + "."));
+  const qlist = queueFiles;
   if (qlist.length) {
-    sh("git checkout -q -B review-clean FETCH_HEAD");
+    sh("git checkout -q -B review-clean origin/pending-review");
     for (const f of qlist) sh(`git rm -q "${f}"`);
     sh(`git commit -m "review: 放行 ${h}——队列清理 [approve.mjs]"`);
     sh("git push origin HEAD:pending-review");
