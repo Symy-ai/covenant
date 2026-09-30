@@ -1,9 +1,0 @@
-{
-  "name": "上线前巡检测试",
-  "institution": "",
-  "role": "",
-  "emailHash": "e8af60da4237217e",
-  "confirmedAt": "2026-09-30T03:50:44.519Z",
-  "review": "manual-approved",
-  "reviewNote": "上线前巡检全流程测试（Spark 11:37 指定 hcl.mygtt@gmail.com）"
-}
