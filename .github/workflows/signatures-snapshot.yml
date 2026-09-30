@@ -4,7 +4,7 @@
 name: signatures-snapshot
 on:
   schedule:
-    - cron: "*/1 * * * *" # UTC，每分钟（构建零 API 调用，轻量无压力）
+    - cron: "*/5 * * * *" # UTC，每 5 分钟——GitHub 对 <5min 间隔的 cron 静默节流（*/1 实测 6 分钟零触发），5 分钟是最小可靠频率
   workflow_dispatch: {} # 支持手动触发（调试/补跑）
 permissions:
   contents: write
