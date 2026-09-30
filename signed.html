@@ -132,7 +132,7 @@ document.addEventListener("DOMContentLoaded", function () {
           viewBtn.id = "view-list-btn";
           viewBtn.style.marginTop = "18px";
           const a = document.createElement("a");
-          a.href = base + "/signatures.html";
+          a.href = base + "/signatures.html?fresh=1"; // fresh: 签名者本人实时拉（跳过快照直读 API）
           a.textContent = T("okViewList");
           a.style.cssText = "display:inline-block;border:1px solid #009767;border-radius:6px;padding:10px 26px;color:#009767;text-decoration:none;font-weight:600;";
           viewBtn.appendChild(a);

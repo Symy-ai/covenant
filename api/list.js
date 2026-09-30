@@ -4,8 +4,8 @@
 //      名单页在主站代理路径下所有前端数据 fetch 均被浏览器拦截(直连域正常)。
 //      服务端聚合不受浏览器 CSP 约束 → 主站/直连两域统一走此同源端点。
 // 通道: ① jsDelivr CDN(秒开底座, 最多滞后12h) ② GitHub API(token 实时增量) 合并去重
-// 缓存: 进程内 300s + 响应 Cache-Control(浏览器300s/边缘600s), 防高频刷穿上游
-// 2026-09-30 Spark 拍板: 名单从「实时」改为「定时刷新」——签名生效后最坏 5 分钟才上墙
+// 缓存: 进程内 60s + 响应 Cache-Control(浏览器60s/边缘120s)——次通道兜底（主通道是每分钟静态快照）
+// 2026-09-30 Spark 拍板: 主通道 data/signatures.json（cron */1 + 签名生效触发构建）
 // ============================================================
 import { ghList, ghGet } from "../lib/github.js";
 import { logError } from "../lib/monitoring.js";
@@ -13,7 +13,7 @@ import { logError } from "../lib/monitoring.js";
 const REPO = process.env.GITHUB_REPO || "symy-ai/covenant";
 const CDN = `https://cdn.jsdelivr.net/gh/${REPO}@main/signatures/verified`;
 const CDN_LIST = `https://data.jsdelivr.com/v1/packages/gh/${REPO}@main?structure=flat`;
-const TTL_MS = 300_000;
+const TTL_MS = 60_000;
 
 const key = (x) => x.emailHash || `${x.name}|${x.confirmedAt || ""}`;
 let CACHE = null; // { at, payload }
@@ -56,8 +56,9 @@ export default async function handler(req, res) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   if (req.method !== "GET") return res.status(405).json({ error: "method_not_allowed" });
 
-  if (CACHE && Date.now() - CACHE.at < TTL_MS) {
-    res.setHeader("Cache-Control", "public, max-age=300, s-maxage=600");
+  const live = req.query.live === "1"; // 签名者刚签完实时查——绕过进程缓存直读上游（低频：仅 signed 页 fresh 进入触发）
+  if (!live && CACHE && Date.now() - CACHE.at < TTL_MS) {
+    res.setHeader("Cache-Control", "public, max-age=60, s-maxage=120");
     res.setHeader("X-Covenant-Cache", "hit");
     return res.status(200).json(CACHE.payload);
   }
@@ -93,6 +94,6 @@ export default async function handler(req, res) {
 
   const payload = { count: rows.length, sources, rows };
   CACHE = { at: Date.now(), payload };
-  res.setHeader("Cache-Control", "public, max-age=300, s-maxage=600");
+  res.setHeader("Cache-Control", "public, max-age=60, s-maxage=120");
   return res.status(200).json(payload);
 }

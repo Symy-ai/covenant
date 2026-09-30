@@ -118,9 +118,11 @@ for (const t of allTokens) {
 if (allTokens.length) console.log(`✓ token 墓碑 → ok ×${allTokens.length}`);
 
 // 6. commit + push main（只提交签名数据——绝不卷入工作区无关变更，脏 commit 教训）
-const changed = sh("git status --porcelain signatures/").trim();
+//    放行即上墙：顺手重建静态快照进同一 commit（签名者零等待，不等 cron）
+sh("node tools/build_snapshot.mjs");
+const changed = sh("git status --porcelain signatures/ data/").trim();
 if (changed) {
-  sh("git add signatures/");
+  sh("git add signatures/ data/");
   sh(`git commit -m "review: 放行 ${h}${name ? `（${name}）` : ""}${note ? "——" + note : ""} [approve.mjs]"`);
   sh("git push origin main");
   console.log("✓ main 已推送");

@@ -51,7 +51,7 @@
 </script>
 <script>
 // ===== 兜底 i18n：网络差 i18n.js 加载失败时本页仍完整显示（初始文本已内置中文；i18n.js 到达后自动接管）=====
-var COV_FB = {"zh":{"iSign":"我要签署","listCountPost":"位签署者","listCountPre":"共","listDesc":"名单读取公开仓库签名档案，每 5 分钟自动刷新；点击日期可核验该签名在 GitHub 上的提交记录。","listDocTitle":"已签署名单 · 《智慧生命共生契约》","listLoadFail":"（名单加载失败，请刷新或直接访问公开仓库）","listLoading":"加载中…","listTitle":"已签署名单","pageTitle":"《智慧生命共生契约》","thDate":"签署日期","thInst":"单位","thName":"姓名","thRole":"职务","verifyHint":"在 GitHub 上核验这条签名","listSubTitle":"—— 让弱肉强食到此为止的人","listUpdated":"更新于 "},"en":{"iSign":"Sign the Covenant","listCountPost":" signatories","listCountPre":"共","listDesc":"This list reads from the public signature archive and auto-refreshes every 5 minutes. Click a date to verify the commit behind that signature on GitHub.","listDocTitle":"Signatories · Covenant of Symbiosis with Intelligent Life","listLoadFail":"(Failed to load the list — refresh or visit the public repository)","listLoading":"Loading…","listTitle":"Signatories","pageTitle":"Covenant of Symbiosis with Intelligent Life","thDate":"Signed","thInst":"Affiliation","thName":"Name","thRole":"Job Title","verifyHint":"Verify this signature on GitHub","listSubTitle":"— Those who ended the law of the jungle","listUpdated":"Updated "}};
+var COV_FB = {"zh":{"iSign":"我要签署","listCountPost":"位签署者","listCountPre":"共","listDesc":"名单读取公开仓库签名档案，每分钟自动刷新；点击日期可核验该签名在 GitHub 上的提交记录。","listDocTitle":"已签署名单 · 《智慧生命共生契约》","listLoadFail":"（名单加载失败，请刷新或直接访问公开仓库）","listLoading":"加载中…","listTitle":"已签署名单","pageTitle":"《智慧生命共生契约》","thDate":"签署日期","thInst":"单位","thName":"姓名","thRole":"职务","verifyHint":"在 GitHub 上核验这条签名","listSubTitle":"—— 让弱肉强食到此为止的人","listUpdated":"更新于 "},"en":{"iSign":"Sign the Covenant","listCountPost":" signatories","listCountPre":"共","listDesc":"This list reads from the public signature archive and auto-refreshes every minute. Click a date to verify the commit behind that signature on GitHub.","listDocTitle":"Signatories · Covenant of Symbiosis with Intelligent Life","listLoadFail":"(Failed to load the list — refresh or visit the public repository)","listLoading":"Loading…","listTitle":"Signatories","pageTitle":"Covenant of Symbiosis with Intelligent Life","thDate":"Signed","thInst":"Affiliation","thName":"Name","thRole":"Job Title","verifyHint":"Verify this signature on GitHub","listSubTitle":"— Those who ended the law of the jungle","listUpdated":"Updated "}};
 var COV_FB_LANG = (function () {
   var q = new URLSearchParams(location.search).get("lang");
   if (q === "zh" || q === "en") return q;
@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function () { if (!window.covenant
   <div class="lang-switch"><button onclick="covLangToggle()">EN / 中</button></div>
   <h1 data-i18n="listTitle">已签署名单</h1>
   <p class="page-sub" data-i18n="listSubTitle">—— 让弱肉强食到此为止的人</p>
-  <p class="muted"><span data-i18n="listDesc">名单读取公开仓库签名档案，每 5 分钟自动刷新；点击日期可核验该签名在 GitHub 上的提交记录。</span> <span id="updated-at" class="updated-at"></span> <span id="loading" data-i18n="listLoading">加载中…</span></p>
+  <p class="muted"><span data-i18n="listDesc">名单读取公开仓库签名档案，每分钟自动刷新；点击日期可核验该签名在 GitHub 上的提交记录。</span> <span id="updated-at" class="updated-at"></span> <span id="loading" data-i18n="listLoading">加载中…</span></p>
   <table>
     <thead><tr><th data-i18n="thName">姓名</th><th data-i18n="thInst">单位</th><th data-i18n="thRole">职务</th><th data-i18n="thDate">签署日期</th></tr></thead>
     <tbody id="rows"></tbody>
@@ -105,8 +105,10 @@ document.addEventListener("DOMContentLoaded", function () { if (!window.covenant
     const LIST_API = `https://api.github.com/repos/${REPO}/contents/signatures/verified?ref=main`;
     const API_BASE = location.pathname.indexOf("/covenant") === 0 ? "/covenant" : "";
 
-    async function loadRows() {
-      // 主通道: 静态快照（全站 CDN 缓存，零函数调用零上游配额；Actions 每 5 分钟构建）
+    async function loadRows(live) {
+      // live=true: 签名者刚签完实时查——跳过快照直走聚合 API
+      if (!live) {
+      // 主通道: 静态快照（全站 CDN 缓存，零函数调用零上游配额；每分钟构建+签名生效即时触发）
       try {
         const r = await fetch(`${API_BASE}/data/signatures.json`);
         if (r.ok) {
@@ -114,12 +116,13 @@ document.addEventListener("DOMContentLoaded", function () { if (!window.covenant
           if (j && Array.isArray(j.rows)) return j.rows; // 空数组=真空名单，同样是合法快照
         }
       } catch (_) { /* 快照不可用 → 次通道 */ }
+      }
 
       // 次通道: 同源聚合 API（边缘缓存，动态兜底——快照刚更新间隙/构建故障时）
       const rows = new Map();
       const key = (x) => x.emailHash || x.name + "|" + (x.confirmedAt || "");
       try {
-        const r = await fetch(`${API_BASE}/api/list`); // 不带 t= 时间戳——让浏览器/边缘 HTTP 缓存生效
+        const r = await fetch(`${API_BASE}/api/list${live ? "?live=1" : ""}`); // live 时绕过服务端进程缓存
         if (!r.ok) throw new Error(r.status);
         const j = await r.json();
         for (const x of j.rows) rows.set(key(x), x);
@@ -196,13 +199,14 @@ document.addEventListener("DOMContentLoaded", function () { if (!window.covenant
       document.getElementById("loading").style.display = "none"; // display 控制：i18n 重排 data-i18n 文案也不会顶回来
       showUpdated(at);
     }
+    const FRESH = new URLSearchParams(location.search).get("fresh") === "1"; // 从签署成功页「查看名单」进入：签名者本人，实时拉
     async function refreshList() {
-      const c = readCache();
+      const c = FRESH ? null : readCache();
       const fresh = c && Date.now() - c.at < LIST_TTL;
       if (c) render(c.rows, c.at); // 缓存秒开（哪怕过期也先显示旧的）
       if (fresh) return;
       try {
-        const rows = await loadRows();
+        const rows = await loadRows(FRESH);
         render(rows, Date.now());
         writeCache(rows);
       } catch (_) {

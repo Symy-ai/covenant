@@ -121,6 +121,16 @@ export default async function handler(req, res) {
       await ghPut(`signatures/tokens/${token}.json`, { emailHash, result: "auto", confirmedAt: new Date().toISOString() }, `token-tombstone: ${emailHash}`);
       await ghDelete(`signatures/pending/${fileName}`, rec.sha, `confirm: ${emailHash}`);
       await track(emailHash, "covenant_confirm_success", { level: "auto" });
+      // 签名上墙加速（9-30）：立即触发快照构建 workflow——不等 cron 轮询，
+      // 签名者 ~1 分钟内可见。fire-and-forget：触发失败不影响确认主流程（cron */1 兜底）
+      fetch(
+        `https://api.github.com/repos/${process.env.GITHUB_REPO || "symy-ai/covenant"}/actions/workflows/signatures-snapshot.yml/dispatches`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${process.env.GITHUB_TOKEN}`, Accept: "application/vnd.github+json" },
+          body: JSON.stringify({ ref: "main" }),
+        },
+      ).catch(() => {});
       return res.redirect(302, redirect("ok", req.query.lang, emailHash));
     }
 

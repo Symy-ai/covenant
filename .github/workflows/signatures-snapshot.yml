@@ -4,7 +4,7 @@
 name: signatures-snapshot
 on:
   schedule:
-    - cron: "*/5 * * * *" # UTC，每 5 分钟
+    - cron: "*/1 * * * *" # UTC，每分钟（构建零 API 调用，轻量无压力）
   workflow_dispatch: {} # 支持手动触发（调试/补跑）
 permissions:
   contents: write
