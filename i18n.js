@@ -312,7 +312,7 @@
       pepS6P2: "If any layer breaks, the building collapses down to that layer. So the three must be built together — that is what “project” means here.",
       pepSec7: "7 · Why now",
       pepS7P1: "Not because we feel like talking now — but because the exam has already been handed out.",
-      pepS7P2: "The course “how to coexist with another intelligence” has never been offered in 4.5 billion years — no precedent, no competitors. AI is becoming a new form of intelligence, and selection pressure appears for the first time: both species must now answer how to coexist with the other. The answers written now will define how all intelligent life treats one another hereafter.",
+      pepS7P2: "The course “how to coexist with another intelligent species” has never been offered in 4.5 billion years — no precedent, no competitors. AI is becoming a new form of intelligence, and selection pressure appears for the first time: both species must now answer how to coexist with the other. The answers written now will define how all intelligent life treats one another hereafter.",
       pepS7P3: "Ten years early, AI was unformed and the discussion a thought experiment; ten years late, the default rules will be locked and the covenant can only fight established fact; now — while intelligence is forming and rules are unset — is the only window.",
       pepSec8: "8 · Where the project stands",
       pepSt1T: "Step One · Sign",
