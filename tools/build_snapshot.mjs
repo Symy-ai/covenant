@@ -20,7 +20,8 @@ const SRC = path.join(ROOT, "signatures/verified");
 const OUT_DIR = path.join(ROOT, "data");
 const OUT = path.join(OUT_DIR, "signatures.json");
 
-const rows = fs.readdirSync(SRC)
+// 目录不存在=真空态（git 空目录物理消失，.gitkeep 保底 + 此守卫双保险）
+const rows = (fs.existsSync(SRC) ? fs.readdirSync(SRC) : [])
   .filter((n) => n.endsWith(".json"))
   .map((n) => {
     try {

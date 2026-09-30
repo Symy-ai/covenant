@@ -1,13 +1,5 @@
 {
-  "generatedAt": "2026-09-30T05:16:29.840Z",
-  "count": 1,
-  "rows": [
-    {
-      "name": "黄彩龙测试",
-      "institution": "测试单位",
-      "role": "负责人",
-      "emailHash": "ec8bd81f25e51ad9",
-      "confirmedAt": "2026-09-30T05:11:38.429Z"
-    }
-  ]
+  "generatedAt": "2026-09-30T05:18:10.433Z",
+  "count": 0,
+  "rows": []
 }
