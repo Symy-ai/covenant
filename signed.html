@@ -107,6 +107,16 @@ document.addEventListener("DOMContentLoaded", function () {
         error:    { icon: "🔧", title: "errTitle", desc: "errDesc" },
       };
       const s = new URLSearchParams(location.search).get("status") || "invalid";
+      // 微信内 + 已签署 + 带指纹：立即转去 share.html——微信「···」转发读的是当前页 URL，
+      // 停在 signed.html 转发出去的就是 signed 链接（bug 0921）；share 页才是可分享的家
+      const JUMP_H = (function () {
+        const h = new URLSearchParams(location.search).get("h") || "";
+        return /^[0-9a-f]{16}$/.test(h) ? h : "";
+      })();
+      if (JUMP_H && (s === "ok" || s === "duplicate") && /MicroMessenger/i.test(navigator.userAgent || "")) {
+        location.replace(base + "/share.html?lang=" + fLang + "&h=" + JUMP_H + "&src=ok");
+        return;
+      }
       const m = M[s] || M.invalid;
       document.getElementById("icon").textContent = m.icon;
       document.getElementById("title").textContent = T(m.title);

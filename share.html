@@ -23,6 +23,7 @@
   .signer-meta { color: #5f7568; font-size: .92em; margin: 6px 0 0; }
   .signer-date { color: #8a9a90; font-size: .82em; margin: 2px 0 0; }
   .invite-line { color: #2e4a3c; font-size: .95em; margin: 18px 0 0; }
+  .invite-sub { color: #5f7568; font-size: .88em; margin: 3px 0 0; }
   .generic-title { font-size: 1.2em; font-weight: 700; color: #143527; margin: 0 0 10px; }
   .generic-desc { color: #2e4a3c; font-size: .92em; margin: 0; }
   .cta-btn { display: inline-block; margin-top: 22px; background: #009767; color: #fff; border-radius: 10px; padding: 13px 42px; font-size: 1.05em; font-weight: 600; text-decoration: none; transition: background .15s; }
@@ -96,7 +97,8 @@ document.addEventListener("DOMContentLoaded", function () {
         shareGenericTitle: "有人把一份契约分享给了你",
         shareGenericDesc: "一位《智慧生命共生契约》的签署者邀请你来看看这份写给未来智慧生命的公开备忘录——它只有一个句子，不可修订，向所有人公开。",
         shareCta: "我也要签", viewList: "查看已签署名单", planLink: "了解完整计划 →", back: "返回",
-        inviteLine: "邀请你签署《智慧生命共生契约》——签下名字，给我们的未来留下生存空间。",
+        inviteLine: "签署了《智慧生命共生契约》，你也来签吧！",
+        inviteSub: "——签下名字，给我们的未来留下生存空间。",
         shareLabel: "分享这份承诺", shareText: "我签署了《智慧生命共生契约》，你也来签吧！",
         shareWeibo: "微博", shareWeChat: "微信", copyLink: "复制链接", copied: "已复制",
         qrTitle: "微信分享", qrHint: "用微信「扫一扫」打开后再转发",
@@ -110,7 +112,8 @@ document.addEventListener("DOMContentLoaded", function () {
         shareGenericTitle: "Someone shared a covenant with you",
         shareGenericDesc: "A signatory of the Covenant of Symbiosis with Intelligent Life invites you to read this open memorandum to future intelligent life — one sentence, unamendable, public to all.",
         shareCta: "I want to sign too", viewList: "View signatories", planLink: "Read the full plan →", back: "Back",
-        inviteLine: "invites you to sign the Covenant of Symbiosis with Intelligent Life — sign your name, and leave living space for our future.",
+        inviteLine: "has signed the Covenant of Symbiosis with Intelligent Life — come sign it too!",
+        inviteSub: "— Sign your name, and leave living space for our future.",
         shareLabel: "Share this commitment", shareText: "I signed the Covenant of Symbiosis with Intelligent Life — come sign it too!",
         copyLink: "Copy link", copied: "Copied",
         wxForward: "Forward to friends", wxForwardHint: "Tap \"···\" at the top-right, then \"Send to Friend\" or \"Share to Moments\"",
@@ -172,6 +175,10 @@ document.addEventListener("DOMContentLoaded", function () {
         inv.className = "invite-line";
         inv.textContent = signerData.name + " " + T("inviteLine");
         card.appendChild(inv);
+        var invSub = document.createElement("p");
+        invSub.className = "invite-sub";
+        invSub.textContent = T("inviteSub");
+        card.appendChild(invSub);
       } else {
         var t = document.createElement("p");
         t.className = "generic-title";
@@ -184,12 +191,17 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       area.appendChild(card);
     }
-    function loadSigner(cb) {
+    var SRC_OK = new URLSearchParams(location.search).get("src") === "ok"; // 刚签完从 signed 页跳来
+    function loadSigner(cb, isRetry) {
       if (!PAGE_H) { signerData = false; cb(); return; }
-      fetch(base + "/api/list").then(function (r) { return r.ok ? r.json() : Promise.reject(); }).then(function (j) {
+      fetch(base + "/api/list?t=" + Date.now()).then(function (r) { return r.ok ? r.json() : Promise.reject(); }).then(function (j) {
         var rows = (j && j.rows) || [];
         signerData = rows.filter(function (x) { return x.emailHash === PAGE_H; })[0] || false;
-      }).catch(function () { signerData = false; }).then(cb);
+      }).catch(function () { signerData = false; }).then(function () {
+        // 刚签完跳转：名单进程缓存最坏 60s 滞后，未命中时延迟重试一次
+        if (!signerData && SRC_OK && !isRetry) { setTimeout(function () { loadSigner(cb, true); }, 2500); return; }
+        cb();
+      });
     }
     // ---- 分享区（微信内：直接转发引导，不再让用户扫码）----
     function isWeChat() { return /MicroMessenger/i.test(navigator.userAgent); }
@@ -314,6 +326,12 @@ document.addEventListener("DOMContentLoaded", function () {
       buildShare();
     }
     document.addEventListener("DOMContentLoaded", function () {
+      // src=ok 只是一次性跳转标记（刚签完从 signed 页来），用完即清——转发出去的 URL 保持干净
+      if (new URLSearchParams(location.search).get("src")) {
+        var q0 = new URLSearchParams(location.search); q0.delete("src");
+        var clean = q0.toString();
+        history.replaceState(null, "", location.pathname + (clean ? "?" + clean : ""));
+      }
       var btn = document.getElementById("lang-btn");
       if (btn) btn.onclick = function () {
         var to = fLang === "zh" ? "en" : "zh";
