@@ -36,13 +36,20 @@ const rows = (fs.existsSync(SRC) ? fs.readdirSync(SRC) : [])
 
 const snapshot = { generatedAt: new Date().toISOString(), count: rows.length, rows };
 
-// 幂等守卫：仅 rows 实质变化才写文件（时间戳不触发），Action 据此决定是否提交
+// 幂等守卫：rows 实质变化立即写；无变化但快照已老化也写（心跳）——
+// 心跳是页面 75min 新鲜度守卫能区分「管线活着但无新签名」与「管线死了」的唯一依据，
+// 没有它，冷启动/空闲期 generatedAt 永久冻结 → 页面每次加载都穿透到动态次通道（1011 教训）。
+// 频率权衡：60min 心跳 = 空闲期 ≤24 次提交/天（每次连带一次 Vercel 部署，远低于 Hobby 100/天）。
+const HEARTBEAT_MS = 60 * 60 * 1000;
 if (fs.existsSync(OUT)) {
   const old = JSON.parse(fs.readFileSync(OUT, "utf8"));
-  if (JSON.stringify(old.rows) === JSON.stringify(snapshot.rows)) {
-    console.log(`no-change: ${rows.length} 条签名，快照无实质变化，不写`);
+  const rowsChanged = JSON.stringify(old.rows) !== JSON.stringify(snapshot.rows);
+  const stale = !old.generatedAt || Date.now() - new Date(old.generatedAt).getTime() > HEARTBEAT_MS;
+  if (!rowsChanged && !stale) {
+    console.log(`no-change: ${rows.length} 条签名，快照未到心跳阈值（${HEARTBEAT_MS / 60000}min），不写`);
     process.exit(0);
   }
+  if (!rowsChanged && stale) console.log(`heartbeat: ${rows.length} 条签名无变化，仅刷新 generatedAt`);
 }
 
 fs.mkdirSync(OUT_DIR, { recursive: true });

@@ -4,8 +4,8 @@
 //      名单页在主站代理路径下所有前端数据 fetch 均被浏览器拦截(直连域正常)。
 //      服务端聚合不受浏览器 CSP 约束 → 主站/直连两域统一走此同源端点。
 // 通道: ① jsDelivr CDN(秒开底座, 最多滞后12h) ② GitHub API(token 实时增量) 合并去重
-// 缓存: 进程内 60s + 响应 Cache-Control(浏览器60s/边缘120s)——次通道兜底（主通道是每分钟静态快照）
-// 2026-09-30 Spark 拍板: 主通道 data/signatures.json（cron */1 + 签名生效触发构建）
+// 缓存: 进程内 60s + 响应 Cache-Control(浏览器60s/边缘120s)——次通道兜底（主通道是 5 分钟静态快照 + 60min 心跳）
+// 2026-09-30 Spark 拍板: 主通道 data/signatures.json（cron */5 + 签名生效数据变化即提交）
 // ============================================================
 import { ghList, ghGet } from "../lib/github.js";
 import { logError } from "../lib/monitoring.js";
@@ -35,17 +35,23 @@ async function fromJsdelivr() {
     }),
   );
   const rows = settled.filter((s) => s.status === "fulfilled").map((s) => s.value);
-  if (!rows.length) throw new Error("cdn-all-failed");
+  if (!rows.length) {
+    // 清一色 404 = data-api 目录清单缓存滞后（幽灵文件：清单说有、文件层已无，
+    // 如清零/撤销后 12h+ 的窗口期）。通道降级但不视为名单真空——真伪由 GitHub 通道裁决。
+    const all404 = settled.every((s) => / 404$/.test(String((s.reason && s.reason.message) || s.reason)));
+    throw new Error(all404 ? "cdn-ghost-listing" : "cdn-all-failed");
+  }
   return rows;
 }
 
 async function fromGithub() {
-  const names = await ghList("signatures/verified");
-  if (!names.length) return []; // 空目录是合法状态（名单真空），非故障
+  // .json 过滤必须先于空判：清零后目录只剩 .gitkeep（b020ab6 保目录用），
+  // 若先判 names 非空再过滤，allSettled([]) → rows 空 → 会被误判 gh-all-failed，
+  // 把合法的名单真空态当成通道故障（1011 空态 502 的 GitHub 侧根因）
+  const names = (await ghList("signatures/verified")).filter((n) => n.endsWith(".json"));
+  if (!names.length) return []; // 无 .json = 名单真空（.gitkeep/空目录均合法），非故障
   const settled = await Promise.allSettled(
-    names
-      .filter((n) => n.endsWith(".json"))
-      .map(async (n) => (await ghGet(`signatures/verified/${n}`)).content),
+    names.map(async (n) => (await ghGet(`signatures/verified/${n}`)).content),
   );
   const rows = settled.filter((s) => s.status === "fulfilled").map((s) => s.value);
   if (!rows.length) throw new Error("gh-all-failed");

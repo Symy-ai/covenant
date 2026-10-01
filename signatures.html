@@ -108,15 +108,17 @@ document.addEventListener("DOMContentLoaded", function () { if (!window.covenant
     async function loadRows(live) {
       // live=true: 签名者刚签完实时查——跳过快照直走聚合 API
       if (!live) {
-      // 主通道: 静态快照（全站 CDN 缓存，零函数调用零上游配额；每分钟构建+签名生效即时触发）
+      // 主通道: 静态快照（全站 CDN 缓存，零函数调用零上游配额；5 分钟 cron 构建，
+      // 无新签名时 60 分钟心跳提交——两条提交路径都刷新 generatedAt）
       try {
         const r = await fetch(`${API_BASE}/data/signatures.json`);
         if (r.ok) {
           const j = await r.json();
           if (j && Array.isArray(j.rows)) {
-            // 保活：快照超过 10 分钟没更新（cron/Actions 故障）→ 视为 stale 走 API 次通道
+            // 保活：快照 75 分钟没刷新 = 构建管线死了（心跳 60min + cron 5min + 构建余量）→ 走 API 次通道。
+            // 守卫必须大于心跳间隔：空闲期快照按设计每小时才提交一次，守卫太紧会让静态主通道被永久架空（1011 教训）
             const age = j.generatedAt ? Date.now() - new Date(j.generatedAt).getTime() : Infinity;
-            if (age < 10 * 60 * 1000) return j.rows; // 空数组=真空名单，同样是合法快照
+            if (age < 75 * 60 * 1000) return j.rows; // 空数组=真空名单，同样是合法快照
           }
         }
       } catch (_) { /* 快照不可用 → 次通道 */ }
@@ -129,18 +131,19 @@ document.addEventListener("DOMContentLoaded", function () { if (!window.covenant
         const r = await fetch(`${API_BASE}/api/list${live ? "?live=1" : ""}`); // live 时绕过服务端进程缓存
         if (!r.ok) throw new Error(r.status);
         const j = await r.json();
-        for (const x of j.rows) rows.set(key(x), x);
-        if (rows.size) return Array.from(rows.values());
+        for (const x of j.rows || []) rows.set(key(x), x);
+        return Array.from(rows.values()); // 200 即健康：0 条=真空名单（端点自身已区分 502 与 200 空，页面不再重复判空）
       } catch (_) { /* 同源 API 不可用 → 走直连兜底 */ }
 
       async function loadCdn() {
         const r = await fetch(`${CDN_LIST}?t=${Date.now()}`);
         if (!r.ok) throw new Error(r.status);
         const pkg = await r.json();
-        const names = pkg.files
-          .map((f) => f.name.replace('/signatures/verified/', ''))
-          .filter((n) => n.endsWith(".json"));
-        if (!names.length) throw new Error("empty");
+        const PREFIX = '/signatures/verified/';
+        const names = (pkg.files || [])
+          .filter((f) => f.name.startsWith(PREFIX) && f.name.endsWith(".json")) // 必须锚定前缀：replace() 会放过 data/signatures.json 等全仓 .json → 必 404 → 整通道报废
+          .map((f) => f.name.slice(PREFIX.length));
+        if (!names.length) return []; // 清单无签名文件=真空名单（合法），非通道故障
         return await Promise.all(names.map(async (n) => {
           const j = await (await fetch(`${CDN}/${n}?t=${Date.now()}`)).json();
           return j;
@@ -156,14 +159,17 @@ document.addEventListener("DOMContentLoaded", function () { if (!window.covenant
         }));
       }
 
+      let anyAlive = false; // 通道成活与行数解耦：0 条 + 有通道活着 = 真空名单（1011 修复：不再误报 both-empty）
       try {
         for (const x of await loadCdn()) rows.set(key(x), x);
+        anyAlive = true;
       } catch (_) { /* CDN 挂了走纯 GitHub */ }
       try {
         for (const x of await loadGithub()) rows.set(key(x), x);
+        anyAlive = true;
       } catch (_) { /* 限流时 CDN 结果仍完整可用 */ }
-      if (!rows.size) throw new Error("both-empty");
-      return Array.from(rows.values());
+      if (!anyAlive) throw new Error("both-empty");
+      return Array.from(rows.values()); // 空数组=真空名单，合法态
     }
 
     // ---- 名单缓存层（9-30 性能改版：定时刷新替代逐访实时拉取）----

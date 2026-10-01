@@ -1,6 +1,8 @@
 # 名单静态快照——每 5 分钟构建（全网缓存数据源）
 # 页面流量 100% 落 Vercel CDN 静态文件；本 workflow 是唯一的上游刷新源。
-# checkout 后直接读本地文件聚合，不打 GitHub API；无实质变化不提交（防历史膨胀）。
+# checkout 后直接读本地文件聚合，不打 GitHub API；无实质变化不提交（防历史膨胀），
+# 但 build_snapshot 内置 60min 心跳：空闲期 generatedAt 老化也重写 → diff 非空 → 照常提交，
+# 供页面 75min 新鲜度守卫区分「管线活着但无新签名」与「管线死了」（1011 空态穿透教训）。
 name: signatures-snapshot
 on:
   schedule:
