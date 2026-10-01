@@ -33,7 +33,10 @@ document.addEventListener("DOMContentLoaded", function () { if (!window.covenant
 `;
 for (const p of ['index.html', 'plan.html', 'signatures.html', 'charter.html']) {
   let html = fs.readFileSync(p, 'utf8');
-  if (html.includes('COV_FB')) { console.log(p + ': 已插入，跳过'); continue; }
+  // 判定必须锚定块标记而非裸 'COV_FB'：index.html 业务脚本（T 函数兜底）也引用
+  // COV_FB 变量名——裸字符串判定会把「块已删但引用还在」误判为已插入而跳过，
+  // 留下悬空引用（1011 rebuild 实锤）。块标记是块的唯一可靠指纹。
+  if (html.includes('// ===== 兜底 i18n')) { console.log(p + ': 已插入，跳过'); continue; }
   const fb = JSON.parse(fs.readFileSync('/tmp/fb_' + p.replace('.html', '') + '.json', 'utf8'));
   const block = tpl(JSON.stringify(fb));
   html = html.replace('</head>', block + '</head>');
