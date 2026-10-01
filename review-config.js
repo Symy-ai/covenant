@@ -26,6 +26,14 @@
 //   "auto"   = 自动放行（若选择此项，必须同步上线频率限制）
 export const BLANK_SUBMISSION_POLICY = "manual";
 // ─────────────────────────────────────────────────────────────
+// 上线初期总开关：全部转人工核验（REVIEW_ALL_MANUAL）
+//   true  = 所有确认一律进 pending-review 人工队列，A/B/C 分级规则暂停。
+//           上线初期签名公信力是站的生命线，先全量人工把关跑稳，
+//           避免自动放行路径在未经过生产流量验证时出岔子。
+//   false = 恢复正常分级（A 自动 / B 域名分级 / C 人工）。
+// 平稳期切回 false 即可，分级规则与测试均双态兼容（tests/classify.test.js）。
+export const REVIEW_ALL_MANUAL = true;
+// ─────────────────────────────────────────────────────────────
 // A 规则：机构官方邮箱域名 → 机构关键词
 // 匹配方式（api/classify.js）：domain === dom || domain.endsWith("." + dom)
 //   · 天然免疫 tsinghua.edu.cn.evil.com 类对抗域名（已验证）

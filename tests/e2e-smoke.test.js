@@ -16,6 +16,7 @@ import assert from "node:assert/strict";
 
 import { setTestOverrides } from "../lib/github.js";
 import { setTestLogError, hashId } from "../lib/monitoring.js";
+import { REVIEW_ALL_MANUAL } from "../review-config.js";
 import signHandler from "../api/sign.js";
 import confirmHandler from "../api/confirm.js";
 
@@ -381,11 +382,25 @@ function autoPending() {
   };
 }
 
-test("confirm: auto 路径 → 302 ok + 写 verified + 删 pending + 写令牌墓碑", async () => {
+test("confirm: auto 路径 → 302 ok + 写 verified + 删 pending + 写令牌墓碑（REVIEW_ALL_MANUAL 双态）", async (t) => {
   const calls = installGitHub(autoPending());
   const res = mockRes();
   await confirmHandler(mockReq({ method: "GET", query: { t: TOKEN, lang: "en" } }), res);
   assert.equal(res.statusCode, 302);
+
+  // 全量人工模式（上线初期）：原 auto 输入同样进人工队列——verified 不写、
+  // 队列写入、pending 保留、墓碑 manual。此断言块即「总开关在 confirm 链路生效」的 e2e。
+  if (REVIEW_ALL_MANUAL) {
+    assert.match(res.redirect.url, /status=pending/, "全量人工：须显示人工核验中");
+    assert.equal(putsTo(calls, `signatures/verified/${HASH}.json`).length, 0, "全量人工：不得写 verified");
+    const queuePuts = putsTo(calls, `signatures/pending/${HASH}.${TOKEN}.json`, "pending-review");
+    assert.equal(queuePuts.length, 1, "全量人工：须写人工队列（pending-review 分支）");
+    const tombs = putsTo(calls, `signatures/tokens/${TOKEN}.json`);
+    assert.equal(tombs.length, 1, "全量人工：须写令牌墓碑");
+    assert.equal(tombs[0].args[1].result, "manual", "墓碑终态 manual（重开回显人工核验中）");
+    return;
+  }
+
   assert.match(res.redirect.url, /status=ok/);
   assert.match(res.redirect.url, /lang=en/);
 

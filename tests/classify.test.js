@@ -1,7 +1,13 @@
 // 运行：node tests/classify.test.js   （无框架依赖，Node 原生 assert）
-// 期望：26/26 passed
+// 期望：全部 passed
+// 双态兼容：REVIEW_ALL_MANUAL=true（上线初期全量人工）时，所有 case 期望值
+// 一律为 manual——这本身就是在验证「classify 正确遵循总开关」；开关切回
+// false 后，各 case 恢复验证 A/B/C 分级规则本身。两种配置状态下本文件都应全绿。
 import assert from "node:assert/strict";
 import { classify } from "../api/classify.js";
+import { REVIEW_ALL_MANUAL } from "../review-config.js";
+// 期望值归一：全量人工模式下，任何输入的期望都是 manual
+const want = (level) => (REVIEW_ALL_MANUAL ? "manual" : level);
 const cases = [
   ["A1 子域放行",       { email: "zhang@mail.tsinghua.edu.cn", institution: "清华大学", role: "教授" }, "auto"],
   ["A2 基准放行",       { email: "li@pku.edu.cn", institution: "北京大学", role: "" }, "auto"],
@@ -35,12 +41,12 @@ const cases = [
 let failed = 0;
 for (const [name, input, expected] of cases) {
   try {
-    assert.strictEqual(classify(input), expected, name);
-    console.log("PASS " + name);
+    assert.strictEqual(classify(input), want(expected), name);
+    console.log("PASS " + name + (REVIEW_ALL_MANUAL ? " [全量人工模式]" : ""));
   } catch (e) {
     failed++;
     console.error("FAIL " + name + " -> " + e.message);
   }
 }
-console.log(`\n${cases.length - failed}/${cases.length} passed`);
+console.log(`\n${cases.length - failed}/${cases.length} passed (REVIEW_ALL_MANUAL=${REVIEW_ALL_MANUAL})`);
 process.exit(failed ? 1 : 0);

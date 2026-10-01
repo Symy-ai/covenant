@@ -6,7 +6,11 @@ import {
   SENSITIVE_INSTITUTIONS,
   SENSITIVE_ROLES,
   BLANK_SUBMISSION_POLICY,
+  REVIEW_ALL_MANUAL,
 } from "../review-config.js";
+// ── 上线初期总开关：全部转人工（REVIEW_ALL_MANUAL）──────────
+// 开启期间 A/B/C 分级整体暂停——所有确认进人工队列，由 approve.mjs 放行。
+// 队列积压属预期；恢复分级将 review-config.js 的开关置 false 即可。
 // ── P0-1：B 规则机构敏感词自动合并 ──────────────────────────
 // 旧实现只查 SENSITIVE_INSTITUTIONS，导致
 //   "gmail + 机构「清华大学」+ 头衔空" 直接自动上墙（冒名路径）
@@ -35,6 +39,8 @@ function extractDomain(email) {
 }
 /** 分级核验：auto | manual */
 export function classify({ email, institution = "", role = "" }) {
+  // 上线初期总开关：全量人工（REVIEW_ALL_MANUAL，恢复分级见 review-config.js）
+  if (REVIEW_ALL_MANUAL) return "manual";
   const domain = extractDomain(email);
   // ── A 规则：机构官方域名 + 对应关键词 → 自动放行 ──
   // 域名匹配为"等于或点分子域"，免疫 tsinghua.edu.cn.evil.com（已验证）
