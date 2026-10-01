@@ -195,9 +195,21 @@ document.addEventListener("DOMContentLoaded", function () {
     var SRC_OK = new URLSearchParams(location.search).get("src") === "ok"; // 刚签完从 signed 页跳来
     function loadSigner(cb, isRetry) {
       if (!PAGE_H) { signerData = false; cb(); return; }
-      fetch(base + "/api/list?t=" + Date.now()).then(function (r) { return r.ok ? r.json() : Promise.reject(); }).then(function (j) {
+      // 读路径两级：① 静态快照（CDN，零函数调用——分享传播流量 100% 落这层）
+      //            ② /api/list（函数+边缘缓存，仅快照未命中兜底：放行后 ~5min 快照窗口/管线故障）
+      // 写路径（sign/confirm）不在此页。稳态下本页不产生任何 GitHub API 调用。
+      fetch(base + "/data/signatures.json?t=" + Date.now()).then(function (r) { return r.ok ? r.json() : Promise.reject(); }).then(function (j) {
         var rows = (j && j.rows) || [];
-        signerData = rows.filter(function (x) { return x.emailHash === PAGE_H; })[0] || false;
+        var hit = rows.filter(function (x) { return x.emailHash === PAGE_H; })[0] || false;
+        if (hit) { signerData = hit; cb(); return; }
+        throw new Error("not-in-snapshot");
+      }).catch(function () {
+        // 快照未命中 → 同源聚合 API 兜底（响应带 max-age=60/s-maxage=120，函数进程缓存 60s——
+        // 突发分享流量下打到 GitHub 的频率被三层缓存钳制在每分钟级）
+        return fetch(base + "/api/list?t=" + Date.now()).then(function (r) { return r.ok ? r.json() : Promise.reject(); }).then(function (j) {
+          var rows = (j && j.rows) || [];
+          signerData = rows.filter(function (x) { return x.emailHash === PAGE_H; })[0] || false;
+        });
       }).catch(function () { signerData = false; }).then(function () {
         // 刚签完跳转：名单进程缓存最坏 60s 滞后，未命中时延迟重试一次
         if (!signerData && SRC_OK && !isRetry) { setTimeout(function () { loadSigner(cb, true); }, 2500); return; }
