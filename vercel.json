@@ -4,6 +4,13 @@
       "maxDuration": 60
     }
   },
+  "rewrites": [
+    { "source": "/charter", "destination": "/charter.html" },
+    { "source": "/plan", "destination": "/plan.html" },
+    { "source": "/signatures", "destination": "/signatures.html" },
+    { "source": "/share", "destination": "/share.html" },
+    { "source": "/signed", "destination": "/signed.html" }
+  ],
   "headers": [
     {
       "source": "/data/signatures.json",
