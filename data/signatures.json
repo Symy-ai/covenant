@@ -1,7 +1,16 @@
 {
-  "generatedAt": "2026-10-08T00:22:44.516Z",
-  "count": 1,
+  "generatedAt": "2026-10-08T10:26:27.201Z",
+  "count": 2,
   "rows": [
+    {
+      "name": "黄博远",
+      "institution": "武汉理工大学",
+      "role": "学生",
+      "emailHash": "d8f96d15a200c313",
+      "confirmedAt": "2026-10-08T10:26:26.226Z",
+      "review": "manual-approved",
+      "reviewNote": "邮件确认完成，信息真实完整（武汉理工大学·学生），人工核验放行"
+    },
     {
       "name": "裴晟",
       "institution": "",
