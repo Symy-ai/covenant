@@ -1,5 +1,15 @@
 {
-  "generatedAt": "2026-10-01T03:43:53.027Z",
-  "count": 0,
-  "rows": []
+  "generatedAt": "2026-10-08T00:22:44.516Z",
+  "count": 1,
+  "rows": [
+    {
+      "name": "裴晟",
+      "institution": "",
+      "role": "",
+      "emailHash": "305e3ad0fb92d642",
+      "confirmedAt": "2026-10-08T00:22:43.474Z",
+      "review": "manual-approved",
+      "reviewNote": "邮件确认完成，Spark 拍板人工核验放行（首位签署者）"
+    }
+  ]
 }
