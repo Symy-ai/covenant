@@ -1,7 +1,16 @@
 {
-  "generatedAt": "2026-10-08T10:26:27.201Z",
-  "count": 2,
+  "generatedAt": "2026-10-08T13:14:04.316Z",
+  "count": 3,
   "rows": [
+    {
+      "name": "杨雯琦",
+      "institution": "",
+      "role": "",
+      "emailHash": "2c5d425dc22e16bd",
+      "confirmedAt": "2026-10-08T13:14:03.307Z",
+      "review": "manual-approved",
+      "reviewNote": "邮件确认完成（qq.com 个人邮箱，无单位头衔——普通个人签署形态），人工核验放行"
+    },
     {
       "name": "黄博远",
       "institution": "武汉理工大学",
