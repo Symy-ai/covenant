@@ -107,6 +107,7 @@ document.addEventListener("DOMContentLoaded", function () { if (!window.covenant
 
     async function loadRows(live) {
       // live=true: 签名者刚签完实时查——跳过快照直走聚合 API
+      let staleSnapshotRows = null; // 守卫判「过期」的快照内容——仍可用作兜底下限（宁可旧、不可少）
       if (!live) {
       // 主通道: 静态快照（全站 CDN 缓存，零函数调用零上游配额；5 分钟 cron 构建，
       // 无新签名时 60 分钟心跳提交——两条提交路径都刷新 generatedAt）
@@ -119,10 +120,19 @@ document.addEventListener("DOMContentLoaded", function () { if (!window.covenant
             // 守卫必须大于心跳间隔：空闲期快照按设计每小时才提交一次，守卫太紧会让静态主通道被永久架空（1011 教训）
             const age = j.generatedAt ? Date.now() - new Date(j.generatedAt).getTime() : Infinity;
             if (age < 75 * 60 * 1000) return j.rows; // 空数组=真空名单，同样是合法快照
+            staleSnapshotRows = j.rows; // 年龄超窗但内容有效：留作兜底下限参照（1009 名单缺员事故）
           }
         }
       } catch (_) { /* 快照不可用 → 次通道 */ }
       }
+
+      // 数据不可退化守卫：兜底通道给的行数若少于最近已知快照 → 判上游陈旧/残缺
+      // （jsDelivr 幽灵清单给旧文件集、GitHub 限流给空集），弃用兜底、回退快照旧数据——
+      // 名单宁可显示旧的完整版，不可悄悄少人（1009 事故：4 人名单短暂显示成 2 条幽灵记录）
+      const noShrink = (candidate) => {
+        if (!staleSnapshotRows || !staleSnapshotRows.length) return candidate;
+        return candidate.length >= staleSnapshotRows.length ? candidate : staleSnapshotRows;
+      };
 
       // 次通道: 同源聚合 API（边缘缓存，动态兜底——快照刚更新间隙/构建故障时）
       const rows = new Map();
@@ -132,7 +142,7 @@ document.addEventListener("DOMContentLoaded", function () { if (!window.covenant
         if (!r.ok) throw new Error(r.status);
         const j = await r.json();
         for (const x of j.rows || []) rows.set(key(x), x);
-        return Array.from(rows.values()); // 200 即健康：0 条=真空名单（端点自身已区分 502 与 200 空，页面不再重复判空）
+        return noShrink(Array.from(rows.values())); // 200 即健康：0 条=真空名单（端点自身已区分 502 与 200 空，页面不再重复判空）
       } catch (_) { /* 同源 API 不可用 → 走直连兜底 */ }
 
       async function loadCdn() {
@@ -144,10 +154,18 @@ document.addEventListener("DOMContentLoaded", function () { if (!window.covenant
           .filter((f) => f.name.startsWith(PREFIX) && f.name.endsWith(".json")) // 必须锚定前缀：replace() 会放过 data/signatures.json 等全仓 .json → 必 404 → 整通道报废
           .map((f) => f.name.slice(PREFIX.length));
         if (!names.length) return []; // 清单无签名文件=真空名单（合法），非通道故障
-        return await Promise.all(names.map(async (n) => {
-          const j = await (await fetch(`${CDN}/${n}?t=${Date.now()}`)).json();
-          return j;
+        // 幽灵清单防护（与服务端 cdn-ghost-listing 对齐，1009 事故）：jsDelivr data API
+        // 对 @main 的清单缓存刷新极懒（实测 9 天前的已删文件仍在列）——清单列出的
+        // 文件可能早已不存在。逐文件判 ok，全部 404 = 幽灵清单 → 判通道死亡走 GitHub；
+        // 404 响应体是纯文本，不先判 ok 直接 .json() 必炸 SyntaxError。
+        const results = await Promise.all(names.map(async (n) => {
+          const r2 = await fetch(`${CDN}/${n}?t=${Date.now()}`);
+          if (!r2.ok) return null;
+          return await r2.json().catch(() => null);
         }));
+        const alive = results.filter(Boolean);
+        if (!alive.length) throw new Error("cdn-ghost-listing");
+        return alive;
       }
       async function loadGithub() {
         const r = await fetch(`${LIST_API}&t=${Date.now()}`, { headers: { Accept: "application/vnd.github+json" } });
@@ -169,7 +187,7 @@ document.addEventListener("DOMContentLoaded", function () { if (!window.covenant
         anyAlive = true;
       } catch (_) { /* 限流时 CDN 结果仍完整可用 */ }
       if (!anyAlive) throw new Error("both-empty");
-      return Array.from(rows.values()); // 空数组=真空名单，合法态
+      return noShrink(Array.from(rows.values())); // 空数组=真空名单，合法态；退化守卫兜底
     }
 
     // ---- 名单缓存层（9-30 性能改版：定时刷新替代逐访实时拉取）----
