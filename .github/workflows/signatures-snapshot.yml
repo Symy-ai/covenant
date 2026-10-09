@@ -6,7 +6,7 @@
 name: signatures-snapshot
 on:
   schedule:
-    - cron: "*/5 * * * *" # UTC，每 5 分钟——GitHub 对 <5min 间隔的 cron 静默节流（*/1 实测 6 分钟零触发），5 分钟是最小可靠频率
+    - cron: "3-59/5 * * * *" # UTC，每 5 分钟错开整点分钟（3,8,13,...）——GitHub 对整点分钟高负载节流是 schedule 延迟的主因（实测 */5 被 6-8h 才触发一次），offset 后显著更可靠
   workflow_dispatch: {} # 支持手动触发（调试/补跑）
 permissions:
   contents: write
