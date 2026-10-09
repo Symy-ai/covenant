@@ -237,6 +237,61 @@ test("sign: 同邮箱已有 pending → 429 already_pending", async () => {
   assert.deepEqual(res.body, { error: "already_pending" });
 });
 
+// ---------- 重签更新（同邮箱换单位/职务，update=true）----------
+
+test("sign: 重签（update=true + 已 verified）→ 200 + pending 带 resign + 更新版邮件", async () => {
+  const calls = installGitHub({
+    ghGet: async (p) => (p === `signatures/verified/${HASH}.json` ? { sha: "v1", content: { name: "Ada" } } : null),
+    ghList: async () => [],
+  });
+  fetchStub.restore();
+  fetchStub = installFetch((url) =>
+    url.startsWith("https://api.resend.com/") ? new Response(JSON.stringify({ id: "mail_1" }), { status: 200 }) : new Response("", { status: 404 })
+  );
+  const res = mockRes();
+  await signHandler(mockReq({ method: "POST", body: sign400Body({ institution: "新单位", update: true }) }), res);
+  assert.equal(res.statusCode, 200);
+  assert.equal(res.body.ok, true);
+  const pending = calls.filter((c) => c.fn === "ghPut" && c.args[0].startsWith("signatures/pending/"));
+  assert.equal(pending.length, 1);
+  assert.equal(pending[0].args[1].resign, true, "重签 pending 必须带 resign 标记");
+  assert.match(pending[0].args[2], /^pending-resign: /, "commit 信息标记重签");
+  assert.equal(pending[0].args[1].institution, "新单位");
+  const mail = fetchStub.calls.find((c) => c.url.startsWith("https://api.resend.com/emails"));
+  assert.ok(mail, "必须真的向 Resend 发起发送");
+  const mailBody = JSON.parse(mail.init.body);
+  assert.match(mailBody.subject, /请确认更新您的签名/, "重签走更新版邮件标题");
+  assert.match(mailBody.subject, /^尊敬的Ada/);
+});
+
+test("sign: update=true 但未 verified → 按正常首签走（无 resign 标记、首签邮件）", async () => {
+  const calls = installGitHub({ ghGet: async () => null, ghList: async () => [] });
+  fetchStub.restore();
+  fetchStub = installFetch((url) =>
+    url.startsWith("https://api.resend.com/") ? new Response(JSON.stringify({ id: "mail_1" }), { status: 200 }) : new Response("", { status: 404 })
+  );
+  const res = mockRes();
+  await signHandler(mockReq({ method: "POST", body: sign400Body({ update: true }) }), res);
+  assert.equal(res.statusCode, 200);
+  const pending = calls.filter((c) => c.fn === "ghPut" && c.args[0].startsWith("signatures/pending/"));
+  assert.equal(pending.length, 1);
+  assert.equal(pending[0].args[1].resign, undefined, "未签过 → 不是重签");
+  const mail = fetchStub.calls.find((c) => c.url.startsWith("https://api.resend.com/emails"));
+  const mailBody = JSON.parse(mail.init.body);
+  assert.match(mailBody.subject, /请确认您的签名/, "正常首签邮件标题");
+});
+
+test("sign: 重签 + 已有 pending → 429（防刷不因重签豁免）", async () => {
+  installGitHub({
+    ghGet: async (p) => (p === `signatures/verified/${HASH}.json` ? { sha: "v1", content: {} } : null),
+    ghList: async () => [`${HASH}.some-other-token.json`],
+  });
+  const res = mockRes();
+  await signHandler(mockReq({ method: "POST", body: sign400Body({ update: true }) }), res);
+  assert.equal(res.statusCode, 429);
+  assert.deepEqual(res.body, { error: "already_pending" });
+});
+
 test("sign: GitHub 写失败（ghPut 抛错）→ 500 internal_error + logError（不崩）", async () => {
   const err = new Error("ghPut signatures/pending/... → 500: boom");
   const calls = installGitHub({ ghGet: async () => null, ghList: async () => [], ghPut: async () => { throw err; } });
@@ -610,6 +665,75 @@ test("confirm: 已 verified（重复确认）→ 302 duplicate + 清理残留 pe
   const dels = calls.filter((c) => c.fn === "ghDelete");
   assert.equal(dels.length, 1, "须清掉残留 pending");
   assert.match(dels[0].args[2], /^cleanup-dup: /);
+});
+
+// ---------- 重签确认（pending 带 resign → 不判 duplicate，走分级流程）----------
+
+test("confirm: resign pending + 已 verified → 不判 duplicate（manual=带标记入队 / auto=合并写保留原日期）", async () => {
+  const calls = installGitHub({
+    ghList: async (dir) => (dir === "signatures/pending" ? [`${HASH}.${TOKEN}.json`] : []),
+    ghGet: async (p, branch) => {
+      // queueReview 幂等守卫探针：pending-review 分支上队列文件不存在
+      if (p === `signatures/pending/${HASH}.${TOKEN}.json` && branch === "pending-review") return null;
+      if (p === `signatures/pending/${HASH}.${TOKEN}.json`) {
+        // A 规则可自动放行的形态（tsinghua.edu.cn + 清华）：flag-off 时走 auto 合并写
+        return { sha: "p1", content: { ...PENDING_BODY, email: undefined, emailDomain: "tsinghua.edu.cn", institution: "清华大学物理系", emailHash: HASH, resign: true } };
+      }
+      if (p === `signatures/verified/${HASH}.json`)
+        return { sha: "v1", content: { name: "Ada", institution: "旧单位", role: "", emailHash: HASH, confirmedAt: "2026-09-01T00:00:00.000Z" } };
+      return null;
+    },
+  });
+  const res = mockRes();
+  await confirmHandler(mockReq({ method: "GET", query: { t: TOKEN } }), res);
+  assert.equal(res.statusCode, 302);
+  assert.doesNotMatch(res.redirect.url, /status=duplicate/, "resign 不得判为已签署");
+  assert.equal(
+    calls.filter((c) => c.fn === "ghDelete" && /^cleanup-dup: /.test(c.args[2])).length,
+    0,
+    "resign 不得按 duplicate 清理 pending",
+  );
+  if (REVIEW_ALL_MANUAL) {
+    assert.match(res.redirect.url, /status=pending/);
+    const queued = putsTo(calls, `signatures/pending/${HASH}.${TOKEN}.json`, "pending-review");
+    assert.equal(queued.length, 1, "resign 进人工队列");
+    assert.equal(queued[0].args[1].resign, true, "队列记录携带 resign 标记（approve.mjs 依据）");
+    assert.equal(queued[0].args[1].institution, "清华大学物理系");
+    return;
+  }
+  // 分级恢复后（REVIEW_ALL_MANUAL=false）：A 规则 → auto 合并写
+  assert.match(res.redirect.url, /status=ok/);
+  const verified = putsTo(calls, `signatures/verified/${HASH}.json`);
+  assert.equal(verified.length, 1);
+  assert.equal(verified[0].args[1].name, "Ada", "公开字段取 pending 新值");
+  assert.equal(verified[0].args[1].institution, "清华大学物理系", "单位取新值");
+  assert.equal(verified[0].args[1].confirmedAt, "2026-09-01T00:00:00.000Z", "原签名日期保留");
+  assert.ok(verified[0].args[1].updatedAt, "须记 updatedAt");
+  assert.match(verified[0].args[2], /^verified-resign: /);
+});
+
+test("confirm: resign 队列已存在（重复点击确认链接）→ 幂等跳过，不再 PUT", async () => {
+  const calls = installGitHub({
+    ghList: async (dir) => (dir === "signatures/pending" ? [`${HASH}.${TOKEN}.json`] : []),
+    ghGet: async (p, branch) => {
+      // 幂等守卫探针：队列分支上文件已在（第一次点击写入过）
+      if (p === `signatures/pending/${HASH}.${TOKEN}.json` && branch === "pending-review")
+        return { sha: "q1", content: {} };
+      if (p === `signatures/pending/${HASH}.${TOKEN}.json`)
+        return { sha: "p1", content: { ...PENDING_BODY, emailHash: HASH, resign: true } };
+      if (p === `signatures/verified/${HASH}.json`) return { sha: "v1", content: { name: "Ada", confirmedAt: "2026-09-01T00:00:00.000Z" } };
+      return null;
+    },
+  });
+  const res = mockRes();
+  await confirmHandler(mockReq({ method: "GET", query: { t: TOKEN } }), res);
+  assert.equal(res.statusCode, 302);
+  assert.doesNotMatch(res.redirect.url, /status=duplicate/);
+  assert.equal(
+    putsTo(calls, `signatures/pending/${HASH}.${TOKEN}.json`, "pending-review").length,
+    0,
+    "队列已在 → 不再重复 PUT（422 噪声消除）",
+  );
 });
 
 /** manual 路径（未知域名 → 转人工）的 GitHub 桩 */

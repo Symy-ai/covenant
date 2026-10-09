@@ -23,6 +23,8 @@
 //
 // 幂等: verified 已存在 → 报告并继续做墓碑/队列清理（补齐漏步），不重写
 //       （--force 强制重写 verified）
+// 重签: pending 带 resign:true（同邮箱换单位/职务的更新提交）→ 即使 verified
+//       已存在也写入——公开字段取 pending 新值，原签名日期保留，记 updatedAt
 // 安全: 只按 emailHash 前缀精确匹配，绝不碰他人记录；队列分支无匹配即不动
 // ============================================================
 import { execSync } from "node:child_process";
@@ -61,17 +63,33 @@ if (!pendings.length) console.log("· main 无 pending 记录（可能已清理�
 
 let name = "", institution = "", role = "";
 const tokens = [];
+let isResign = false;
 for (const f of pendings) {
   const rec = JSON.parse(fs.readFileSync(path.join(pendDir, f), "utf8"));
   name = name || rec.name; institution = institution || rec.institution || "";
   role = role || rec.role || "";
   if (rec.token) tokens.push(rec.token);
+  if (rec.resign) isResign = true;
 }
 
 // 3. verified（幂等）
 const vPath = `signatures/verified/${h}.json`;
 const vExists = fs.existsSync(vPath);
-if (vExists && !force) {
+if (vExists && isResign) {
+  // 重签更新（同邮箱换单位/职务）：以 pending 新信息覆盖公开字段，
+  // 原签名日期 confirmedAt 保留，另记 updatedAt——Git 历史留痕，旧信息可溯
+  const old = JSON.parse(fs.readFileSync(vPath, "utf8"));
+  if (!name) fail(`resign 记录缺 name——检查 pending 文件`);
+  const confirmedAt = old.confirmedAt || new Date().toISOString();
+  fs.writeFileSync(vPath, JSON.stringify({
+    name, institution, role, emailHash: h,
+    confirmedAt,
+    updatedAt: new Date().toISOString(),
+    review: "manual-approved-resign",
+    reviewNote: note || undefined,
+  }, null, 2) + "\n");
+  console.log(`✓ verified 重签更新：${name}${institution ? " · " + institution : ""}（签名日期保留 ${confirmedAt}）`);
+} else if (vExists && !force) {
   const old = JSON.parse(fs.readFileSync(vPath, "utf8"));
   name = old.name || name; institution = old.institution || institution; role = old.role || role;
   console.log(`· verified 已存在（${name}），跳过写入${force ? "" : "，--force 可重写"}`);
@@ -123,7 +141,7 @@ sh("node tools/build_snapshot.mjs");
 const changed = sh("git status --porcelain signatures/ data/").trim();
 if (changed) {
   sh("git add signatures/ data/");
-  sh(`git commit -m "review: 放行 ${h}${name ? `（${name}）` : ""}${note ? "——" + note : ""} [approve.mjs]"`);
+  sh(`git commit -m "review: 放行 ${h}${name ? `（${name}）` : ""}${isResign ? "——重签更新" : ""}${note ? "——" + note : ""} [approve.mjs]"`);
   sh("git push origin main");
   console.log("✓ main 已推送");
 } else {

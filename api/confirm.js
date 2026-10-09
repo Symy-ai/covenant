@@ -18,6 +18,16 @@ const redirect = (status, lang, h) => `https://symy.ai/covenant/signed.html?stat
  * 不 re-throw：队列写入失败不应让用户看到 invalid/expired
  */
 async function queueReview(record, label, fileName, emailHash) {
+  // 幂等守卫（仅 resign 路径）：resign 的 main pending 在 manual 路径保留 →
+  // 用户重复点击确认链接会重走到这里；队列文件已存在时 Contents PUT 不带 sha
+  // 返 422 → 白报 logError。非 resign 路径保持原行为（batch116-a 回归护栏：重试
+  // 与失败上报是被测试锚定的既有语义，不动）。
+  if (record.resign) {
+    try {
+      const queued = await ghGet(`signatures/pending/${fileName}`, "pending-review");
+      if (queued) return;
+    } catch (_) { /* 读失败按不存在处理，写入失败仍有外层兜底 */ }
+  }
   const put = () =>
     ghPut(`signatures/pending/${fileName}`, record, `review-queue: ${label} (${emailHash || "unknown"})`, {
       branch: "pending-review",
@@ -100,9 +110,11 @@ export default async function handler(req, res) {
     // 分级入参：隐私版 pending 只有 emailDomain（无完整 email），旧记录兜底从 email 提取
     const classifyInput = { email: data.email || `a@${data.emailDomain || "unknown.invalid"}`, institution: data.institution, role: data.role };
 
-    // 幂等：已 verified → 直接提示已签署
+    // 幂等：已 verified → 直接提示已签署。
+    // 重签例外（pending 带 resign）：单位/职务变动的更新提交 → 跳过 duplicate，
+    // 走分级流程，最终覆盖原记录（原签名日期保留）
     const already = await ghGet(`signatures/verified/${emailHash}.json`);
-    if (already) {
+    if (already && !data.resign) {
       // 清残留 pending（若有）
       await ghDelete(`signatures/pending/${fileName}`, rec.sha, `cleanup-dup: ${emailHash}`);
       await track(emailHash, "covenant_confirm_duplicate", {});
@@ -112,10 +124,16 @@ export default async function handler(req, res) {
     const level = classify(classifyInput);
 
     if (level === "auto") {
+      // 重签合并：原记录在 → 覆盖公开字段但保留原签名日期，另记 updatedAt
+      const prev = already && data.resign ? already.content : null;
       await ghPut(
         `signatures/verified/${emailHash}.json`,
-        { name: data.name, institution: data.institution, role: data.role, emailHash, confirmedAt: new Date().toISOString() },
-        `verified: ${data.name} (${emailHash})`,
+        {
+          name: data.name, institution: data.institution, role: data.role, emailHash,
+          confirmedAt: (prev && prev.confirmedAt) || new Date().toISOString(),
+          ...(prev ? { updatedAt: new Date().toISOString() } : {}),
+        },
+        `verified${prev ? "-resign" : ""}: ${data.name} (${emailHash})`,
       );
       // 令牌墓碑：重复打开已确认链接时回显结果，不再误报"链接已失效"
       await ghPut(`signatures/tokens/${token}.json`, { emailHash, result: "auto", confirmedAt: new Date().toISOString() }, `token-tombstone: ${emailHash}`);
