@@ -20,13 +20,17 @@ jobs:
       - uses: actions/checkout@v4
         with:
           # 快照要和最新 main 对齐；若 push 竞态导致 non-fast-forward，
-          # 本轮放弃（下一轮 5 分钟后重试），绝不强推
+          # 本轮放弃（下一轮 5 分钟后重试），绝不强推。
+          # fetch-depth 0：pull --rebase 竞态重放需要完整历史（shallow 会拒）
           ref: main
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - run: node tools/build_snapshot.mjs
       - name: Commit if changed
+        env:
+          DEPLOY_KEY: ${{ secrets.COVENANT_DEPLOY_KEY }}
         run: |
           if git diff --quiet -- data/signatures.json; then
             echo "no snapshot change, skip commit"
@@ -35,6 +39,15 @@ jobs:
           git config user.name "covenant-bot"
           git config user.email "bot@symy.ai"
           git add data/signatures.json
-          git commit -m "chore(data): signatures snapshot [skip ci]"
+          # 注意：不带 [skip ci]——Vercel 尊重 skip 指令会跳过部署，CDN 上的
+          # 快照静态文件就永不刷新，静态主通道形同虚设（曾潜伏的管线断点）
+          git commit -m "chore(data): signatures snapshot"
+          # GITHUB_TOKEN 无法 bypass ruleset（平台限制：内置 Actions App 不可
+          # 作为 ruleset bypass actor）→ SSH deploy key 推送（DeployKey bypass）
+          mkdir -p ~/.ssh
+          printf '%s\n' "$DEPLOY_KEY" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          echo "github.com ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIOMqqnkVzrm0SdG6UOoqKLsabgH5C9okWi0dh2l9GKJl" >> ~/.ssh/known_hosts
+          git remote set-url origin git@github.com:Symy-ai/covenant.git
           git pull --rebase origin main || (echo "rebase failed, skip this round" && git rebase --abort && exit 1)
           git push origin main || (echo "push conflict, skip this round" && exit 1)
