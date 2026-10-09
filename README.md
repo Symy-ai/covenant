@@ -84,9 +84,19 @@ pending-review 分支的 `signatures/pending/` 即审核队列：核对邮箱域
 node tools/approve.mjs <emailHash> --note "放行理由"
 ```
 
-脚本自动完成四步（单 commit）：写 `verified/{emailHash}.json`（`review: manual-approved` 留痕）→ 删 main pending → **token 墓碑 `result: "ok"`** → 清 pending-review 队列。幂等：verified 已存在时跳过重写但补齐墓碑/队列。
+脚本自动完成四步（单 commit）：写 `verified/{emailHash}.json`（`review: manual-approved` 留痕）→ 删 main pending → **token 墓碑 `result: "ok"`** → 清 pending-review 队列。幂等：verified 已存在时跳过重写但补齐墓碑/队列；pending 带 `resign: true`（重签更新）时覆盖公开字段但保留原签名日期。
 
 **为什么必须走脚本（勿手工）**：放行是四步联动操作，2026-09-30 手工放行漏改墓碑语义（写了 `result:"ok"` 但 confirm.js 当时只认 `"auto"`），用户重开确认链接仍显示「人工核验中」。confirm.js 现已同时接受 `auto | ok` 两种墓碑终态，但脚本保证以后不会再有漏步——墓碑值、verified 格式、队列清理一处都不会错。
+
+## 分支保护与快照推送（2026-10-10 起）
+
+main 由 repo ruleset `main-branch-protection` 保护：协作者改 main 须走 PR（1 approval）；bypass 三重——Repository admin、Spark-Huang（User）、快照 deploy key。
+
+**为什么快照推送走 SSH deploy key 而不是 GITHUB_TOKEN**：GitHub 平台限制——内置 Actions App 不是可安装的 org app，无法作为 ruleset bypass actor（API 422）。快照 workflow（`signatures-snapshot.yml`）push 时挂 `COVENANT_DEPLOY_KEY` secret（SSH 私钥）以 deploy key 身份推送，ruleset 的 DeployKey bypass 放行。
+
+依赖的 org 设置：`deploy_keys_enabled_for_repositories = true`（2026-10-10 开，原 false；回滚 `PATCH /orgs/Symy-ai`）。deploy key `covenant-snapshot-push`（id 165931232，读写，仅此仓库）。
+
+> 1009 事故备忘：此前 main 用经典分支保护（require PR），Actions bot 被 GH006 连拒 12+ 轮 → 快照心跳停摆 >24h → 页面守卫判死、全站穿透动态通道，叠加 jsDelivr 幽灵清单与部署窗口，出现「4 人名单显示成 2 条幽灵记录」。切换 ruleset + deploy key 后管线首次端到端跑通（run #46，`covenant-bot` 直推 `2a7f4e7`）。
 
 ### 人工审核：邮箱核验 SOP（2026-09-24 起）
 
