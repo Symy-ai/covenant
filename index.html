@@ -104,6 +104,67 @@
   .overlay-upd { display: none; margin-top: 14px; background: #fff; color: #143527; border: 1.5px solid #143527; border-radius: 6px; padding: 9px 26px; font-size: 14px; cursor: pointer; width: auto; }
   #ov-upd-note { display: none; margin: 16px 0 0; font-size: 0.88em; color: #5f7568; border-top: 1px dashed #d8e6dc; padding-top: 14px; line-height: 1.7; }
 </style>
+<style>
+  /* ===== 夜间模式（跟随系统深色设置）：标题与 FAQ 用亮白绿，全站深墨绿底 ===== */
+  @media (prefers-color-scheme: dark) {
+    :root { color-scheme: light dark; }
+    body { background: #0c1b14; color: #d9ece1; }
+    h1 { color: #aef0c9; }
+    .page-sub { color: #9fb8a9; }
+    .charter-card { background: #132719; border-color: #2d4a3a; }
+    .charter-section-title { color: #9fb8a9; }
+    blockquote.charter-quote { color: #aef0c9; }
+    .signers-label { color: #7f978c; }
+    .signers-org, .signers-names, .signers-venue { color: #c6ddcf; }
+    .signers-note { color: #7f978c; }
+    .hiw { background: #132719; border-color: #2d4a3a; }
+    .hiw-title { color: #c6ddcf; }
+    .hiw li, .hiw-body, .hiw-point { color: #aec9ba; }
+    .hiw-point { border-left-color: #2d4a3a; }
+    .why-now-label { color: #9fb8a9; }
+    .why-now-body { color: #c1d8c9; }
+    .plan-strip { background: #102117; }
+    .plan-strip-title { color: #c6ddcf; }
+    .plan-strip-steps { color: #b9d0c1; }
+    .plan-strip-note { color: #9fb8a9; }
+    .plan-strip-link a { color: #3ddc97; }
+    h2 { color: #cfe7d8; }
+    .faq h2 { color: #aef0c9; }
+    .faq summary { color: #aef0c9; }
+    .faq summary:hover { color: #d1f9e0; }
+    .faq details p { color: #aec9ba; }
+    .faq details { border-bottom-color: #24402f; }
+    .faq details:first-of-type { border-top-color: #24402f; }
+    .note { border-top-color: #24402f; }
+    .muted, .note-body { color: #9fb8a9; }
+    label { color: #d9ece1; }
+    .agree-row { color: #c6ddcf; }
+    input[type=text], input[type=email] { background: #0f2118; border-color: #2d4a3a; color: #e6f4ec; }
+    input::placeholder { color: #7f978c; }
+    input[type=text]:focus, input[type=email]:focus { border-color: #3ddc97; box-shadow: 0 0 0 3px rgba(61, 220, 151, 0.18); }
+    input[type=text].invalid, input[type=email].invalid { border-color: #ff8f8f; }
+    input[type=text].invalid:focus, input[type=email].invalid:focus { border-color: #ff8f8f; box-shadow: 0 0 0 3px rgba(255, 143, 143, 0.15); }
+    button { background: #1f6b4d; color: #fff; }
+    button:hover:not(:disabled) { background: #2ed097; color: #06231a; }
+    button:disabled { background: #3a5346; }
+    a { color: #3ddc97; }
+    a:hover { color: #6ff0b6; }
+    .lang-switch button { border-color: #3ddc97; color: #3ddc97; }
+    .gh-link svg { fill: #3ddc97; }
+    .overlay { background: rgba(4, 13, 9, 0.92); }
+    .overlay-card { background: #132719; border-color: #2ed097; box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5); }
+    .overlay-card h2 { color: #aef0c9; }
+    .overlay-card p { color: #c6ddcf; }
+    .overlay-card .hint { color: #9fb8a9; }
+    .overlay-close { background: #1f6b4d; }
+    .overlay-upd { background: #132719; color: #3ddc97; border-color: #2d4a3a; }
+    #ov-upd-note { color: #9fb8a9; border-top-color: #24402f; }
+    .msg.ok { background: #10331f; color: #7fe3ae; }
+    .msg.err { background: #3a1414; color: #ff9d9d; }
+    .field-err { color: #ff9d9d; }
+    .req { color: #ff8f8f; }
+  }
+</style>
 <script>
 // 内链自适应: 主站代理(/covenant/*)带前缀, 直连域用根路径
 (function () {

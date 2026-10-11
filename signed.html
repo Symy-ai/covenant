@@ -35,6 +35,23 @@
   .qr-table td { width: 5px; height: 5px; padding: 0; border: none; }
   .qr-table td.on { background: #0c2017; }
 </style>
+<style>
+  /* ===== 夜间模式（跟随系统深色设置）：全站深墨绿底；二维码/微信引导卡保持白底（扫码功能色）===== */
+  @media (prefers-color-scheme: dark) {
+    :root { color-scheme: light dark; }
+    body { background: #0c1b14; color: #d9ece1; }
+    h1 { color: #aef0c9; }
+    .muted { color: #9fb8a9; }
+    .share-label { color: #9fb8a9; }
+    a { color: #3ddc97; }
+    a:hover { color: #6ff0b6; }
+    .share-pill { background: #132719; border-color: #2d4a3a; color: #d9ece1; }
+    .share-pill:hover { border-color: #3ddc97; color: #3ddc97; }
+    .qr-overlay, .wx-overlay { background: rgba(4, 13, 9, 0.7); }
+    /* qr-card / wx-card 保持白底亮卡：二维码黑白模块是扫描功能色，不做深色化 */
+    .qr-table td.on { background: #0c2017; }
+  }
+</style>
 <script>
 var base = location.pathname.indexOf("/covenant") === 0 ? "/covenant" : "";
 (function () {

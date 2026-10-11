@@ -34,6 +34,25 @@
   a { color: #009767; }
   a:hover { color: #007956; }
 </style>
+<style>
+  /* ===== 夜间模式（跟随系统深色设置）：全站深墨绿底 ===== */
+  @media (prefers-color-scheme: dark) {
+    :root { color-scheme: light dark; }
+    body { background: #0c1b14; color: #d9ece1; }
+    h1 { color: #aef0c9; }
+    .updated-at { color: #7f978c; }
+    .page-sub { color: #9fb8a9; }
+    .lang-switch button { border-color: #3ddc97; color: #3ddc97; }
+    .gh-link svg { fill: #3ddc97; }
+    th, td { border-bottom-color: #24402f; }
+    th { color: #9fb8a9; }
+    td a { text-decoration-color: #2d4a3a; }
+    .count { color: #3ddc97; }
+    .muted { color: #9fb8a9; }
+    a { color: #3ddc97; }
+    a:hover { color: #6ff0b6; }
+  }
+</style>
 <script>
 (function () {
   var base = location.pathname.indexOf("/covenant") === 0 ? "/covenant" : "";

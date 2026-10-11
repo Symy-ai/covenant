@@ -38,6 +38,30 @@
   .cta { display: block; background: #143527; color: #fff; text-align: center; padding: 14px; border-radius: 6px; text-decoration: none; font-weight: 600; margin: 32px 0; }
   .cta:hover { background: #0c2017; }
 </style>
+<style>
+  /* ===== 夜间模式（跟随系统深色设置）：标题用亮白绿，全站深墨绿底 ===== */
+  @media (prefers-color-scheme: dark) {
+    :root { color-scheme: light dark; }
+    body { background: #0c1b14; color: #d9ece1; }
+    h1 { color: #aef0c9; }
+    .page-decl { color: #c1d8c9; }
+    .page-sub { color: #9fb8a9; }
+    .charter-card { background: #132719; border-color: #2d4a3a; }
+    .charter-section-title { color: #9fb8a9; }
+    blockquote.charter-quote { color: #aef0c9; }
+    .signers-label { color: #7f978c; }
+    .signers-org, .signers-names, .signers-venue { color: #c6ddcf; }
+    .signers-note { color: #7f978c; }
+    .note { border-top-color: #24402f; }
+    .note-body { color: #9fb8a9; }
+    a { color: #3ddc97; }
+    a:hover { color: #6ff0b6; }
+    .lang-switch button { border-color: #3ddc97; color: #3ddc97; }
+    .gh-link svg { fill: #3ddc97; }
+    .cta { background: #1f6b4d; color: #fff; }
+    .cta:hover { background: #2ed097; color: #06231a; }
+  }
+</style>
 <script>
 (function () {
   var base = location.pathname.indexOf("/covenant") === 0 ? "/covenant" : "";
