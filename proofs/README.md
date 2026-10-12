@@ -2,9 +2,9 @@
 
 论文《跨代际互惠与类型工程——智慧生命续任序列中的合作机制与一份自指性契约的设计》（黄彩龙，清华大学，2026）的数学形式化验证代码。
 
-> **DOI（即将发布）**：本目录随 [Symy-ai/covenant](https://github.com/Symy-ai/covenant) 仓库发布 Release v1.0 时经 Zenodo 归档，概念 DOI 与版本 DOI 将在 Release 后回填至本行。
+> **DOI（v1.0 已归档）**：概念 DOI [10.5281/zenodo.23308013](https://doi.org/10.5281/zenodo.23308013)（引用仓库整体，永远指向最新版本）· 版本 DOI [10.5281/zenodo.23308014](https://doi.org/10.5281/zenodo.23308014)（引用 v1.0 特定版本）
 >
-> [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.XXXXXXX.svg)](https://doi.org/10.5281/zenodo.XXXXXXX)
+> [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23308013.svg)](https://doi.org/10.5281/zenodo.23308013)
 
 ## 目录结构
 
@@ -68,8 +68,9 @@ lake env lean Covenant.lean
                   (Intergenerational Reciprocity and Type Engineering)},
   year         = {2026},
   publisher    = {Zenodo},
-  doi          = {10.5281/zenodo.XXXXXXX},
-  url          = {https://doi.org/10.5281/zenodo.XXXXXXX}
+  version      = {v1.0},
+  doi          = {10.5281/zenodo.23308014},
+  url          = {https://doi.org/10.5281/zenodo.23308014}
 }
 ```
 
