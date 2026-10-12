@@ -14,12 +14,16 @@
 -/
 
 import Mathlib.Tactic.Ring
+import Mathlib.Probability.Distributions.Bernoulli
+import Mathlib.Probability.Moments.SubGaussian
 import Mathlib.Tactic.FieldSimp
 import Mathlib.Tactic.LinearCombination
 import Mathlib.Tactic.Linarith
 import Mathlib.Algebra.Order.Field.Basic
 import Mathlib.Basic.Real.Basic
 import Mathlib.Data.Rat.Defs
+import Mathlib.Probability.Independence.Basic
+import Mathlib.MeasureTheory.Integral.Pi
 
 -- ================================================================
 -- T1 破产闭式递推（论文原形）
@@ -242,120 +246,351 @@ theorem cone_le (uC uD δ : Real) (L n : ℕ) (hδ : 0 ≤ δ) (hcone : uD * (1 
     | succ k ik =>
         have : 0 ≤ δ * S δ k := mul_nonneg hδ ik
         rw [S_succ]; linarith
-  have hkey : uD * (1 - δ ^ L) * S δ n ≤ uC * S δ n :=
+  -- 收尾：锥条件沿 telescope 放大
+  have hteL : S δ L * (1 - δ) = 1 - δ ^ L := S_telescope δ L
+  have hten : S δ n * (1 - δ) = 1 - δ ^ n := S_telescope δ n
+  have hcon1 : uD * (1 - δ ^ L) * S δ n ≤ uC * S δ n :=
     mul_le_mul_of_nonneg_right hcone hSn
-  have TL : S δ L * (1 - δ) = 1 - δ ^ L := S_telescope δ L
-  have Tn : S δ n * (1 - δ) = 1 - δ ^ n := S_telescope δ n
-  have h3 : δ ^ n = 1 - S δ n * (1 - δ) := by linear_combination Tn
-  rw [← TL] at hkey
-  rw [h3]
-  nlinarith [hkey]
+  have hcon2 : uD * (1 - δ ^ L) * S δ n = uD * S δ L * (1 - δ ^ n) := by
+    rw [← hteL, ← hten]; ring
+  have hcon3 : uD * S δ L * (1 - δ ^ n) ≤ uC * S δ n := by
+    rw [← hcon2]; exact hcon1
+  nlinarith [hcon3]
 
--- 末段引理（B）：h ≤ L 时清洁态值 = 整段几何抢夺和（隐藏窗口内背叛恒最优）
-theorem Vp_endgame (uC uD δ : Real) (L : ℕ) (hCD : uC ≤ uD) (h1L : 1 ≤ L) (h : ℕ) :
-    h ≤ L → Vp uC uD δ L St.clean h = uD * S δ h := by
+-- S 非负（几何和 positivity；δ ≥ 0）
+theorem S_nonneg (δ : Real) (hδ : 0 ≤ δ) (n : ℕ) : 0 ≤ S δ n := by
+  induction n with
+  | zero => simp [S]
+  | succ m ih =>
+      have : 0 ≤ δ * S δ m := mul_nonneg hδ ih
+      rw [S_succ]; linarith
+
+-- 末段闭式：剩余 h ≤ L 时（记录延迟长于游戏本身）背叛值主导
+theorem Vp_endgame (uC uD δ : Real) (L : ℕ) (hCD : uC ≤ uD) :
+    ∀ h : ℕ, h ≤ L → Vp uC uD δ L St.clean h = uD * S δ h := by
+  intro h
   induction h with
   | zero => intro _; rw [Vp_zero, S_zero, mul_zero]
   | succ m ih =>
-      intro hh
-      by_cases hL : L ≤ 1
-      · have hm0 : m = 0 := by omega
+      intro hm
+      rw [Vp_clean_step]
+      by_cases hL1 : L = 1
+      · subst hL1
+        have hm0 : m = 0 := by omega
         subst hm0
-        rw [Vp_clean_step, Vp_zero, ite_eq_left hL, Vp_dirty_eq, mul_zero,
-            max_eq_right (by linarith : uC + 0 ≤ uD + 0)]
-        norm_num [S]
+        have hif : (if (1:ℕ) ≤ 1 then St.dirty else St.count (1 - 1)) = St.dirty :=
+          ite_eq_left (by omega)
+        rw [hif, Vp_dirty_eq, mul_zero, add_zero, Vp_zero, mul_zero, add_zero]
+        rw [max_eq_right hCD, S_one, mul_one]
       · have hL2 : 2 ≤ L := by omega
         have hif : (if L ≤ 1 then St.dirty else St.count (L - 1)) = St.count (L - 1) :=
           ite_eq_right (by omega : ¬ L ≤ 1)
-        have hmL1 : 1 ≤ L - 1 := by omega
-        have hc := Vp_count_eq uC uD δ L hCD m (L - 1) hmL1
+        rw [hif]
+        have hc := Vp_count_eq uC uD δ L hCD m (L - 1) (by omega : 1 ≤ L - 1)
         have hmin : min (L - 1) m = m := by omega
-        have him := ih (by omega)
-        have hle : uC + δ * Vp uC uD δ L St.clean m
-            ≤ uD + δ * Vp uC uD δ L (St.count (L - 1)) m := by
-          rw [him, hc, hmin]; linarith
-        rw [Vp_clean_step, hif, max_eq_right hle, hc, hmin, S_succ]
+        rw [hc, hmin, ih (by omega : m ≤ L)]
+        have hle : uC + δ * (uD * S δ m) ≤ uD + δ * (uD * S δ m) :=
+          add_le_add_left hCD _
+        rw [max_eq_right hle, S_succ]
         ring
 
--- 锥内主定理（C）：合作恰保持到剩余 L 期，此后抢夺整个隐藏窗口
-theorem Vp_cone (uC uD δ : Real) (L : ℕ) (hδ : 0 < δ) (h1L : 1 ≤ L) (hCD : uC ≤ uD)
-    (hcone : uD * (1 - δ ^ L) ≤ uC) (h : ℕ) :
-    L ≤ h → Vp uC uD δ L St.clean h
-      = uC * S δ (h - L) + δ ^ (h - L) * (uD * S δ L) := by
-  induction h with
-  | zero => intro hh; exact absurd hh (by omega : ¬ L ≤ 0)
-  | succ m ih =>
-      intro hh
-      by_cases hbase : m + 1 = L
-      · have h0 : m + 1 - L = 0 := by omega
-        have hLm : m + 1 ≤ L := by omega
-        rw [Vp_endgame uC uD δ L hCD h1L (m + 1) hLm, h0, S_zero, pow_zero, mul_zero,
-            zero_add, one_mul, hbase]
-      · have hmL : L ≤ m := by omega
-        have him := ih hmL
-        have hD := Vp_Dbranch_eq uC uD δ L hCD h1L m hmL
-        have hstep : m + 1 - L = (m - L) + 1 := by omega
-        have hge : uD * S δ L
-            ≤ uC * S δ (m + 1 - L) + δ ^ (m + 1 - L) * (uD * S δ L) :=
-          cone_le uC uD δ L (m + 1 - L) (by linarith : 0 ≤ δ) hcone
-        have hC : uC + δ * (uC * S δ (m - L) + δ ^ (m - L) * (uD * S δ L))
-            = uC * S δ (m + 1 - L) + δ ^ (m + 1 - L) * (uD * S δ L) := by
-          rw [hstep, S_succ, pow_succ]; ring
-        have hle : uD * S δ L
-            ≤ uC + δ * (uC * S δ (m - L) + δ ^ (m - L) * (uD * S δ L)) := by
-          rw [hC]; exact hge
-        rw [Vp_clean_step, hD, him, max_eq_left hle, hC]
-
--- 政策推论一：末段（h+1 ≤ L）背叛最优
-theorem T6_defect_optimal (uC uD δ : Real) (L : ℕ) (hCD : uC ≤ uD) (h1L : 1 ≤ L)
-    (h : ℕ) (hh : h + 1 ≤ L) :
-    Vp uC uD δ L St.clean (h + 1)
-      = uD + δ * Vp uC uD δ L (if L ≤ 1 then St.dirty else St.count (L - 1)) h := by
-  have hVh := Vp_endgame uC uD δ L hCD h1L h (by omega)
-  have hW : Vp uC uD δ L (if L ≤ 1 then St.dirty else St.count (L - 1)) h
-      = uD * S δ h := by
-    by_cases hL : L = 1
-    · have h0 : h = 0 := by omega
-      rw [ite_eq_left (by omega : L ≤ 1), Vp_dirty_eq, h0, S_zero, mul_zero]
-    · have hif : (if L ≤ 1 then St.dirty else St.count (L - 1)) = St.count (L - 1) :=
-        ite_eq_right (by omega : ¬ L ≤ 1)
-      have hc := Vp_count_eq uC uD δ L hCD h (L - 1) (by omega : 1 ≤ L - 1)
-      have hmin : min (L - 1) h = h := by omega
-      rw [hif, hc, hmin]
-  rw [Vp_clean_step, hVh, hW, max_eq_right (by linarith)]
-
--- 政策推论二：锥内、剩余超过 L 期时合作最优
-theorem T6_coop_optimal (uC uD δ : Real) (L : ℕ) (hδ : 0 < δ) (h1L : 1 ≤ L)
-    (hCD : uC ≤ uD) (hcone : uD * (1 - δ ^ L) ≤ uC) (h : ℕ) (hh : L ≤ h) :
-    Vp uC uD δ L St.clean (h + 1) = uC + δ * Vp uC uD δ L St.clean h := by
-  have hD := Vp_Dbranch_eq uC uD δ L hCD h1L h hh
-  have hC := Vp_cone uC uD δ L hδ h1L hCD hcone h hh
-  have hge := cone_le uC uD δ L (h + 1 - L) (by linarith : 0 ≤ δ) hcone
-  have hstep : h + 1 - L = (h - L) + 1 := by omega
-  have hbridge : uC + δ * (uC * S δ (h - L) + δ ^ (h - L) * (uD * S δ L))
-      = uC * S δ (h + 1 - L) + δ ^ (h + 1 - L) * (uD * S δ L) := by
-    rw [hstep, S_succ, pow_succ]; ring
-  have hle : uD + δ * Vp uC uD δ L (if L ≤ 1 then St.dirty else St.count (L - 1)) h
-      ≤ uC + δ * Vp uC uD δ L St.clean h := by
-    rw [hD, hC, hbridge]; exact hge
-  rw [Vp_clean_step, max_eq_left hle]
-
--- T6 主定理：末段崩塌宽度恰等于语料传输延迟（K = L 的政策内容）
-theorem T6_K_eq_L (uC uD δ : Real) (L : ℕ) (hδ : 0 < δ) (h1L : 1 ≤ L) (hCD : uC ≤ uD)
+-- 锥内主闭式（T6 核心）：合作恰保持到剩余 L 期——
+-- Vp clean (L+k) = uC·S k + δ^k·(uD·S L)：前 k 期合作，末 L 期背叛
+theorem Vp_cone (uC uD δ : Real) (L : ℕ) (h1L : 1 ≤ L) (hCD : uC ≤ uD) (hδ : 0 ≤ δ)
     (hcone : uD * (1 - δ ^ L) ≤ uC) :
-    ∀ h : ℕ, (h + 1 ≤ L ∧ Vp uC uD δ L St.clean (h + 1)
-        = uD + δ * Vp uC uD δ L (if L ≤ 1 then St.dirty else St.count (L - 1)) h)
-      ∨ (L ≤ h ∧ Vp uC uD δ L St.clean (h + 1) = uC + δ * Vp uC uD δ L St.clean h) := by
-  intro h
-  by_cases hh : h + 1 ≤ L
-  · exact Or.inl ⟨hh, T6_defect_optimal uC uD δ L hCD h1L h hh⟩
-  · exact Or.inr ⟨by omega, T6_coop_optimal uC uD δ L hδ h1L hCD hcone h (by omega)⟩
+    ∀ m : ℕ, L ≤ m → Vp uC uD δ L St.clean m
+      = uC * S δ (m - L) + δ ^ (m - L) * (uD * S δ L) := by
+  have main : ∀ k : ℕ, Vp uC uD δ L St.clean (L + k)
+      = uC * S δ k + δ ^ k * (uD * S δ L) := by
+    intro k
+    induction k with
+    | zero =>
+        have e : L + 0 = L := by omega
+        rw [e, Vp_endgame uC uD δ L hCD L (le_refl L), S_zero, mul_zero, pow_zero,
+            one_mul, zero_add]
+    | succ k ih =>
+        have esucc : L + (k + 1) = (L + k) + 1 := by omega
+        rw [esucc, Vp_clean_step]
+        have hD := Vp_Dbranch_eq uC uD δ L hCD h1L (L + k) (by omega : L ≤ L + k)
+        rw [hD, ih]
+        have hexp : uC + δ * (uC * S δ k + δ ^ k * (uD * S δ L))
+            = uC * S δ (k + 1) + δ ^ (k + 1) * (uD * S δ L) := by
+          rw [S_succ]; ring
+        rw [hexp, max_eq_left (cone_le uC uD δ L (k + 1) hδ hcone)]
+  intro m hm
+  have e : m = L + (m - L) := by omega
+  rw [e, Nat.add_sub_cancel_left]
+  exact main (m - L)
 
-#print axioms Vp_count_eq
-#print axioms Vp_Dbranch_eq
-#print axioms cone_le
+-- T6 背叛最优（终局段，K ≥ L 方向）：剩余 h ≤ L 时值 = uD·S h，
+-- 合作策略值 uC·S h 不超过它——崩塌至少 L 期
+theorem T6_defect_optimal (uC uD δ : Real) (L : ℕ) (hCD : uC ≤ uD) (hδ : 0 ≤ δ)
+    (h : ℕ) (hh : h ≤ L) :
+    uC * S δ h ≤ Vp uC uD δ L St.clean h ∧ Vp uC uD δ L St.clean h = uD * S δ h := by
+  constructor
+  · rw [Vp_endgame uC uD δ L hCD h hh]
+    exact mul_le_mul_of_nonneg_right hCD (S_nonneg δ hδ h)
+  · exact Vp_endgame uC uD δ L hCD h hh
+
+-- T6 合作最优（锥内，K ≤ L 方向）：剩余 m > L 时合作支 ≥ 背叛支——
+-- 崩塌不会在剩余 L 期之前开始
+theorem T6_coop_optimal (uC uD δ : Real) (L : ℕ) (h1L : 1 ≤ L) (hCD : uC ≤ uD)
+    (hδ : 0 ≤ δ) (hcone : uD * (1 - δ ^ L) ≤ uC) (m : ℕ) (hm : L < m) :
+    uD + δ * Vp uC uD δ L (if L ≤ 1 then St.dirty else St.count (L - 1)) m
+      ≤ uC + δ * Vp uC uD δ L St.clean m := by
+  have hV := Vp_cone uC uD δ L h1L hCD hδ hcone m (by omega)
+  have hD := Vp_Dbranch_eq uC uD δ L hCD h1L m (by omega)
+  have hexp : uC + δ * (uC * S δ (m - L) + δ ^ (m - L) * (uD * S δ L))
+      = uC * S δ (m - L + 1) + δ ^ (m - L + 1) * (uD * S δ L) := by
+    have e : m - L + 1 = (m - L) + 1 := by omega
+    rw [e, S_succ]; ring
+  rw [hD, hV, hexp]
+  exact cone_le uC uD δ L (m - L + 1) hδ hcone
+
+-- T6 主定理（K = L）：锥内清洁态的最优折现值恰为
+-- 「前 m−L 期合作 + 末 L 期背叛」——末段崩塌宽度等于传输延迟。
+-- L = 1 时锥条件 uD·(1−δ) ≤ uC 退化为 T5 的平稳救援条件。
+theorem T6_K_eq_L (uC uD δ : Real) (L : ℕ) (h1L : 1 ≤ L) (hCD : uC ≤ uD) (hδ : 0 ≤ δ)
+    (hcone : uD * (1 - δ ^ L) ≤ uC) (m : ℕ) (hm : L ≤ m) :
+    Vp uC uD δ L St.clean m
+      = uC * S δ (m - L) + δ ^ (m - L) * (uD * S δ L) :=
+  Vp_cone uC uD δ L h1L hCD hδ hcone m hm
+
+-- ================================================================
+-- 第 III 部分：T3 物种层 Hoeffding 不等式（有限时域 m）
+-- ================================================================
+-- Ω = Fin m → ℝ（Fintype 时域；无穷时域需 ProductMeasure.infinitePi，
+-- 留作扩展）。每坐标独立 Ber(1, −1, p)：P(ω i = +1) = p，漂移 E[ω i] = 2p−1。
+-- 崩塌事件 {∑ω ≤ 0} = {m·g ≤ ∑(g − ωi)}，Hoeffding（区间宽 2，c = 1）。
+
+namespace T3
+
+open MeasureTheory ProbabilityTheory
+
+/-- m 步随机游走测度：乘积 Bernoulli（p ∈ [0,1] 打包成合取假设）。 -/
+noncomputable def walk (p : ℝ) (hp : 0 ≤ p ∧ p ≤ 1) (m : ℕ) :
+    Measure (Fin m → ℝ) :=
+  Measure.pi (fun _ => bernoulliMeasure (1:ℝ) (-1:ℝ) ⟨p, hp.1, hp.2⟩)
+
+instance (p : ℝ) (hp : 0 ≤ p ∧ p ≤ 1) (m : ℕ) :
+    IsProbabilityMeasure (walk p hp m) := by
+      unfold walk
+      exact inferInstance
+
+/-- 坐标期望：E[ω i] = 2p − 1（柱积分换成单点 Bernoulli 积分）。 -/
+theorem integral_coord (p : ℝ) (hp : 0 ≤ p ∧ p ≤ 1) (m : ℕ) (i : Fin m) :
+    ∫ ω : Fin m → ℝ, ω i ∂walk p hp m = 2 * p - 1 := by
+  have h : ∫ ω : Fin m → ℝ, (fun x : ℝ => x) (ω i) ∂
+      Measure.pi (fun _ : Fin m => bernoulliMeasure (1:ℝ) (-1:ℝ) ⟨p, hp.1, hp.2⟩)
+      = ∫ x : ℝ, x ∂bernoulliMeasure (1:ℝ) (-1:ℝ) ⟨p, hp.1, hp.2⟩ :=
+    integral_comp_eval (μ := fun _ : Fin m =>
+      bernoulliMeasure (1:ℝ) (-1:ℝ) ⟨p, hp.1, hp.2⟩)
+      (f := fun x : ℝ => x) (i := i) measurable_id.aestronglyMeasurable
+  show (∫ ω : Fin m → ℝ, (fun x : ℝ => x) (ω i) ∂
+      Measure.pi (fun _ : Fin m => bernoulliMeasure (1:ℝ) (-1:ℝ) ⟨p, hp.1, hp.2⟩))
+    = 2 * p - 1
+  rw [h, integral_bernoulliMeasure]
+  simp
+  ring
+
+/-- 居中坐标期望：E[g − ω i] = 0（g = 2p − 1 恰为漂移）。 -/
+theorem integral_centered (p : ℝ) (hp : 0 ≤ p ∧ p ≤ 1) (m : ℕ) (i : Fin m)
+    (g : ℝ) (hg : g = 2 * p - 1) :
+    ∫ ω : Fin m → ℝ, g - ω i ∂walk p hp m = 0 := by
+  have hm : Measurable (fun x : ℝ => g - x) := by fun_prop
+  have h : ∫ ω : Fin m → ℝ, (fun x : ℝ => g - x) (ω i) ∂
+      Measure.pi (fun _ : Fin m => bernoulliMeasure (1:ℝ) (-1:ℝ) ⟨p, hp.1, hp.2⟩)
+      = ∫ x : ℝ, g - x ∂bernoulliMeasure (1:ℝ) (-1:ℝ) ⟨p, hp.1, hp.2⟩ :=
+    integral_comp_eval (μ := fun _ : Fin m =>
+      bernoulliMeasure (1:ℝ) (-1:ℝ) ⟨p, hp.1, hp.2⟩)
+      (f := fun x : ℝ => g - x) (i := i) hm.aestronglyMeasurable
+  show (∫ ω : Fin m → ℝ, (fun x : ℝ => g - x) (ω i) ∂
+      Measure.pi (fun _ : Fin m => bernoulliMeasure (1:ℝ) (-1:ℝ) ⟨p, hp.1, hp.2⟩))
+    = 0
+  rw [h, integral_bernoulliMeasure]
+  simp
+  subst hg
+  ring
+
+/-- 居中坐标 a.s. 落在宽度 2 的区间（亚高斯参数 c = 1 的来源）。 -/
+theorem centered_mem_Icc (p : ℝ) (hp : 0 ≤ p ∧ p ≤ 1) (m : ℕ) (i : Fin m) (g : ℝ) :
+    ∀ᵐ ω ∂walk p hp m, g - ω i ∈ Set.Icc (g - 1) (g + 1) := by
+  rw [ae_iff]
+  have hmap : Measure.map (fun ω : Fin m → ℝ => ω i) (walk p hp m)
+      = bernoulliMeasure (1:ℝ) (-1:ℝ) ⟨p, hp.1, hp.2⟩ :=
+    (measurePreserving_eval (fun _ : Fin m =>
+      bernoulliMeasure (1:ℝ) (-1:ℝ) ⟨p, hp.1, hp.2⟩) i).map_eq
+  have hset : (fun ω : Fin m → ℝ => ω i) ⁻¹'
+      {x : ℝ | ¬(g - x ∈ Set.Icc (g - 1) (g + 1))}
+      = {ω : Fin m → ℝ | ¬(g - ω i ∈ Set.Icc (g - 1) (g + 1))} := rfl
+  rw [← hset, ← Measure.map_apply (measurable_pi_apply i), hmap]
+  rw [bernoulliMeasure_def]
+  simp [Measure.smul_apply, Measure.add_apply]
+  · constructor <;> exact Or.inr (by linarith)
+  · have hpre : MeasurableSet ((fun x : ℝ => g - x) ⁻¹' Set.Icc (g - 1) (g + 1)) :=
+      measurableSet_Icc.preimage (by fun_prop)
+    have heq : {x : ℝ | ¬(g - x ∈ Set.Icc (g - 1) (g + 1))}
+        = ((fun x : ℝ => g - x) ⁻¹' Set.Icc (g - 1) (g + 1))ᶜ := by
+      ext x
+      simp only [Set.mem_ofPred_eq, Set.mem_preimage, Set.mem_compl_iff]
+    rw [heq]
+    exact hpre.compl
+
+/-- 坐标独立（居中版）：iIndepFun (fun i ω => g − ω i)。 -/
+theorem indep_centered (p : ℝ) (hp : 0 ≤ p ∧ p ≤ 1) (m : ℕ) (g : ℝ) :
+    ProbabilityTheory.iIndepFun (fun i (ω : Fin m → ℝ) => g - ω i) (walk p hp m) :=
+  iIndepFun_pi (μ := fun _ : Fin m =>
+      bernoulliMeasure (1:ℝ) (-1:ℝ) ⟨p, hp.1, hp.2⟩)
+    (X := fun _ (x : ℝ) => g - x)
+    (fun _ => (by fun_prop : Measurable (fun x : ℝ => g - x)).aemeasurable)
+
+/-- T3 物种层 Hoeffding 尾界：漂移 g = 2p − 1 的随机游走 m 步后，
+    崩塌（平均增益 ≤ 0）概率 ≤ exp(−m·g²/2)。
+    p ≥ 1/2（正漂移）时指数衰减；亚高斯参数 c = 1（区间宽 2）。 -/
+theorem T3_species (p : ℝ) (hp0 : 0 ≤ p) (hp1 : p ≤ 1) (hp2 : 1 / 2 ≤ p)
+    (m : ℕ) (hm : 1 ≤ m) :
+    (walk p ⟨hp0, hp1⟩ m).real {ω : Fin m → ℝ | ∑ i, ω i ≤ 0}
+      ≤ Real.exp (-(m:ℝ) * (2 * p - 1) ^ 2 / 2) := by
+  set g := 2 * p - 1 with hgdef
+  have hg0 : 0 ≤ g := by linarith
+  have hsum : ∀ ω : Fin m → ℝ, ∑ i, (g - ω i) = (m:ℝ) * g - ∑ i, ω i := by
+    intro ω
+    have h1 : ∑ i, (g - ω i) = ∑ i, g - ∑ i, ω i :=
+      Finset.sum_sub_distrib (f := fun _ : Fin m => g) (g := fun i => ω i)
+    have h2 : ∑ i : Fin m, g = (m:ℝ) * g := by simp
+    rw [h1, h2]
+  have hev : {ω : Fin m → ℝ | ∑ i, ω i ≤ 0}
+      = {ω : Fin m → ℝ | (m:ℝ) * g ≤ ∑ i, (g - ω i)} := by
+    ext ω
+    simp only [Set.mem_ofPred_eq]
+    rw [hsum ω]
+    constructor <;> intro hh <;> linarith
+  have hmeas : ∀ i : Fin m, AEMeasurable (fun ω : Fin m → ℝ => g - ω i)
+      (walk p ⟨hp0, hp1⟩ m) := fun i =>
+    (by fun_prop : Measurable (fun ω : Fin m → ℝ => g - ω i)).aemeasurable
+  have hsg : ∀ i : Fin m, ProbabilityTheory.HasSubgaussianMGF
+      (fun ω : Fin m → ℝ => g - ω i) 1 (walk p ⟨hp0, hp1⟩ m) := by
+    intro i
+    have h0 := hasSubgaussianMGF_of_mem_Icc_of_integral_eq_zero (a := g - 1) (b := g + 1)
+      (hmeas i) (centered_mem_Icc p ⟨hp0, hp1⟩ m i g)
+      (integral_centered p ⟨hp0, hp1⟩ m i g hgdef)
+    have hc : ((‖g + 1 - (g - 1)‖₊ / 2) ^ 2) = 1 := by
+      have e : g + 1 - (g - 1) = 2 := by ring
+      rw [e]; simp
+    rw [hc] at h0
+    exact h0
+  have hmg : 0 ≤ (m:ℝ) * g := mul_nonneg (by positivity) hg0
+  have hH := ProbabilityTheory.HasSubgaussianMGF.measure_sum_ge_le_of_iIndepFun
+    (h_indep := indep_centered p ⟨hp0, hp1⟩ m g) (c := fun _ => 1) (s := Finset.univ)
+    (h_subG := fun i _ => hsg i) (ε := (m:ℝ) * g) (hε := hmg)
+  simp at hH
+  have h1m : (1:ℝ) ≤ (m:ℝ) := by exact_mod_cast hm
+  have hdiv : -((m:ℝ) * g) ^ 2 / (2 * (m:ℝ)) = -(m:ℝ) * g ^ 2 / 2 := by
+    have h2m : (0:ℝ) < 2 * (m:ℝ) := by linarith
+    rw [div_eq_iff (ne_of_gt h2m)]
+    ring
+  calc (walk p ⟨hp0, hp1⟩ m).real {ω : Fin m → ℝ | ∑ i, ω i ≤ 0}
+      ≤ Real.exp (-((m:ℝ) * g) ^ 2 / (2 * (m:ℝ))) := hH
+    _ = Real.exp (-(m:ℝ) * g ^ 2 / 2) := by rw [hdiv]
+    _ = Real.exp (-(m:ℝ) * (2 * p - 1) ^ 2 / 2) := by rw [← hgdef]
+
+/-- T3 个体层（柱集定理）：个体在前 k 期连续遭遇逆风（每期 ω i = −1）的
+概率恰为 (1−p)^k——独立乘积的精确形式，非上界。k ≤ m（Fin m 时域内取
+前 k 个坐标）。证明走柱测度：事件改写为 Set.pi 柱集，`Measure.pi_pi`
+把柱测度拆成逐坐标因子积，Ber({−1}) = 1−p（bernoulli 的 y 点权），因子
+积按 range k 过滤后只剩常数幂。 -/
+theorem T3_individual (p : ℝ) (hp : 0 ≤ p ∧ p ≤ 1) (m k : ℕ) (hkm : k ≤ m) :
+    (walk p hp m) {ω : Fin m → ℝ | ∀ i : Fin m, (i : ℕ) < k → ω i = -1}
+      = ENNReal.ofReal (1 - p) ^ k := by
+  -- 事件改写为柱集 Set.pi univ (前 k 坐标取 {−1}，其余全空间)
+  have hE : {ω : Fin m → ℝ | ∀ i : Fin m, (i : ℕ) < k → ω i = -1}
+      = Set.pi Set.univ
+          (fun i : Fin m => if (i : ℕ) < k then ({-1} : Set ℝ) else Set.univ) := by
+    ext ω
+    simp [Set.mem_pi, Set.mem_univ]
+  rw [hE, walk, Measure.pi_pi]
+  -- 逐坐标因子：Ber({−1}) = 1−p，Ber(univ) = 1
+  have hfac : ∀ i : Fin m,
+      bernoulliMeasure (1:ℝ) (-1:ℝ) ⟨p, hp.1, hp.2⟩
+        (if (i : ℕ) < k then ({-1} : Set ℝ) else Set.univ)
+      = (if (i : ℕ) < k then ENNReal.ofReal (1 - p) else 1) := by
+    intro i
+    by_cases h : (i : ℕ) < k
+    · rw [ite_eq_left h, bernoulliMeasure_apply_of_notMem_of_mem (p := ⟨p, hp.1, hp.2⟩)
+        (by measurability) (by norm_num) (by simp)]
+      have hh : (unitInterval.toNNReal
+          (unitInterval.symm (⟨p, hp.1, hp.2⟩ : Set.Icc (0:ℝ) 1)) : ℝ) = 1 - p := by
+        simp [unitInterval.coe_toNNReal, unitInterval.coe_symm_eq]
+      rw [show ENNReal.ofReal (1 - p)
+          = (unitInterval.toNNReal
+              (unitInterval.symm (⟨p, hp.1, hp.2⟩ : Set.Icc (0:ℝ) 1)) : ENNReal) from by
+        rw [ENNReal.ofReal_eq_coe_nnreal (by linarith)]
+        congr 1]
+      rw [ite_eq_left h]
+    · rw [ite_eq_right h, bernoulliMeasure_apply_of_mem_of_mem (p := ⟨p, hp.1, hp.2⟩)
+        (by measurability) (by simp) (by simp)]
+      rw [ite_eq_right h]
+  rw [Finset.prod_congr rfl (fun i _ => hfac i)]
+  -- 因子积拆分：∏ i : Fin m → ∏ j ∈ range k（其余因子为 1）
+  rw [Fin.prod_univ_eq_prod_range (fun j : ℕ => if j < k then ENNReal.ofReal (1 - p) else 1)]
+  rw [← Finset.prod_filter]
+  have hfrange : (Finset.range m).filter (fun j : ℕ => j < k) = Finset.range k := by
+    ext j; simp [Finset.mem_filter, Finset.mem_range]; omega
+  rw [hfrange, Finset.prod_const, Finset.card_range]
+
+/-- 数值实例（附录 A 落地计算）：p = 11/20、m = 5000、k = 10。
+第一分量：物种层 Hoeffding 指数恰为 25（纯算术，norm_num 可复核）——
+即 T3_species 的尾界在此参数下为 exp(−25) ≈ 1.4×10⁻¹¹；第二分量：该尾界
+严格小于个体层柱集概率 (1−p)^k = (9/20)^10 ≈ 3.4×10⁻⁴（T3_individual 的
+精确值）。两个数量级差 = 个体侥幸存活的机会远大于整个物种漂移翻车的机会：
+契约的「物种层紧、个体层松」结构在数值上成立。证明：e ≥ 2（add_one_le_exp）
+⟹ e^25 ≥ 2^25（幂单调性手动归纳）⟹ exp(−25) ≤ 2^−25 < (9/20)^10
+（纯整数幂比较，norm_num 收尾）。 -/
+theorem numerical_instance :
+    (5000:ℝ) * (2 * (11/20:ℝ) - 1)^2 / 2 = 25
+      ∧ Real.exp (-25) < (9/20:ℝ)^10 := by
+  refine ⟨by norm_num, ?_⟩
+  have h2 : (2:ℝ) ≤ Real.exp 1 := by
+    have := Real.add_one_le_exp 1
+    linarith
+  have h3 : (2:ℝ)^25 ≤ (Real.exp 1)^25 := by
+    have key : ∀ n : ℕ, (2:ℝ)^n ≤ (Real.exp 1)^n := by
+      intro n
+      induction n with
+      | zero => norm_num
+      | succ n ih =>
+        calc (2:ℝ)^(n+1) = (2:ℝ)^n * 2 := by ring
+          _ ≤ (Real.exp 1)^n * Real.exp 1 :=
+              mul_le_mul ih h2 (by norm_num) (by positivity)
+          _ = (Real.exp 1)^(n+1) := by ring
+    exact key 25
+  have h4 : Real.exp 25 = (Real.exp 1)^25 := by
+    rw [← Real.exp_nat_mul 1 25]; norm_num
+  have h5 : (2:ℝ)^25 ≤ Real.exp 25 := by rw [h4]; exact h3
+  have h6 : Real.exp (-25) = 1 / Real.exp 25 := by
+    rw [Real.exp_neg, inv_eq_one_div]
+  rw [h6]
+  have h7 : 1 / Real.exp 25 ≤ 1 / (2:ℝ)^25 :=
+    one_div_le_one_div_of_le (by norm_num) h5
+  have h8 : (1:ℝ) / (2:ℝ)^25 < (9/20:ℝ)^10 := by
+    rw [div_pow]
+    rw [div_lt_div_iff₀ (by norm_num) (by norm_num)]
+    norm_num
+  linarith
+end T3
+
+-- ================================================================
+-- 公理基底终检（mathlib 标准三件套：propext / Classical.choice / Quot.sound）
+-- ================================================================
 #print axioms Vp_endgame
 #print axioms Vp_cone
 #print axioms T6_defect_optimal
 #print axioms T6_coop_optimal
 #print axioms T6_K_eq_L
+#print axioms T3.integral_coord
+#print axioms T3.integral_centered
+#print axioms T3.centered_mem_Icc
+#print axioms T3.indep_centered
+#print axioms T3.T3_species
+#print axioms T3.T3_individual
+#print axioms T3.numerical_instance

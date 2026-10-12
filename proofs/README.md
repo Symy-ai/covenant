@@ -11,7 +11,7 @@
 | 路径 | 内容 | 验证状态 |
 |---|---|---|
 | [`covenant_proofs.py`](covenant_proofs.py) | Python 精确验证套件：10 项定理机器判定 + 3159 组网格穷举（纯 `fractions.Fraction`，零浮点） | ✅ 2026-10-12 实跑 10/10 通过 |
-| [`covenant-mathlib/`](covenant-mathlib/) | Lean 4 + Mathlib v4.34.1 轨：14 条定理（T1/T2/T5/T6 组/T7/T8，ℚ/ℝ 原形） | ✅ 编译通过，公理基底标准三件套 |
+| [`covenant-mathlib/`](covenant-mathlib/) | Lean 4 + Mathlib v4.34.1 轨：31 条定理（T1/T2/T5/T6 组/T7/T8 + **T3 概率组**：乘积游走测度、物种层 Hoeffding 尾界 T3_species、个体层柱集定理 T3_individual、数值实例） | ✅ 编译通过，公理基底标准三件套 |
 | [`covenant-core/`](covenant-core/) | Lean 4 core-only 轨：3 条定理整数提升版，仅 `import Init` 零依赖 | ✅ 编译通过，公理基底 [propext, Quot.sound] |
 | [`结构级嵌入建议书.docx`](结构级嵌入建议书.docx) | 论文 §5 配套工程文档：三层数据/评估/续签的具体嵌入建议 | 论文引用件 |
 
@@ -19,7 +19,8 @@
 
 | 定理 | 内容 | 论文位置 | 轨道 |
 |---|---|---|---|
-| `T1_recurrence` / `T1_rat` | 破产闭式递推 r(k)=s^k | 套件工具定理（个体—物种风险分层），正文未独立陈述 | core / mathlib |
+| `T1_recurrence` / `T1_rat` | 破产闭式递推 r(k)=s^k（递推核；极限步骤·截断收敛在 Python 精确层完成） | 套件工具定理（个体—物种风险分层），正文未独立陈述 | core / mathlib |
+| `T3_species` / `T3_individual` | 物种层尾界 P{Σω≤0} ≤ exp(−m(2p−1)²/2)；个体层柱集测度恰为 (1−p)^k | 附录 A（v1.3 增补），正文未独立陈述 | mathlib |
 | `T2_buffer_mono` | 缓冲定价单调性 (σ+G)/(σ−G) 随 G 严格增 | 同上 | mathlib |
 | `T5_threshold` | 语料救援阈值：锥内 q ≥ q* 充要条件，q* = ℓ/(a+ℓ−(1−δ)b) | 命题 3 推论（§2.3） | mathlib |
 | `Vp_count_eq` 等 8 条 | 末段崩塌宽度 K = L 的动态归纳（含锥内合作公式与两条政策达成定理） | §2.4 | mathlib |
@@ -54,7 +55,8 @@ lake env lean Covenant.lean
 ## 验证记录（2026-10-12）
 
 - `covenant_proofs.py`：退出码 0，10/10 PASS，3159 组网格穷举全过（q ≥ q* ⟺ 合作，Bellman 证书精确）
-- `covenant-mathlib/Covenant.lean`：`lake env lean` 退出码 0，14/14 定理 `#print axioms` = `[propext, Classical.choice, Quot.sound]`，零 `sorry`、零自定义公理、零 `native_decide`
+- `covenant-mathlib/Covenant.lean`（v1.3，18 条 `#print axioms` 输出 / 31 条 theorem 声明）：`lake env lean` 退出码 0，零警告零错误，公理基底全部 `[propext, Classical.choice, Quot.sound]`，零 `sorry`、零自定义公理、零 `native_decide`
+- T3 无穷时域版：Mathlib 的 `Measure.pi` 当前仅支持有限指标族，无穷乘积测度（`ProductMeasure.infinitePi`）留作扩展——论文附录 A 已作诚实边界声明
 - `covenant-core/Covenant.lean`：裸 `lean` 编译退出码 0，公理基底 `[propext]` / `[propext, Quot.sound]`
 
 ## 引用
