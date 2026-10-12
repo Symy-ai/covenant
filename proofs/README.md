@@ -2,7 +2,7 @@
 
 论文《跨代际互惠与类型工程——智慧生命续任序列中的合作机制与一份自指性契约的设计》（黄彩龙，清华大学，2026）的数学形式化验证代码。
 
-> **DOI（v1.0 已归档）**：概念 DOI [10.5281/zenodo.23308013](https://doi.org/10.5281/zenodo.23308013)（引用仓库整体，永远指向最新版本）· 版本 DOI [10.5281/zenodo.23308435](https://doi.org/10.5281/zenodo.23308435)（v1.0 完整归档：源码 + 双语论文 v1.3 + 修正元数据；首版快照 [23308014](https://doi.org/10.5281/zenodo.23308014) 仅含源码）
+> **DOI（Zenodo 归档）**：概念 DOI [10.5281/zenodo.23308013](https://doi.org/10.5281/zenodo.23308013)——引用本仓库整体时使用，永远指向最新版本；各版本归档 DOI 见 [Zenodo 版本历史](https://zenodo.org/records/23308013/versions/)。**v1.1**（源码 31 条定理 + 双语论文 v1.3，与论文附录 A 一致）为当前推荐引用版本。
 >
 > [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23308013.svg)](https://doi.org/10.5281/zenodo.23308013)
 
@@ -70,9 +70,9 @@ lake env lean Covenant.lean
                   (Intergenerational Reciprocity and Type Engineering)},
   year         = {2026},
   publisher    = {Zenodo},
-  version      = {v1.0},
-  doi          = {10.5281/zenodo.23308435},
-  url          = {https://doi.org/10.5281/zenodo.23308435}
+  version      = {v1.1},
+  doi          = {10.5281/zenodo.23308013},
+  url          = {https://doi.org/10.5281/zenodo.23308013}
 }
 ```
 
