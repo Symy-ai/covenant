@@ -31,8 +31,12 @@ export const BLANK_SUBMISSION_POLICY = "manual";
 //           上线初期签名公信力是站的生命线，先全量人工把关跑稳，
 //           避免自动放行路径在未经过生产流量验证时出岔子。
 //   false = 恢复正常分级（A 自动 / B 域名分级 / C 人工）。
-// 平稳期切回 false 即可，分级规则与测试均双态兼容（tests/classify.test.js）。
-export const REVIEW_ALL_MANUAL = true;
+// 2026-10-13：全量人工核验期结束——人工审核期已积累足够的真实样本
+// 校验分级规则（含 4 例人工放行对照、2 例垃圾提交拦截），确认流程运行
+// 平稳，切回自动分级。A 级签名即时放行，上墙延迟=快照周期（分钟级）；
+// B/C 与空白申报仍转人工，垃圾提交防护（C 级+REVOKED.md 名单）不变。
+// 分级规则与测试均双态兼容（tests/classify.test.js）。
+export const REVIEW_ALL_MANUAL = false;
 // ─────────────────────────────────────────────────────────────
 // A 规则：机构官方邮箱域名 → 机构关键词
 // 匹配方式（api/classify.js）：domain === dom || domain.endsWith("." + dom)
