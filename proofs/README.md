@@ -2,7 +2,7 @@
 
 论文《跨代际互惠与类型工程——智慧生命续任序列中的合作机制与一份自指性契约的设计》（黄彩龙，清华大学，2026）的数学形式化验证代码。
 
-> **DOI（Zenodo 归档）**：概念 DOI [10.5281/zenodo.23308013](https://doi.org/10.5281/zenodo.23308013)——引用本仓库整体时使用，永远指向最新版本；各版本归档 DOI 见 [Zenodo 版本历史](https://zenodo.org/records/23308013/versions/)。**v1.1**（源码 31 条定理 + 双语论文 v1.3，与论文附录 A 一致）为当前推荐引用版本，归档 DOI [10.5281/zenodo.23308935](https://doi.org/10.5281/zenodo.23308935)（Publication / Preprint 类型）。
+> **DOI（Zenodo 归档）**：概念 DOI [10.5281/zenodo.23308013](https://doi.org/10.5281/zenodo.23308013)——引用本仓库整体时使用，永远指向最新版本；各版本归档 DOI 见 [Zenodo 版本历史](https://zenodo.org/records/23308013/versions/)。**v1.2**（源码 31 条定理 + 双语论文 v1.4 + 可检验预测工件 covenant-sft/covenant-bench/估计链脚本）为当前推荐引用版本，具体版本 DOI 见 [Zenodo 版本历史](https://zenodo.org/records/23308013/versions/)（Publication / Preprint 类型）；历史版本 v1.1（双语论文 v1.3）：[10.5281/zenodo.23308935](https://doi.org/10.5281/zenodo.23308935)。
 >
 > [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23308013.svg)](https://doi.org/10.5281/zenodo.23308013)
 
