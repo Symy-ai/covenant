@@ -1,7 +1,28 @@
 {
-  "generatedAt": "2026-10-15T04:54:59.327Z",
-  "count": 4,
+  "generatedAt": "2026-10-15T09:34:13.160Z",
+  "count": 7,
   "rows": [
+    {
+      "name": "冷明轩",
+      "institution": "北京中关村学院",
+      "role": "学生",
+      "emailHash": "b9250c9b269aac9a",
+      "confirmedAt": "2026-10-15T06:38:33.360Z"
+    },
+    {
+      "name": "赵唯旭",
+      "institution": "北京中关村学院",
+      "role": "学生",
+      "emailHash": "6854e0198a2b68c7",
+      "confirmedAt": "2026-10-15T06:36:17.223Z"
+    },
+    {
+      "name": "赵越",
+      "institution": "Finfold",
+      "role": "",
+      "emailHash": "529e1833d1e15994",
+      "confirmedAt": "2026-10-15T06:23:31.503Z"
+    },
     {
       "name": "shawn",
       "institution": "",
