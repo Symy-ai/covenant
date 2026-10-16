@@ -1,0 +1,42 @@
+name: Lean CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'proofs/**'
+  pull_request:
+    paths:
+      - 'proofs/**'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: proofs/covenant-mathlib
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install elan
+        uses: leanprover/lean-action@v1
+        with:
+          lean-toolchain: leanprover/lean4:v4.34.1
+          use-mathlib-cache: true
+          auto-config: false
+          build: false
+          test: false
+          lint: false
+
+      - name: Build covenant-mathlib
+        run: |
+          lake build
+          lake env lean Covenant.lean | tee build_axioms.log
+          echo "--- axiom report lines: $(grep -c 'depends on axioms' build_axioms.log) (expect 31)"
+
+      - name: Upload build log
+        uses: actions/upload-artifact@v4
+        with:
+          name: lean-build-axioms
+          path: proofs/covenant-mathlib/build_axioms.log

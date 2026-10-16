@@ -1,6 +1,6 @@
 name = "covenant-mathlib"
 version = "0.1.0"
-defaultTargets = ["covenant-mathlib"]
+defaultTargets = ["Covenant"]
 
 [[require]]
 name = "mathlib"

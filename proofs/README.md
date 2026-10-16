@@ -2,9 +2,10 @@
 
 论文《跨代际互惠与类型工程——智慧生命续任序列中的合作机制与一份自指性契约的设计》（黄彩龙，清华大学，2026）的数学形式化验证代码。
 
-> **DOI（Zenodo 归档）**：概念 DOI [10.5281/zenodo.23308013](https://doi.org/10.5281/zenodo.23308013)——引用本仓库整体时使用，永远指向最新版本；各版本归档 DOI 见 [Zenodo 版本历史](https://zenodo.org/records/23308013/versions/)。**v1.2**（源码 31 条定理 + 双语论文 v1.4 + 可检验预测工件 covenant-sft/covenant-bench/估计链脚本）为当前推荐引用版本，具体版本 DOI 见 [Zenodo 版本历史](https://zenodo.org/records/23308013/versions/)（Publication / Preprint 类型）；历史版本 v1.1（双语论文 v1.3）：[10.5281/zenodo.23308935](https://doi.org/10.5281/zenodo.23308935)。
+> **DOI（Zenodo 归档）**：概念 DOI [10.5281/zenodo.23308013](https://doi.org/10.5281/zenodo.23308013)——引用本仓库整体时使用，永远指向最新版本；各版本归档 DOI 见 [Zenodo 版本历史](https://zenodo.org/records/23308013/versions/)。**v1.3**（源码 31 条定理 + 双语论文 v1.5 + 可检验预测工件 covenant-sft/covenant-bench + 估计链脚本 + 完整构建日志）为当前推荐引用版本，具体版本 DOI 见 [Zenodo 版本历史](https://zenodo.org/records/23308013/versions/)（Publication / Preprint 类型）。历史版本：v1.2（31 条定理 + 论文 v1.4，不含估计链脚本与构建日志）；v1.1（论文 v1.3）：[10.5281/zenodo.23308935](https://doi.org/10.5281/zenodo.23308935)。
 >
 > [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23308013.svg)](https://doi.org/10.5281/zenodo.23308013)
+> [![Lean CI](https://github.com/Symy-ai/covenant/actions/workflows/lean-ci.yml/badge.svg)](https://github.com/Symy-ai/covenant/actions/workflows/lean-ci.yml)
 
 ## 目录结构
 
@@ -30,7 +31,7 @@
 ## 环境依赖
 
 - **Python 轨**：Python ≥ 3.8，零第三方依赖（仅标准库 `fractions`/`math`/`random`）
-- **Lean mathlib 轨**：[elan](https://elan.lean-lang.org/) + Lean 4.34.1 + Mathlib v4.34.1（首拉约 6.9 GB，走官方缓存）
+- **Lean mathlib 轨**：[elan](https://elan.lean-lang.org/) + Lean 4.34.1 + Mathlib v4.34.1（commit `d13f23b723b8a846827a245b89c10fc7d3f11612`；首拉约 6.9 GB，走官方缓存）
 - **Lean core 轨**：Lean 4 即可，无需 Mathlib（秒级编译）
 
 ## 复现步骤
@@ -52,10 +53,11 @@ lake update
 lake env lean Covenant.lean
 ```
 
-## 验证记录（2026-10-12）
+## 验证记录（最新：2026-10-16）
 
 - `covenant_proofs.py`：退出码 0，10/10 PASS，3159 组网格穷举全过（q ≥ q* ⟺ 合作，Bellman 证书精确）
-- `covenant-mathlib/Covenant.lean`（v1.3，18 条 `#print axioms` 输出 / 31 条 theorem 声明）：`lake env lean` 退出码 0，零警告零错误，公理基底全部 `[propext, Classical.choice, Quot.sound]`，零 `sorry`、零自定义公理、零 `native_decide`
+- `covenant-mathlib/Covenant.lean`（v1.4，**31 条 `#print axioms` 全覆盖 / 31 条 theorem 声明**，2026-10-16 实编译）：`lake build` + `lake env lean` 退出码 0，零警告零错误，公理基底全部 `[propext, Classical.choice, Quot.sound]`，零 `sorry`、零自定义公理、零 `native_decide`；完整构建日志随 v1.3 归档。CI（GitHub Actions lean-ci）在每次 proofs/ 变更时重跑此验证
+- 历史记录（2026-10-12）：v1.3 版本为 18 条 `#print axioms` / 31 条 theorem——覆盖不全由审稿指出，已于 2026-10-16 补全
 - T3 无穷时域版：Mathlib 的 `Measure.pi` 当前仅支持有限指标族，无穷乘积测度（`ProductMeasure.infinitePi`）留作扩展——论文附录 A 已作诚实边界声明
 - `covenant-core/Covenant.lean`：裸 `lean` 编译退出码 0，公理基底 `[propext]` / `[propext, Quot.sound]`
 
@@ -70,11 +72,15 @@ lake env lean Covenant.lean
                   (Intergenerational Reciprocity and Type Engineering)},
   year         = {2026},
   publisher    = {Zenodo},
-  version      = {v1.1},
-  doi          = {10.5281/zenodo.23308935},
-  url          = {https://doi.org/10.5281/zenodo.23308935}
+  version      = {v1.3},
+  doi          = {10.5281/zenodo.23308013},
+  url          = {https://doi.org/10.5281/zenodo.23308013},
+  note         = {Concept DOI, always resolves to the latest version;
+                  per-version DOIs at the Zenodo version history page}
 }
 ```
+
+> 引用纪律：本 README 为活文档，BibTeX 用概念 DOI（永远指向最新归档）；送审等需要冻结快照的场合，请用当期版本 DOI（见 [Zenodo 版本历史](https://zenodo.org/records/23308013/versions/)）。
 
 ## 与签名站的关系
 

@@ -594,3 +594,17 @@ end T3
 #print axioms T3.T3_species
 #print axioms T3.T3_individual
 #print axioms T3.numerical_instance
+-- v1.3: coverage completed to all 31 theorems (reviewer request M3)
+#print axioms Vp_zero
+#print axioms Vp_dirty_step
+#print axioms Vp_count_step
+#print axioms Vp_clean_step
+#print axioms S_zero
+#print axioms S_succ
+#print axioms S_one
+#print axioms S_telescope
+#print axioms Vp_dirty_eq
+#print axioms Vp_count_eq
+#print axioms Vp_Dbranch_eq
+#print axioms cone_le
+#print axioms S_nonneg
