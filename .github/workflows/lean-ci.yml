@@ -20,22 +20,19 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install elan
-        uses: leanprover/lean-action@v1
-        with:
-          lean-toolchain: leanprover/lean4:v4.34.1
-          use-mathlib-cache: true
-          auto-config: false
-          build: false
-          test: false
-          lint: false
+        run: |
+          set -e
+          curl -sSfL https://elan.lean-lang.org/elan-init.sh | sh -s -- -y --default-toolchain leanprover/lean4:v4.34.1
+          echo "$HOME/.elan/bin" >> "$GITHUB_PATH"
 
-      - name: Build covenant-mathlib
+      - name: Build and verify axioms
         run: |
           lake build
           lake env lean Covenant.lean | tee build_axioms.log
-          echo "--- axiom report lines: $(grep -c 'depends on axioms' build_axioms.log) (expect 31)"
+          test "$(grep -c 'depends on axioms' build_axioms.log)" = "31"
 
       - name: Upload build log
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: lean-build-axioms
