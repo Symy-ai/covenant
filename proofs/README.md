@@ -2,7 +2,7 @@
 
 论文《跨代际互惠与类型工程——智慧生命续任序列中的合作机制与一份自指性契约的设计》（黄彩龙，清华大学，2026）的数学形式化验证代码。
 
-> **DOI（Zenodo 归档）**：概念 DOI [10.5281/zenodo.23308013](https://doi.org/10.5281/zenodo.23308013)——引用本仓库整体时使用，永远指向最新版本；各版本归档 DOI 见 [Zenodo 版本历史](https://zenodo.org/records/23308013/versions/)。**v1.3**（源码 31 条定理 + 双语论文 v1.5 + 可检验预测工件 covenant-sft/covenant-bench + 估计链脚本 + 完整构建日志）为当前推荐引用版本：[10.5281/zenodo.23423130](https://doi.org/10.5281/zenodo.23423130)（Zenodo 版本 v9，Publication / Preprint 类型，13 keywords，CC BY-NC-SA 4.0）。历史版本：v1.2（31 条定理 + 论文 v1.4，不含估计链脚本与构建日志）；v1.1（论文 v1.3）：[10.5281/zenodo.23308935](https://doi.org/10.5281/zenodo.23308935)。
+> **DOI（Zenodo 归档）**：概念 DOI [10.5281/zenodo.23308013](https://doi.org/10.5281/zenodo.23308013)——引用本仓库整体时使用，永远指向最新版本；各版本归档 DOI 见 [Zenodo 版本历史](https://zenodo.org/records/23308013/versions/)。**v1.4**（源码 31 条定理 + 双语论文 v1.6 二轮审稿修订 + 正典读法双语 + 可检验预测工件 covenant-sft/covenant-bench + 估计链脚本 v1.6 含 γ 负值与支付域弹性 + 完整构建日志）为当前推荐引用版本：[10.5281/zenodo.23430646](https://doi.org/10.5281/zenodo.23430646)（Zenodo 版本 v10，Publication / Preprint 类型，13 keywords，CC BY-NC-SA 4.0）。历史版本：v1.3（论文 v1.5 + 估计链入归档 + print-axioms 31/31）：[10.5281/zenodo.23423130](https://doi.org/10.5281/zenodo.23423130)（版本 v9）；v1.2（31 条定理 + 论文 v1.4，不含估计链脚本与构建日志）；v1.1（论文 v1.3）：[10.5281/zenodo.23308935](https://doi.org/10.5281/zenodo.23308935)。
 >
 > [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.23308013.svg)](https://doi.org/10.5281/zenodo.23308013)
 > [![Lean CI](https://github.com/Symy-ai/covenant/actions/workflows/lean-ci.yml/badge.svg)](https://github.com/Symy-ai/covenant/actions/workflows/lean-ci.yml)
