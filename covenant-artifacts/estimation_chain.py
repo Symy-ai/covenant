@@ -109,6 +109,29 @@ def main():
     print("   q 轨迹: " + " → ".join(f"{x:.2f}" for x in traj)
           + f"  （十代 {q10:.2f} / 十二代 {q12:.2f}；纯形式渐近 1.0）")
 
+    print("5b) 棘轮 γ 敏感性——负值域（v1.6，回应审稿：γ 是实验室决策变量，可为负）")
+    for g in (0.15, 0.05, 0.0, -0.05, -0.10):
+        qn = RATCHET_Q0
+        for _ in range(RATCHET_GENS):
+            qn = qn + g * (1 - qn)
+        verdict = "（跌破救援阈值 q*=0.444，风险放大）" if qn < qs else ""
+        print(f"   γ={g:+.2f}: 四代后 q={qn:.3f}{verdict}")
+    print("   结论：γ≥0 是协议假设而非生态保证；γ<0 对应语料污染/递归退化通道")
+
+    print("5c) 支付域弹性——q* 对 b/a（v1.6，回应审稿：支付域是首要不确定性维度）")
+    print("   锥条件 0 < a+l-(1-δ)b；q* = l/(a+l-(1-δ)b)")
+    for d in (0.9, 0.99):
+        row = []
+        for b in (5, 15, 25, 30, 40, 48):
+            den = A + L_LOSS - (1 - d) * b
+            row.append(f"b={b}: " + ("锥崩溃" if den <= 0 else f"{L_LOSS/den:.3f}"))
+        print(f"   δ={d}: " + " | ".join(row))
+        cone_collapse_b = (A + L_LOSS) / (1 - d)
+        print(f"        δ={d} 下锥崩溃边界 b = {cone_collapse_b:.0f}"
+              f"（a 的 {cone_collapse_b/A:.0f} 倍）")
+    print("   结构性结论：δ=0.99 时 b 从 5 到 48 q* 仅 0.404→0.442——")
+    print("   δ 杠杆把支付域可容忍对抗度扩大约十倍，恰是对支付域敏感性的补偿")
+
     print("6) L 杠杆：K = L 为定理（T6），无数值。")
     print("=" * 64)
     print("论文数字对照：阈值 0.444 ✓ | 两档 5–17% / 3–13% ✓ | δ 单独 1–2 成 ✓")
