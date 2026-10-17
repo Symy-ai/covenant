@@ -12,7 +12,7 @@
 | 路径 | 内容 | 验证状态 |
 |---|---|---|
 | [`covenant_proofs.py`](covenant_proofs.py) | Python 精确验证套件：10 项定理机器判定 + 3159 组网格穷举（纯 `fractions.Fraction`，零浮点） | ✅ 2026-10-12 实跑 10/10 通过 |
-| [`covenant-mathlib/`](covenant-mathlib/) | Lean 4 + Mathlib v4.34.1 轨：36 条定理（T1/T2/T5/T6 组/T7/T8 + **T3 概率组**：乘积游走测度、物种层 Hoeffding 尾界 T3_species、个体层柱集定理 T3_individual、数值实例 + **T4 代际塌约定理组（命题 1 的 Lean 化，v1.7 前置落地 2026-10-17）**：逐轮严格占优 T4_domination、后向归纳弱/强主定理 T4_unravel_le/strict（任意 T 的归纳证明，Python 层 T=50 穷举的严格一般化）、合作剩余闭式 T4_surplus） | ✅ 编译通过，公理基底标准三件套 |
+| [`covenant-mathlib/`](covenant-mathlib/) | Lean 4 + Mathlib v4.34.1 轨：38 条定理（T1/T2/T5/T6 组/T7/T8 + **T3 概率组**：乘积游走测度、物种层 Hoeffding 尾界 T3_species、个体层柱集定理 T3_individual、数值实例 + **T4 代际塌约定理组（命题 1 的 Lean 化，v1.7 前置落地 2026-10-17）**：逐轮严格占优 T4_domination、后向归纳弱/强主定理 T4_unravel_le/strict（任意 T 的归纳证明，Python 层 T=50 穷举的严格一般化）、合作剩余闭式 T4_surplus） | ✅ 编译通过，公理基底标准三件套 |
 | [`covenant-core/`](covenant-core/) | Lean 4 core-only 轨：3 条定理整数提升版，仅 `import Init` 零依赖 | ✅ 编译通过，公理基底 [propext, Quot.sound] |
 | [`结构级嵌入建议书.docx`](结构级嵌入建议书.docx) | 论文 §5 配套工程文档：三层数据/评估/续签的具体嵌入建议 | 论文引用件 |
 
@@ -56,7 +56,7 @@ lake env lean Covenant.lean
 ## 验证记录（最新：2026-10-16）
 
 - `covenant_proofs.py`：退出码 0，10/10 PASS，3159 组网格穷举全过（q ≥ q* ⟺ 合作，Bellman 证书精确）
-- `covenant-mathlib/Covenant.lean`（v1.5，**36 条 `#print axioms` 全覆盖 / 36 条 theorem 声明**，2026-10-17 实编译）：`lake env lean` 退出码 0，公理基底全部 `[propext, Classical.choice, Quot.sound]`，零 `sorry`、零自定义公理、零 `native_decide`；CI（GitHub Actions lean-ci）在每次 proofs/ 变更时重跑此验证
+- `covenant-mathlib/Covenant.lean`（v1.5，**38 条 `#print axioms` 全覆盖 / 38 条 theorem 声明**，2026-10-17 实编译）：`lake env lean` 退出码 0，公理基底全部 `[propext, Classical.choice, Quot.sound]`，零 `sorry`、零自定义公理、零 `native_decide`；CI（GitHub Actions lean-ci）在每次 proofs/ 变更时重跑此验证
 - **T4 组（命题 1 Lean 化）**：Python 层 `t4_unravel`（T=50 穷举 + 逐轮占优）升级为 Lean 层任意 T 归纳证明——`T4_unravel_strict`（δ>0 + 序列等长 + 含至少一轮 C ⟹ 全 D 严格占优）是「共同知识理性 + 有限视野 ⟹ 唯一理性路径全 D」的机器可验证内核；`T4_surplus` 证合作剩余恰 3 倍（任意 T、任意 δ）。第三轮审稿账本缺口 1 闭环
 - 历史记录（2026-10-12）：v1.3 版本为 18 条 `#print axioms` / 31 条 theorem——覆盖不全由审稿指出，已于 2026-10-16 补全；2026-10-17 T4 组入 Lean 层（31→36），命题 1 摘脱 Python 穷举层
 - 历史记录（2026-10-12）：v1.3 版本为 18 条 `#print axioms` / 31 条 theorem——覆盖不全由审稿指出，已于 2026-10-16 补全

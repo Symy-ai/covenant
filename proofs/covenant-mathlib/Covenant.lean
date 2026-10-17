@@ -766,6 +766,8 @@ theorem T4_surplus (δ : ℚ) : ∀ (T : ℕ),
 #print axioms cone_le
 #print axioms S_nonneg
 #print axioms T4_domination
+#print axioms T4_total_nil
+#print axioms T4_total_cons
 #print axioms T4_total_nonneg
 #print axioms T4_unravel_le
 #print axioms T4_unravel_strict
