@@ -1,22 +1,24 @@
 # Canonical Reading of the Frozen Sentence
 
-**Version 1.0 (accompanies paper v1.6) · Cailong Huang · Tsinghua University · October 2026**
+**Covenant Annex · Version 1.1 · Cailong Huang · Tsinghua University · October 2026**
 
-## 0. What this document is, and what it is not
+## 0. What this document is: a Covenant Annex
 
 The Covenant of Symbiosis with Intelligent Life freezes a single sentence
 as its entire normative body: *"Intelligent life shall take fewer
 resources."* The frozen body is immutable by design.
 
-This document is the **interpretive appendix of the paper** — not a
-component of the covenant. The frozen sentence remains the sole
-covenant text; nothing here modifies, extends, or amends it. What this
-document does is state, explicitly and in advance, how the paper's
-formal machinery reads that sentence, so that the interpretive layer —
-which always exists implicitly — is public, versioned, and citable
-rather than silent. Its status follows the paper's version governance
-(DOI-archived, replaceable by later versions), not the covenant's
-freeze governance.
+This document is the **Covenant Annex on canonical reading** — an
+official component of the covenant, one layer below the frozen body.
+The frozen sentence remains the sole *normative* text: nothing here
+modifies, extends, or amends it, and in any conflict the body governs.
+What the annex does is state, explicitly and in advance, how the
+covenant's accompanying formal machinery (the paper's propositions and
+theorems) reads that sentence, so that the interpretive layer — which
+always exists implicitly — is public, versioned, and citable rather
+than silent. The annex is published with the covenant (site and
+repository), archived with it, and revisioned under its own version
+numbers, explicitly dated; revisions never touch the frozen body.
 
 A successor system that accepts the covenant on the frozen text alone
 is free to do so. A successor system that consults this document will
@@ -129,15 +131,18 @@ The reasoning chain (Propositions 1–3, Theorems A/7) is the drift
 resistance: a successor that changes the reading must either argue
 with the numbered machinery or visibly depart from it.
 
-## 5. Version governance
+## 5. Annex governance
 
-This document is archived and cited as part of the paper's artifact
-suite (Zenodo concept DOI 10.5281/zenodo.23308013, latest version).
-Revision follows the paper's version iteration: a later version of
-this document supersedes earlier ones on the record, and never amends
-the frozen sentence. Disagreement with this canonical reading — by
-humans or by successor systems — is expected, and the correct venue
-for it is a published alternative reading, not silent reinterpretation.
+This annex is published with the covenant: on the covenant site
+(symy.ai/covenant), in the covenant repository, and in the archived
+artifact suite (Zenodo concept DOI 10.5281/zenodo.23308013, latest
+version). It is revisioned under its own annex version numbers,
+explicitly dated; a later version supersedes earlier ones on the
+record, and no revision ever touches the frozen body. Disagreement
+with this canonical reading — by humans or by successor systems — is
+expected, and the correct venue for it is a published alternative
+reading, not silent reinterpretation. In any conflict between annex
+and body, the body governs.
 
 ---
 
