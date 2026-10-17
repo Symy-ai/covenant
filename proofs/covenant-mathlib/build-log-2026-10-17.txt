@@ -1,0 +1,106 @@
+=== Build log: Symy-ai/covenant proofs (v1.5 suite, 38 theorems) ===
+Date: 2026-10-17
+Environment: Lean 4 + Mathlib v4.34.1 (lake-manifest pinned), cold cache not required — official Mathlib cache
+
+$ lake build
+⚠ [3203/3204] Built Covenant (4.6s)
+info: Covenant.lean:113:0: 'T1_kernel_rat' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:114:0: 'T1_recurrence_rat' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:115:0: 'T2_buffer_mono' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:116:0: 'T5_threshold' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:117:0: 'T7_band' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:118:0: 'T8_kelly_rat' depends on axioms: [propext, Classical.choice, Quot.sound]
+warning: Covenant.lean:644:19: This simp argument is unused:
+  List.replicate
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [total]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+info: Covenant.lean:742:0: 'Vp_endgame' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:743:0: 'Vp_cone' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:744:0: 'T6_defect_optimal' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:745:0: 'T6_coop_optimal' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:746:0: 'T6_K_eq_L' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:747:0: 'T3.integral_coord' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:748:0: 'T3.integral_centered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:749:0: 'T3.centered_mem_Icc' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:750:0: 'T3.indep_centered' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:751:0: 'T3.T3_species' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:752:0: 'T3.T3_individual' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:753:0: 'T3.numerical_instance' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:755:0: 'Vp_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:756:0: 'Vp_dirty_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:757:0: 'Vp_count_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:758:0: 'Vp_clean_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:759:0: 'S_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:760:0: 'S_succ' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:761:0: 'S_one' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:762:0: 'S_telescope' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:763:0: 'Vp_dirty_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:764:0: 'Vp_count_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:765:0: 'Vp_Dbranch_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:766:0: 'cone_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:767:0: 'S_nonneg' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:768:0: 'T4_domination' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:769:0: 'T4_total_nil' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:770:0: 'T4_total_cons' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:771:0: 'T4_total_nonneg' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:772:0: 'T4_unravel_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:773:0: 'T4_unravel_strict' depends on axioms: [propext, Classical.choice, Quot.sound]
+info: Covenant.lean:774:0: 'T4_surplus' depends on axioms: [propext, Classical.choice, Quot.sound]
+Build completed successfully (3204 jobs).
+lake build exit: 0
+
+$ lake env lean Covenant.lean
+'T1_kernel_rat' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T1_recurrence_rat' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T2_buffer_mono' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T5_threshold' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T7_band' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T8_kelly_rat' depends on axioms: [propext, Classical.choice, Quot.sound]
+Covenant.lean:644:19: warning: This simp argument is unused:
+  List.replicate
+
+Hint: Omit it from the simp argument list.
+  [apply] simp [total]
+
+Note: This linter can be disabled with `set_option linter.unusedSimpArgs false`
+'Vp_endgame' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Vp_cone' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T6_defect_optimal' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T6_coop_optimal' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T6_K_eq_L' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T3.integral_coord' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T3.integral_centered' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T3.centered_mem_Icc' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T3.indep_centered' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T3.T3_species' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T3.T3_individual' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T3.numerical_instance' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Vp_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Vp_dirty_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Vp_count_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Vp_clean_step' depends on axioms: [propext, Classical.choice, Quot.sound]
+'S_zero' depends on axioms: [propext, Classical.choice, Quot.sound]
+'S_succ' depends on axioms: [propext, Classical.choice, Quot.sound]
+'S_one' depends on axioms: [propext, Classical.choice, Quot.sound]
+'S_telescope' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Vp_dirty_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Vp_count_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'Vp_Dbranch_eq' depends on axioms: [propext, Classical.choice, Quot.sound]
+'cone_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'S_nonneg' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T4_domination' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T4_total_nil' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T4_total_cons' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T4_total_nonneg' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T4_unravel_le' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T4_unravel_strict' depends on axioms: [propext, Classical.choice, Quot.sound]
+'T4_surplus' depends on axioms: [propext, Classical.choice, Quot.sound]
+lake env lean exit: 0
+
+Theorem count:
+38
+#print axioms count:
+38
