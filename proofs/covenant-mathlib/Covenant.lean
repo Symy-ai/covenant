@@ -579,6 +579,163 @@ theorem numerical_instance :
   linarith
 end T3
 
+
+-- ================================================================
+-- T4 代际塌约定理（命题 1 的 Lean 化，v1.7 前置落地）
+-- Python 层 t4_unravel（T=50 穷举）的通用化：任意 T 的归纳证明。
+-- 逐轮支付（行=本方行动 a，列=对方行动 o；false=C, true=D）：
+--   CC=3  DC=5  CD=0  DD=1
+-- 数学内核：D 逐轮严格占优（差恰 ≥ 1，精确有理数），且 total 的
+-- 延续项 δ·total as' os' δ 不依赖本轮行动（子博弈唯一性的结构化
+-- ——「延续值独立性」由定义直接保证）⟹ 后向归纳的代数形式：
+-- 对方任意序列下，本方全 D 严格最优（含 C 即严格劣）；
+-- 双方对称时合作剩余恰 3 倍被摧毁（任意 T、任意 δ）。
+-- ================================================================
+
+def pay (a o : Bool) : ℚ :=
+  match a, o with
+  | true,  true  => 1
+  | true,  false => 5
+  | false, true  => 0
+  | false, false => 3
+
+def total (as os : List Bool) (δ : ℚ) : ℚ :=
+  match as, os with
+  | [], _ => 0
+  | _::_, [] => 0
+  | a::as', o::os' => pay a o + δ * total as' os' δ
+
+-- 逐轮严格占优（精确）：D 比 C 至少多 1，无论对方行动
+theorem T4_domination (o : Bool) : pay false o + 1 ≤ pay true o := by
+  cases o <;> unfold pay <;> norm_num
+
+-- total 的结构引理（rfl 展开）
+theorem T4_total_nil (os : List Bool) (δ : ℚ) : total [] os δ = 0 := rfl
+
+theorem T4_total_cons (a o : Bool) (as' os' : List Bool) (δ : ℚ) :
+    total (a::as') (o::os') δ = pay a o + δ * total as' os' δ := rfl
+
+-- 非负性：δ ≥ 0 时 total ≥ 0（支付非负+折现非负）
+theorem T4_total_nonneg : ∀ (as os : List Bool) (δ : ℚ), 0 ≤ δ → 0 ≤ total as os δ := by
+  intro as
+  induction as with
+  | nil =>
+      intro os δ _
+      exact le_of_eq (T4_total_nil os δ).symm
+  | cons a as' ih =>
+      intro os δ hδ
+      cases os with
+      | nil => exact le_of_eq (T4_total_nil (a::as') δ).symm
+      | cons o os' =>
+          rw [T4_total_cons]
+          have h1 : (0:ℚ) ≤ pay a o := by cases a <;> cases o <;> unfold pay <;> norm_num
+          have h2 : (0:ℚ) ≤ total as' os' δ := ih os' δ hδ
+          have h3 : (0:ℚ) ≤ δ * total as' os' δ := mul_nonneg hδ h2
+          linarith
+
+-- 弱主定理（后向归纳的代数形式，非严格版）：
+-- 对方任意序列下，本方全 D 的折现支付 ≥ 任何本方序列
+theorem T4_unravel_le : ∀ (s os : List Bool) (δ : ℚ), 0 ≤ δ →
+    total s os δ ≤ total (List.replicate s.length true) os δ := by
+  intro s
+  induction s with
+  | nil =>
+      intro os δ _
+      simp [total, List.replicate]
+  | cons a s' ih =>
+      intro os δ hδ
+      cases os with
+      | nil =>
+          have e1 : total (a::s') [] δ = 0 := rfl
+          have e2 : total (List.replicate (a::s').length true) [] δ = 0 := rfl
+          rw [e1, e2]
+      | cons o os' =>
+          rw [T4_total_cons]
+          have hrep : List.replicate (a::s').length true
+              = true :: List.replicate s'.length true := by
+              simp [List.replicate_succ]
+          rw [hrep, T4_total_cons]
+          have hdom : pay a o ≤ pay true o := by
+              cases a with
+              | true => rfl
+              | false =>
+                  have h1 : pay false o + 1 ≤ pay true o := T4_domination o
+                  linarith
+          have hrec : total s' os' δ ≤ total (List.replicate s'.length true) os' δ :=
+              ih os' δ hδ
+          have hmul : δ * total s' os' δ
+              ≤ δ * total (List.replicate s'.length true) os' δ :=
+              mul_le_mul_of_nonneg_left hrec hδ
+          linarith
+
+-- 强主定理（唯一性）：δ > 0、双方序列等长、本方含至少一轮 C（false）
+-- ⟹ 全 D 严格占优——「共同知识理性 + 有限视野 ⟹ 唯一理性路径全 D」
+-- 的机器可验证内核（命题 1）
+theorem T4_unravel_strict : ∀ (s os : List Bool) (δ : ℚ), 0 < δ →
+    s.length = os.length → s.any Bool.not →
+    total s os δ < total (List.replicate s.length true) os δ := by
+  intro s
+  induction s with
+  | nil =>
+      intro os δ _ _ hC
+      simp at hC
+  | cons a s' ih =>
+      intro os δ hδ hlen hC
+      cases os with
+      | nil =>
+          exfalso
+          simp [List.length_cons] at hlen
+      | cons o os' =>
+          rw [T4_total_cons]
+          have hrep : List.replicate (a::s').length true
+              = true :: List.replicate s'.length true := by
+              simp [List.replicate_succ]
+          rw [hrep, T4_total_cons]
+          have hlen'' : s'.length = os'.length := by
+              simp [List.length_cons] at hlen
+              omega
+          cases a with
+          | true =>
+              have hC' : s'.any Bool.not := by simpa [List.any_cons] using hC
+              have hrec := ih os' δ hδ hlen'' hC'
+              have hmul : δ * total s' os' δ
+                  < δ * total (List.replicate s'.length true) os' δ :=
+                  mul_lt_mul_of_pos_left hrec hδ
+              have hn1 : (0:ℚ) ≤ total s' os' δ := T4_total_nonneg s' os' δ (le_of_lt hδ)
+              have hn2 : (0:ℚ) ≤ total (List.replicate s'.length true) os' δ :=
+                  T4_total_nonneg _ _ δ (le_of_lt hδ)
+              linarith
+          | false =>
+              have hdom : pay false o + 1 ≤ pay true o := T4_domination o
+              have hle : total s' os' δ ≤ total (List.replicate s'.length true) os' δ :=
+                  T4_unravel_le s' os' δ (le_of_lt hδ)
+              have hmul : δ * total s' os' δ
+                  ≤ δ * total (List.replicate s'.length true) os' δ :=
+                  mul_le_mul_of_nonneg_left hle (le_of_lt hδ)
+              have hnn1 : (0:ℚ) ≤ total s' os' δ := T4_total_nonneg _ _ δ (le_of_lt hδ)
+              have hnn2 : (0:ℚ) ≤ total (List.replicate s'.length true) os' δ :=
+                  T4_total_nonneg _ _ δ (le_of_lt hδ)
+              have hpos : (0:ℚ) < δ := hδ
+              linarith
+
+-- 合作剩余闭式（任意 T、任意 δ，双方对称序列）：
+-- 双方全 C 的折现支付 = 3 × 双方全 D 的折现支付
+-- ——「合作剩余恰 3 倍被摧毁」的通用刻画（Python 层 T=50 特例的一般化）
+theorem T4_surplus (δ : ℚ) : ∀ (T : ℕ),
+    total (List.replicate T false) (List.replicate T false) δ
+      = 3 * total (List.replicate T true) (List.replicate T true) δ := by
+  intro T
+  induction T with
+  | zero => simp [total, List.replicate]
+  | succ T ih =>
+      have hF : List.replicate (T+1) false = false :: List.replicate T false :=
+          List.replicate_succ
+      have hT : List.replicate (T+1) true = true :: List.replicate T true :=
+          List.replicate_succ
+      rw [hF, hT, T4_total_cons, T4_total_cons,
+          show pay false false = (3:ℚ) from rfl, show pay true true = (1:ℚ) from rfl, ih]
+      ring
+
 -- ================================================================
 -- 公理基底终检（mathlib 标准三件套：propext / Classical.choice / Quot.sound）
 -- ================================================================
@@ -608,3 +765,8 @@ end T3
 #print axioms Vp_Dbranch_eq
 #print axioms cone_le
 #print axioms S_nonneg
+#print axioms T4_domination
+#print axioms T4_total_nonneg
+#print axioms T4_unravel_le
+#print axioms T4_unravel_strict
+#print axioms T4_surplus
