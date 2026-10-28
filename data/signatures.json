@@ -1,7 +1,16 @@
 {
-  "generatedAt": "2026-10-28T00:01:52.291Z",
-  "count": 8,
+  "generatedAt": "2026-10-28T02:17:03.666Z",
+  "count": 9,
   "rows": [
+    {
+      "name": "王田苗",
+      "institution": "北京航空航天大学",
+      "role": "教授",
+      "emailHash": "8f0f07bcbd378668",
+      "confirmedAt": "2026-10-28T02:17:02.208Z",
+      "review": "manual-approved",
+      "reviewNote": "北航机构邮箱（buaa.edu.cn）与单位头衔自洽，机构域名排除冒名；邮件已确认。克莱尔审核放行"
+    },
     {
       "name": "谢杭辛",
       "institution": "清华大学心理与认知科学系",
