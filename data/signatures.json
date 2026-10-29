@@ -1,7 +1,14 @@
 {
-  "generatedAt": "2026-10-29T01:15:48.343Z",
-  "count": 10,
+  "generatedAt": "2026-10-29T07:11:09.696Z",
+  "count": 11,
   "rows": [
+    {
+      "name": "温长喜",
+      "institution": "清华大学",
+      "role": "学生",
+      "emailHash": "10a34b7beafd7a62",
+      "confirmedAt": "2026-10-29T03:55:28.120Z"
+    },
     {
       "name": "唐若潇",
       "institution": "",
