@@ -1,9 +1,10 @@
 {
   "name": "唐若潇",
-  "institution": "",
-  "role": "",
+  "institution": "北京大学",
+  "role": "学生",
   "emailHash": "fd3e79bfa5d602bf",
   "confirmedAt": "2026-10-28T02:17:11.054Z",
-  "review": "manual-approved",
-  "reviewNote": "普通个人签名（qq 邮箱、无单位头衔、非敏感组合），邮件已确认，非乱码非冒名。克莱尔审核放行"
+  "updatedAt": "2026-10-29T07:29:50.467Z",
+  "review": "manual-approved-resign",
+  "reviewNote": "重签补信息（北京大学/学生，qq邮箱普通个人），邮件已确认入队。克莱尔审核放行"
 }
