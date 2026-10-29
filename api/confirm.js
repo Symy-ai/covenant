@@ -134,9 +134,20 @@ export default async function handler(req, res) {
           ...(prev ? { updatedAt: new Date().toISOString() } : {}),
         },
         `verified${prev ? "-resign" : ""}: ${data.name} (${emailHash})`,
+        // ⭐ 更新已存在文件必须带 sha（Contents API 422 规则）。
+        // 1029 生产实锤（杨雯琦重签）：resign 合并写漏传 sha → GitHub 422 →
+        // ghPut throw（仅豁免 409）→ 用户确认页报「系统繁忙」。
+        // 首签（无 verified）是新文件，不带 sha。
+        already ? { sha: already.sha } : {},
       );
       // 令牌墓碑：重复打开已确认链接时回显结果，不再误报"链接已失效"
-      await ghPut(`signatures/tokens/${token}.json`, { emailHash, result: "auto", confirmedAt: new Date().toISOString() }, `token-tombstone: ${emailHash}`);
+      // 幂等守卫（与 manual 路径同款）：pending 删除前的重放窗口内重复点击 →
+      // 墓碑已存在 → 不带 sha 的 PUT 返 422 → throw → error 页。已存在则跳过。
+      let tombExistsAuto = false;
+      try { tombExistsAuto = !!(await ghGet(`signatures/tokens/${token}.json`)); } catch (_) { /* 读失败按不存在处理 */ }
+      if (!tombExistsAuto) {
+        await ghPut(`signatures/tokens/${token}.json`, { emailHash, result: "auto", confirmedAt: new Date().toISOString() }, `token-tombstone: ${emailHash}`);
+      }
       await ghDelete(`signatures/pending/${fileName}`, rec.sha, `confirm: ${emailHash}`);
       await track(emailHash, "covenant_confirm_success", { level: "auto" });
       return res.redirect(302, redirect("ok", req.query.lang, emailHash));

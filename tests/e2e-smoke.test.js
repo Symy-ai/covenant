@@ -464,6 +464,8 @@ test("confirm: auto 路径 → 302 ok + 写 verified + 删 pending + 写令牌�
   assert.equal(verified[0].args[1].emailHash, HASH);
   assert.equal(verified[0].args[1].name, "Ada");
   assert.ok(verified[0].args[1].confirmedAt, "verified 记录须带确认时间");
+  // 首签=新文件：不得带 sha（Contents API 对不存在文件带 sha 的 PUT 返 422）
+  assert.equal(verified[0].args[3].sha, undefined, "首签新文件不得带 sha");
 
   const dels = calls.filter((c) => c.fn === "ghDelete");
   assert.equal(dels.length, 1, "auto 必须删掉 pending");
@@ -710,6 +712,9 @@ test("confirm: resign pending + 已 verified → 不判 duplicate（manual=带�
   assert.equal(verified[0].args[1].confirmedAt, "2026-09-01T00:00:00.000Z", "原签名日期保留");
   assert.ok(verified[0].args[1].updatedAt, "须记 updatedAt");
   assert.match(verified[0].args[2], /^verified-resign: /);
+  // 1029 生产实锤回归：resign 合并写更新已存在文件必须带 sha（Contents API 422）
+  // 注：桩收到的是 lib/github.js 归一后的 opts（{branch:'main', sha}），断言只看 sha
+  assert.equal(verified[0].args[3].sha, "v1", "更新已有 verified 必须带 sha（漏传=422=系统繁忙）");
 });
 
 test("confirm: resign 队列已存在（重复点击确认链接）→ 幂等跳过，不再 PUT", async () => {
