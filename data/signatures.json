@@ -1,7 +1,16 @@
 {
-  "generatedAt": "2026-11-08T02:16:34.136Z",
-  "count": 11,
+  "generatedAt": "2026-11-08T02:29:11.591Z",
+  "count": 12,
   "rows": [
+    {
+      "name": "张翔",
+      "institution": "",
+      "role": "",
+      "emailHash": "029128a7b52d2d2c",
+      "confirmedAt": "2026-11-08T02:29:10.020Z",
+      "review": "manual-approved",
+      "reviewNote": "团队成员（投资人版团队页，AI工程线），邮件已确认。克莱尔审核放行"
+    },
     {
       "name": "温长喜",
       "institution": "清华大学",
