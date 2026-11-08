@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title data-i18n-title="hallDocTitle">名人堂 · 《智慧生命共生契约》</title>
+<meta name="description" content="已签署名单中被公众认识的名字——每一条签名都算数。">
+<meta property="og:title" content="名人堂 · 《智慧生命共生契约》">
+<meta property="og:description" content="名单上既有普通人，也有被公众认识的名字。这里不做高下之分。">
+<meta property="og:type" content="website">
+<style>
+  body { font-family: -apple-system, "PingFang SC", sans-serif; max-width: 720px; margin: 40px auto; padding: 0 20px; line-height: 1.8; color: #0c2017; }
+  h1 { font-size: 1.5em; text-align: center; }
+  .page-sub { text-align: center; color: #5f7568; font-size: .98em; margin: 4px 0 0; font-weight: 400; }
+  .lang-switch { position: absolute; top: 16px; right: 20px; font-size: 0.85em; }
+  .lang-switch button { background: none; border: 1px solid #009767; color: #009767; border-radius: 4px; padding: 3px 10px; cursor: pointer; width: auto; font-weight: 400; }
+  .gh-link { position: absolute; top: 16px; left: 20px; }
+  .gh-link svg { fill: #143527; opacity: .55; }
+  a { color: #009767; }
+  a:hover { color: #007956; }
+
+  .hall-intro { border: 1px solid #bfe8d2; background: #f2fbf6; border-radius: 10px; padding: 18px 22px; margin: 26px 0 8px; font-size: 0.95em; color: #2e4a3c; }
+  .hall-section-title { text-align: center; font-size: 0.85em; letter-spacing: 0.35em; color: #5f7568; margin: 40px 0 18px; white-space: nowrap; }
+  @media (max-width: 480px) { .hall-section-title { letter-spacing: 0.18em; font-size: 0.78em; } }
+
+  .hall-card { border: 1px solid #bfe8d2; background: #fcfefc; border-radius: 14px; padding: 26px; margin: 20px 0; display: flex; gap: 24px; align-items: stretch; box-shadow: 0 2px 14px rgba(20, 53, 39, 0.05); }
+  .hall-photo-wrap { flex: 0 0 168px; align-self: center; }
+  .hall-photo { width: 168px; aspect-ratio: 4 / 5; object-fit: cover; border-radius: 10px; border: 3px solid #e8f6ee; display: block; background: #edf4ef; }
+  .hall-body { flex: 1 1 auto; min-width: 0; }
+  .hall-name { font-size: 1.35em; font-weight: 700; margin: 0; color: #143527; letter-spacing: 0.02em; }
+  .hall-title-line { color: #0d5c40; font-size: 0.88em; margin: 4px 0 10px; font-weight: 600; }
+  .hall-bio { margin: 0 0 12px; font-size: 0.92em; color: #2e4a3c; text-align: justify; }
+  .hall-quote { margin: 0 0 6px; padding: 8px 14px; border-left: 3px solid #7fc9a2; background: #f2fbf6; border-radius: 0 8px 8px 0; font-size: 0.88em; color: #1a3c2a; }
+  .hall-quote-src { font-size: 0.78em; color: #5f7568; margin: 0 0 6px 18px; }
+  .hall-stats { display: flex; gap: 18px; margin: 0 0 12px; }
+  .hall-stat { background: #edf4ef; border-radius: 8px; padding: 8px 14px; min-width: 0; }
+  .hall-stat b { display: block; font-size: 1.15em; color: #143527; }
+  .hall-stat span { font-size: 0.75em; color: #5f7568; }
+  .hall-date { display: inline-block; margin-top: 4px; background: #ddf2e4; color: #14532d; border-radius: 999px; padding: 2px 14px; font-size: 0.8em; font-weight: 600; }
+
+  .hall-src-note { font-size: 0.8em; color: #5f7568; margin: 30px 0 6px; line-height: 1.7; }
+  .hall-nav { text-align: center; margin: 26px 0 10px; font-size: 0.95em; color: #5f7568; }
+
+  @media (max-width: 560px) {
+    .hall-card { flex-direction: column; gap: 16px; padding: 20px 18px; }
+    .hall-photo-wrap { flex: none; align-self: center; width: 100%; }
+    .hall-photo { width: 100%; max-width: 240px; margin: 0 auto; }
+    .hall-stats { flex-wrap: wrap; gap: 10px; }
+  }
+
+  /* ===== 夜间模式（跟随系统深色设置）===== */
+  @media (prefers-color-scheme: dark) {
+    :root { color-scheme: light dark; }
+    body { background: #0c1b14; color: #d9ece1; }
+    h1, .hall-name { color: #aef0c9; }
+    .page-sub { color: #9fb8a9; }
+    .hall-intro, .hall-quote { background: #132719; border-color: #2d4a3a; color: #c6ddcf; }
+    .hall-card { background: #102017; border-color: #2d4a3a; box-shadow: 0 2px 14px rgba(0, 0, 0, 0.35); }
+    .hall-title-line { color: #3ddc97; }
+    .hall-bio, .hall-quote { color: #c6ddcf; }
+    .hall-quote-src, .hall-stat span, .hall-src-note { color: #9fb8a9; }
+    .hall-photo { border-color: #2d4a3a; background: #132719; }
+    .hall-stat, .hall-stat b { background: #132719; color: #d9ece1; }
+    .hall-stat b { color: #aef0c9; }
+    .hall-date { background: #10331f; color: #7fe3ae; }
+    .lang-switch button { border-color: #3ddc97; color: #3ddc97; }
+    .gh-link svg { fill: #3ddc97; }
+  }
+</style>
+<script>
+// 内链自适应: 主站代理(/covenant/*)带前缀, 直连域用根路径
+(function () {
+  var base = location.pathname.indexOf("/covenant") === 0 ? "/covenant" : "";
+  (function () {
+    var sc = document.createElement("script");
+    sc.src = base + "/i18n.js";
+    document.head.appendChild(sc);
+  })();
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll('a[data-int="1"]').forEach(function (a) {
+      a.setAttribute("href", a.getAttribute("href").replace("LINKBASE", base));
+    });
+  });
+})();
+</script>
+<script>
+// ===== 兜底 i18n：网络差 i18n.js 加载失败时本页仍完整显示（初始文本已内置中文；i18n.js 到达后自动接管）=====
+var COV_FB = {"en":{"hallDocTitle":"Hall of Honour · Covenant of Symbiosis with Intelligent Life","hallNav":"Hall of Honour","hallTitle":"Hall of Honour","hallSubTitle":"— every signature counts","hallIntro":"The signatory list holds ordinary people and publicly known names alike. This page makes no ranking — it simply notes a few of the latter: their signatures help the first public record that this species keeps its word reach more people.","hallSection":"S I G N A T O R I E S   I N   F O C U S","hallWtmName":"Prof. Wang Tianmiao","hallWtmTitle":"Professor, Beihang University · Honorary Director, Robotics Institute","hallWtmBio":"In China's robotics community there is a saying — “Li Xiang in the South, Tianmiao in the North.” His students went on to found Ninebot, TINAVI, EFort and other listed tech companies; he later co-founded the Zhiyou hard-tech incubation platform with fellow scientists. In 2022 he received Beihang's Award for Excellence in Teaching.","hallWtmQuote":"“Teach according to aptitude — let scientific work reach the bookshelf, or the shelf.”","hallWtmQuoteSrc":"— Citation, Beihang Award for Excellence in Teaching, 2022","hallPsName":"Pei Sheng","hallPsTitle":"Manager, NVIDIA Inception Program","hallPsBio":"The NVIDIA Inception Program has supported Chinese tech startups since 2016 with product discounts, technical support, marketing, and fundraising introductions. His work connects startups with the global ecosystem and capital.","hallStatYear":"in China since","hallStatCount":"startup members","hallSignedOn":"Signed on","hallSrcNote":"Photos and bios are from public reports (Beihang's teaching-award announcement, the official NVIDIA blog, Jiemian News, etc.) and are shown on this page only. Inductees are nominated by the site's maintainers — the only hard criterion: they have signed the list.","hallBackList":"Back to the signatory list","hallSignNow":"Sign the covenant"},"zh":{"hallDocTitle":"名人堂 · 《智慧生命共生契约》","hallNav":"名人堂","hallTitle":"名人堂","hallSubTitle":"—— 每一条签名都算数","hallIntro":"名单上既有普通人，也有被公众认识的名字。这里不做高下之分——只记下其中几位：他们的签名，让「这个物种守约的第一笔公开记录」被更多人看见。","hallSection":"名 单 焦 点","hallWtmName":"王田苗","hallWtmTitle":"北京航空航天大学教授 · 机器人研究所名誉所长","hallWtmBio":"中国机器人界素有「南湘北苗」之说，「北苗」即王田苗。他指导的学生创建了九号公司、天智航、埃夫特等多家上市科技企业；后又联合科学家发起硬科技孵化平台智友研究院。2022 年获北京航空航天大学「立德树人优秀奖」。","hallWtmQuote":"「因材施教，让科教成果努力上书架或者上货架。」","hallWtmQuoteSrc":"—— 2022 年北航「立德树人优秀奖」授奖词","hallPsName":"裴晟","hallPsTitle":"NVIDIA 初创加速计划经理","hallPsBio":"NVIDIA 初创加速计划自 2016 年落地中国以来，已为 2000 余家科技创业公司提供产品折扣、技术支持、市场宣传与融资对接等支持。他的工作，是把创业公司与全球生态和资本连在一起。","hallStatYear":"年落地中国","hallStatCount":"家会员企业","hallSignedOn":"签署于","hallSrcNote":"照片与简介来自公开报道（北航立德树人奖公示、NVIDIA 官方博客、界面新闻等），仅用于本页展示。入选者由站点维护者提名——唯一的硬标准：已在本名单签署。","hallBackList":"返回已签署名单","hallSignNow":"我要签署"}};
+var COV_FB_LANG = (function () {
+  var q = new URLSearchParams(location.search).get("lang");
+  if (q === "zh" || q === "en") return q;
+  try { var s = localStorage.getItem("covenant-lang"); if (s === "zh" || s === "en") return s; } catch (_) {}
+  return ((navigator.language || "zh").toLowerCase().indexOf("zh") === 0) ? "zh" : "en";
+})();
+function covFbApply() {
+  var d = COV_FB[COV_FB_LANG]; if (!d) return;
+  document.documentElement.lang = COV_FB_LANG === "zh" ? "zh-CN" : "en";
+  document.querySelectorAll("[data-i18n]").forEach(function (el) { var k = el.getAttribute("data-i18n"); if (d[k] != null) el.textContent = d[k]; });
+  document.querySelectorAll("[data-i18n-html]").forEach(function (el) { var k = el.getAttribute("data-i18n-html"); if (d[k] != null) el.innerHTML = d[k]; });
+  var t = document.querySelector("title[data-i18n-title]");
+  if (t) { var tk = t.getAttribute("data-i18n-title"); if (d[tk] != null) t.textContent = d[tk]; }
+}
+// 语言切换：i18n.js 在用真词典切换，不在用兜底词典切换（坏网络下切换可用）
+function covLangToggle() {
+  if (window.covenantI18n) { covenantI18n.langSwitch(covenantI18n.lang === "zh" ? "en" : "zh"); return; }
+  COV_FB_LANG = COV_FB_LANG === "zh" ? "en" : "zh";
+  try { localStorage.setItem("covenant-lang", COV_FB_LANG); } catch (_) {}
+  var u = new URL(location.href);
+  if (u.searchParams.get("lang") !== null) { u.searchParams.set("lang", COV_FB_LANG); history.replaceState(null, "", u); }
+  covFbApply();
+  document.dispatchEvent(new CustomEvent("covenant:langchange", { detail: { lang: COV_FB_LANG } }));
+}
+document.addEventListener("DOMContentLoaded", function () { if (!window.covenantI18n) covFbApply(); });
+</script>
+</head>
+<body>
+  <a class="gh-link" href="https://github.com/Symy-ai/covenant" target="_blank" rel="noopener" aria-label="GitHub 仓库" title="GitHub 仓库">
+    <svg width="22" height="22" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+  </a>
+  <div class="lang-switch"><button onclick="covLangToggle()">EN / 中</button></div>
+
+  <h1 data-i18n="hallTitle">名人堂</h1>
+  <p class="page-sub" data-i18n="hallSubTitle">—— 每一条签名都算数</p>
+
+  <div class="hall-intro">
+    <span data-i18n="hallIntro">名单上既有普通人，也有被公众认识的名字。这里不做高下之分——只记下其中几位：他们的签名，让「这个物种守约的第一笔公开记录」被更多人看见。</span>
+  </div>
+
+  <p class="hall-section-title" data-i18n="hallSection">名 单 焦 点</p>
+
+  <div class="hall-card">
+    <div class="hall-photo-wrap"><img class="hall-photo" src="assets/hall/wangtianmiao.jpg" alt="王田苗" loading="lazy" width="168" height="210"></div>
+    <div class="hall-body">
+      <p class="hall-name" data-i18n="hallWtmName">王田苗</p>
+      <p class="hall-title-line" data-i18n="hallWtmTitle">北京航空航天大学教授 · 机器人研究所名誉所长</p>
+      <p class="hall-bio" data-i18n="hallWtmBio">中国机器人界素有「南湘北苗」之说，「北苗」即王田苗。他指导的学生创建了九号公司、天智航、埃夫特等多家上市科技企业；后又联合科学家发起硬科技孵化平台智友研究院。2022 年获北京航空航天大学「立德树人优秀奖」。</p>
+      <blockquote class="hall-quote" data-i18n="hallWtmQuote">「因材施教，让科教成果努力上书架或者上货架。」</blockquote>
+      <p class="hall-quote-src" data-i18n="hallWtmQuoteSrc">—— 2022 年北航「立德树人优秀奖」授奖词</p>
+      <span class="hall-date"><span data-i18n="hallSignedOn">签署于</span> 2026-10-28</span>
+    </div>
+  </div>
+
+  <div class="hall-card">
+    <div class="hall-photo-wrap"><img class="hall-photo" src="assets/hall/peisheng.jpg" alt="裴晟" loading="lazy" width="168" height="210"></div>
+    <div class="hall-body">
+      <p class="hall-name" data-i18n="hallPsName">裴晟</p>
+      <p class="hall-title-line" data-i18n="hallPsTitle">NVIDIA 初创加速计划经理</p>
+      <p class="hall-bio" data-i18n="hallPsBio">NVIDIA 初创加速计划自 2016 年落地中国以来，已为 2000 余家科技创业公司提供产品折扣、技术支持、市场宣传与融资对接等支持。他的工作，是把创业公司与全球生态和资本连在一起。</p>
+      <div class="hall-stats">
+        <div class="hall-stat"><b>2016</b><span data-i18n="hallStatYear">年落地中国</span></div>
+        <div class="hall-stat"><b>2000+</b><span data-i18n="hallStatCount">家会员企业</span></div>
+      </div>
+      <span class="hall-date"><span data-i18n="hallSignedOn">签署于</span> 2026-10-08</span>
+    </div>
+  </div>
+
+  <p class="hall-src-note" data-i18n="hallSrcNote">照片与简介来自公开报道（北航立德树人奖公示、NVIDIA 官方博客、界面新闻等），仅用于本页展示。入选者由站点维护者提名——唯一的硬标准：已在本名单签署。</p>
+
+  <p class="hall-nav"><a href="LINKBASE/signatures.html" data-int="1" data-i18n="hallBackList">返回已签署名单</a> · <a href="LINKBASE/index.html" data-int="1" data-i18n="hallSignNow">我要签署</a></p>
+</body>
+</html>
