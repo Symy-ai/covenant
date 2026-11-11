@@ -1,15 +1,16 @@
 {
-  "generatedAt": "2026-11-11T10:56:29.727Z",
+  "generatedAt": "2026-11-11T14:32:10.350Z",
   "count": 15,
   "rows": [
     {
       "name": "刘雪伟",
       "institution": "中国科学院大学",
-      "role": "",
+      "role": "学生",
       "emailHash": "31fbf1ec25dc54e0",
       "confirmedAt": "2026-11-08T02:29:25.413Z",
       "review": "manual-approved",
-      "reviewNote": "普通个人签名（国科大学生，qq邮箱+机构无头衔，非冒名组合），邮件已确认。克莱尔审核放行"
+      "reviewNote": "普通个人签名（国科大学生，qq邮箱+机构无头衔，非冒名组合），邮件已确认。克莱尔审核放行",
+      "updatedAt": "2026-11-11T14:30:00.000Z"
     },
     {
       "name": "刘艺",
